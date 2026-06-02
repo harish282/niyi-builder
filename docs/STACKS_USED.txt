@@ -1,0 +1,16 @@
+React
+TypeScript
+Vite
+
+Core Libraries
+├── Zustand
+├── dnd-kit
+├── Lexical
+├── Radix UI
+├── Lucide
+└── Tailwind (Editor Only)
+
+WordPress
+├── Gutenberg APIs
+├── Block APIs
+└── Data APIs
