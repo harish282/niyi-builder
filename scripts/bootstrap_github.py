@@ -80,20 +80,11 @@ class IssueSpec:
 
 
 def default_body(draft_id: int, depends: list[int], issue_map: dict[int, int]) -> str:
-    lines = [
-        f"Tracked from [docs/EXECUTION_PLAN.md](https://github.com/{REPO}/blob/main/docs/EXECUTION_PLAN.md) (draft #{draft_id}).",
-        "",
-    ]
-    if depends:
-        refs = ", ".join(f"#{issue_map[d]}" for d in depends if d in issue_map)
-        if refs:
-            lines.append(f"**Depends on:** {refs}")
-            lines.append("")
-    lines.append("## Acceptance criteria")
-    lines.append("- [ ] Implementation complete")
-    lines.append("- [ ] Tests or manual verification documented")
-    lines.append("- [ ] Linked PR references this issue")
-    return "\n".join(lines)
+    from issue_bodies import ISSUE_CONTENT, build_body
+
+    if draft_id not in ISSUE_CONTENT:
+        raise KeyError(f"No body content for draft_id={draft_id}")
+    return build_body(draft_id, depends, issue_map)
 
 
 ISSUES: list[IssueSpec] = [
