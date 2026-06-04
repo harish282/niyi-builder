@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/harish282/niyi-builder/schemas/layout-v0.json",
+  "title": "Niyi Builder layout document v0",
+  "description": "Internal JSON model for the Gutenberg visual builder. TypeScript source of truth: packages/core.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "root"],
+  "properties": {
+    "version": {
+      "const": 0,
+      "description": "Schema version; bump when breaking the document shape."
+    },
+    "root": {
+      "$ref": "#/$defs/blockNode",
+      "description": "Must be a niyi/container block."
+    }
+  },
+  "$defs": {
+    "blockType": {
+      "type": "string",
+      "enum": [
+        "niyi/container",
+        "niyi/grid",
+        "niyi/spacer",
+        "niyi/heading",
+        "niyi/text",
+        "niyi/button",
+        "niyi/image",
+        "niyi/icon",
+        "niyi/video",
+        "niyi/form",
+        "niyi/form-field-name",
+        "niyi/form-field-text",
+        "niyi/form-field-email",
+        "niyi/form-field-phone",
+        "niyi/form-field-number",
+        "niyi/form-field-textarea",
+        "niyi/form-field-select",
+        "niyi/form-field-checkbox",
+        "niyi/form-field-radio",
+        "niyi/form-field-submit"
+      ]
+    },
+    "blockNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "attributes", "children"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique id within the document."
+        },
+        "type": { "$ref": "#/$defs/blockType" },
+        "attributes": {
+          "type": "object",
+          "description": "Block-specific settings; see packages/core schema/attributes.ts."
+        },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/blockNode" },
+          "description": "Child blocks; must be [] for leaf types (spacer, content, form fields)."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@niyi-builder/serializer",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@niyi-builder/core": "0.0.0",
+    "@wordpress/block-serialization-default-parser": "^5.28.0"
+  },
+  "files": [
+    "dist"
+  ]
+}

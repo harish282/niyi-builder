@@ -1,0 +1,15 @@
+.niyi-builder-app {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1d2327;
+}
+
+.niyi-builder-app__lead {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+.niyi-builder-app__meta {
+  margin: 0;
+  color: #50575e;
+}

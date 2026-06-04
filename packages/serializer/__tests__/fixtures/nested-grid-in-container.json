@@ -1,0 +1,66 @@
+{
+  "version": 0,
+  "root": {
+    "id": "root",
+    "type": "niyi/container",
+    "attributes": {},
+    "children": [
+      {
+        "id": "outer-grid",
+        "type": "niyi/grid",
+        "attributes": {
+          "columns": { "desktop": 3 },
+          "rows": { "desktop": 1 }
+        },
+        "children": [
+          {
+            "id": "column-container-a",
+            "type": "niyi/container",
+            "attributes": { "padding": { "desktop": "16px" } },
+            "children": [
+              {
+                "id": "inner-grid-a",
+                "type": "niyi/grid",
+                "attributes": { "columns": { "desktop": 2 }, "gap": { "desktop": "12px" } },
+                "children": [
+                  {
+                    "id": "spacer-a1",
+                    "type": "niyi/spacer",
+                    "attributes": { "height": { "desktop": "16px" } },
+                    "children": []
+                  },
+                  {
+                    "id": "spacer-a2",
+                    "type": "niyi/spacer",
+                    "attributes": { "height": { "desktop": "24px" } },
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "column-container-b",
+            "type": "niyi/container",
+            "attributes": { "margin": { "desktop": "0 auto" } },
+            "children": [
+              {
+                "id": "inner-container-b",
+                "type": "niyi/container",
+                "attributes": { "background": "#ffffff" },
+                "children": [
+                  {
+                    "id": "spacer-b",
+                    "type": "niyi/spacer",
+                    "attributes": { "height": { "desktop": "48px" } },
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

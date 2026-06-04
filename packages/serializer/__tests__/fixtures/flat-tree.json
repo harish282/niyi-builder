@@ -1,0 +1,48 @@
+{
+  "version": 0,
+  "root": {
+    "id": "root",
+    "type": "niyi/container",
+    "attributes": {
+      "maxWidth": "1200px"
+    },
+    "children": [
+      {
+        "id": "hero-heading",
+        "type": "niyi/heading",
+        "attributes": {
+          "level": 1,
+          "content": "Welcome"
+        },
+        "children": []
+      },
+      {
+        "id": "hero-text",
+        "type": "niyi/text",
+        "attributes": {
+          "content": "Build pages with native Gutenberg blocks."
+        },
+        "children": []
+      },
+      {
+        "id": "hero-cta",
+        "type": "niyi/button",
+        "attributes": {
+          "label": "Get started",
+          "url": "https://example.com"
+        },
+        "children": []
+      },
+      {
+        "id": "hero-spacer",
+        "type": "niyi/spacer",
+        "attributes": {
+          "height": {
+            "desktop": "32px"
+          }
+        },
+        "children": []
+      }
+    ]
+  }
+}
