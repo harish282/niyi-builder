@@ -1,0 +1,171 @@
+.niyi-editor {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 32px);
+  background: #f0f0f1;
+  color: #1d2327;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.niyi-editor__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  min-height: 48px;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  border-bottom: 1px solid #c3c4c7;
+}
+
+.niyi-editor__toolbar-start,
+.niyi-editor__toolbar-end {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.niyi-editor__toolbar-end {
+  justify-content: flex-end;
+}
+
+.niyi-editor__toolbar-center {
+  display: flex;
+  justify-content: center;
+}
+
+.niyi-editor__brand {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.niyi-editor__device-switcher {
+  display: inline-flex;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.niyi-editor__device-btn {
+  margin: 0;
+  padding: 0.35rem 0.75rem;
+  border: 0;
+  border-right: 1px solid #c3c4c7;
+  background: #f6f7f7;
+  color: #50575e;
+  font-size: 12px;
+  cursor: not-allowed;
+}
+
+.niyi-editor__device-btn:last-child {
+  border-right: 0;
+}
+
+.niyi-editor__device-btn.is-active {
+  background: #2271b1;
+  color: #fff;
+}
+
+.niyi-editor__btn {
+  margin: 0;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  background: #f6f7f7;
+  color: #50575e;
+  font-size: 13px;
+  cursor: not-allowed;
+}
+
+.niyi-editor__btn--primary {
+  border-color: #2271b1;
+  background: #2271b1;
+  color: #fff;
+}
+
+.niyi-editor__canvas-wrap {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  padding: 1rem;
+}
+
+.niyi-editor__canvas {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-height: 0;
+  overflow: auto;
+}
+
+.niyi-editor__canvas-inner {
+  width: 100%;
+  max-width: 1200px;
+  min-height: 480px;
+  padding: 2rem;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px), #fff;
+  background-size: 24px 24px;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.niyi-editor__canvas[data-device='tablet'] .niyi-editor__canvas-inner {
+  max-width: 768px;
+}
+
+.niyi-editor__canvas[data-device='mobile'] .niyi-editor__canvas-inner {
+  max-width: 375px;
+}
+
+.niyi-editor__canvas-empty {
+  margin: 0 0 1rem;
+  font-weight: 600;
+}
+
+.niyi-editor__canvas-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem 1.5rem;
+  margin: 0;
+}
+
+.niyi-editor__canvas-meta dt {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #646970;
+}
+
+.niyi-editor__canvas-meta dd {
+  margin: 0.15rem 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+
+@media (max-width: 782px) {
+  .niyi-editor {
+    min-height: calc(100vh - 46px);
+  }
+
+  .niyi-editor__toolbar {
+    flex-wrap: wrap;
+  }
+
+  .niyi-editor__toolbar-start,
+  .niyi-editor__toolbar-center,
+  .niyi-editor__toolbar-end {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+  }
+
+  .niyi-editor__toolbar-center {
+    order: 3;
+  }
+}

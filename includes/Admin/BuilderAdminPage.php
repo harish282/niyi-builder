@@ -11,7 +11,19 @@ final class BuilderAdminPage
     public function register(): void
     {
         add_action('admin_menu', [$this, 'registerMenu']);
+        add_filter('admin_body_class', [$this, 'filterAdminBodyClass']);
         (new AdminAssetRegistrar())->register();
+    }
+
+    public function filterAdminBodyClass(string $classes): string
+    {
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+
+        if ($screen !== null && $screen->id === 'toplevel_page_' . self::MENU_SLUG) {
+            return $classes . ' niyi-builder-editor-screen';
+        }
+
+        return $classes;
     }
 
     public function registerMenu(): void
@@ -38,9 +50,6 @@ final class BuilderAdminPage
         if (!is_readable($viewPath)) {
             wp_die(esc_html__('Builder view could not be loaded.', 'niyi-builder'));
         }
-
-        /** @var string $pageTitle */
-        $pageTitle = __('Visual Builder', 'niyi-builder');
 
         require $viewPath;
     }

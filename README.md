@@ -38,6 +38,8 @@ npm run dev          # Vite HMR for admin/ (port 5173)
 npm test
 npm run lint         # TypeScript + ESLint + Prettier check
 npm run format       # Prettier write
+npm run release      # build + production zip in build/
+npm run release:dev  # build + copy to wp-content/plugins/niyi-builder
 ```
 
 Editor settings: `.editorconfig` and `.vscode/settings.json` (format on save + ESLint fix).

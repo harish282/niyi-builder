@@ -1,14 +1,20 @@
-.niyi-builder-admin__canvas {
-  margin-top: 1rem;
-  padding: 2rem;
-  background: #fff;
-  border: 1px solid #c3c4c7;
-  border-radius: 4px;
-  min-height: 320px;
+/* Full-width builder screen within wp-admin (see BuilderAdminPage::filterAdminBodyClass). */
+
+body.niyi-builder-editor-screen #wpcontent {
+  padding-left: 0;
 }
 
-.niyi-builder-admin__placeholder {
+body.niyi-builder-editor-screen #wpbody-content {
+  padding-bottom: 0;
+}
+
+body.niyi-builder-editor-screen .niyi-builder-admin__root {
   margin: 0;
-  color: #50575e;
-  font-size: 14px;
+  min-height: calc(100vh - 32px);
+}
+
+@media screen and (max-width: 782px) {
+  body.niyi-builder-editor-screen .niyi-builder-admin__root {
+    min-height: calc(100vh - 46px);
+  }
 }

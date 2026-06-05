@@ -27,6 +27,7 @@ export default defineConfig(({ command }) => ({
   resolve: {
     alias: {
       '@niyi-builder/core': resolve(__dirname, 'packages/core/src/index.ts'),
+      '@niyi-builder/editor': resolve(__dirname, 'packages/editor/src/index.ts'),
     },
   },
   server: {

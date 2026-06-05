@@ -5,12 +5,13 @@
 # Ships readme.txt and license.txt (required for WordPress.org).
 #
 # Usage (from repo root):
-#   bash scripts/build-release-zip.sh dev
+#   npm run release
+#     Build production assets and write ./build/niyi-builder-x.y.z.zip
+#   npm run release:dev
 #     Copy runtime files to ../plugins/niyi-builder (local WordPress plugins dir).
+#   bash scripts/build-release-zip.sh dev
 #   bash scripts/build-release-zip.sh prod
-#     Build a distribution zip in ./build (default).
 #   bash scripts/build-release-zip.sh prod /path/to/output-dir
-#     Build zip in a custom output directory.
 #
 # Legacy (prod with custom output dir, mode omitted):
 #   bash scripts/build-release-zip.sh /path/to/output-dir
@@ -56,7 +57,7 @@ if [[ -z "$VERSION" ]]; then
 fi
 
 ensure_built() {
-  if [[ -f "$ROOT/build/manifest.json" ]]; then
+  if [[ -f "$ROOT/build/manifest.json" && -f "$ROOT/build/admin.js" ]]; then
     return 0
   fi
 
@@ -65,10 +66,22 @@ ensure_built() {
     (cd "$ROOT" && npm run build)
   fi
 
-  if [[ ! -f "$ROOT/build/manifest.json" ]]; then
-    echo "error: build/manifest.json missing; run npm run build" >&2
+  if [[ ! -f "$ROOT/build/manifest.json" || ! -f "$ROOT/build/admin.js" ]]; then
+    echo "error: build output missing; run npm run build" >&2
     exit 1
   fi
+}
+
+# WordPress.org readme Stable tag should match the plugin header version.
+sync_readme_version() {
+  local dest="$1"
+  local readme="$dest/readme.txt"
+
+  if [[ ! -f "$readme" ]]; then
+    return 0
+  fi
+
+  sed -i "s/^Stable tag: .*/Stable tag: $VERSION/" "$readme"
 }
 
 # Whitelist: only paths required at runtime (plus operator docs).
@@ -87,6 +100,11 @@ copy_required() {
   local dest="$1"
   local rel="$2"
   if [[ ! -e "$ROOT/$rel" ]]; then
+    if [[ "$rel" == "license.txt" && -e "$ROOT/LICENSE" ]]; then
+      echo "warning: license.txt missing; copying LICENSE as fallback" >&2
+      cp -a "$ROOT/LICENSE" "$dest/license.txt"
+      return 0
+    fi
     echo "error: required release file missing: $rel" >&2
     exit 1
   fi
@@ -116,6 +134,11 @@ stage_plugin_to() {
   # Required for WordPress.org (readme parser, GPL distribution). Only readme.txt at plugin root (Plugin Check).
   copy_required "$dest" "readme.txt"
   copy_required "$dest" "license.txt"
+
+  sync_readme_version "$dest"
+
+  # Production bundles only — drop source maps if present.
+  find "$dest/build" -name '*.map' -delete 2>/dev/null || true
 
   # Drop legacy paths removed from source (cp -a does not delete stale deploy files).
   rm -rf \

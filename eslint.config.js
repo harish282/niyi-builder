@@ -39,7 +39,7 @@ export default tseslint.config(
     extends: [tseslint.configs.disableTypeChecked],
   },
   {
-    files: ['admin/**/*.{ts,tsx}'],
+    files: ['admin/**/*.{ts,tsx}', 'packages/editor/**/*.{ts,tsx}'],
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
