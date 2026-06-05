@@ -15,7 +15,7 @@
     "dev": "vite",
     "test": "vitest run",
     "lint": "npm run lint:types && npm run lint:eslint && npm run format:check",
-    "lint:types": "tsc -b --noEmit && tsc --noEmit -p tsconfig.admin.json",
+    "lint:types": "tsc -b && tsc --noEmit -p tsconfig.admin.json",
     "lint:eslint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
