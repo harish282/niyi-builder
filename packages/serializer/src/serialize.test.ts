@@ -43,8 +43,8 @@ describe('serializeToGutenberg', () => {
     expect(markup).toContain('<!-- wp:paragraph');
     expect(markup).toContain('<!-- wp:button');
     expect(markup).toContain('<!-- wp:spacer');
-    expect(markup).toContain('"niyi"');
-    expect(markup).toContain('"maxWidth":"1200px"');
+    expect(markup).toContain('"contentSize":"1200px"');
+    expect(markup).not.toContain('"maxWidth"');
     expectParsableMarkup(markup);
 
     const blocks = parse(markup);

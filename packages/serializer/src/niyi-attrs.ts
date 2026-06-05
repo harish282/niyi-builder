@@ -1,13 +1,13 @@
 import { sanitizeAttributes } from './attributes.js';
 
-/** Builder payload stored on core Gutenberg blocks (survives round-trip). */
+/** Builder payload for attrs with no Gutenberg equivalent. */
 export const NIYI_ATTR_KEY = 'niyi' as const;
 
 export function withNiyiAttrs(
-  builderAttrs: Record<string, unknown>,
-  nativeAttrs: Record<string, unknown> = {},
+  nativeAttrs: Record<string, unknown>,
+  niyiOnly: Record<string, unknown>,
 ): Record<string, unknown> {
-  const niyi = sanitizeAttributes(builderAttrs);
+  const niyi = sanitizeAttributes(niyiOnly);
 
   if (Object.keys(niyi).length === 0) {
     return nativeAttrs;
@@ -32,18 +32,53 @@ export function readNiyiAttrs(
   return null;
 }
 
-export function fromNiyiAttrs(
+/** Merge native Gutenberg fields with the niyi overflow bucket. */
+export function mergeNativeAndNiyi(
   gutenbergAttrs: Record<string, unknown>,
+  fromNative: (attrs: Record<string, unknown>, innerHTML: string) => Record<string, unknown>,
   innerHTML: string,
-  legacyFallback: (attrs: Record<string, unknown>, innerHTML: string) => Record<string, unknown>,
 ): Record<string, unknown> {
+  const native = fromNative(gutenbergAttrs, innerHTML);
   const niyi = readNiyiAttrs(gutenbergAttrs);
 
-  if (niyi !== null) {
-    return niyi;
+  if (niyi === null) {
+    return native;
   }
 
-  return legacyFallback(gutenbergAttrs, innerHTML);
+  return mergeBuilderWithNiyiOverflow(native, niyi);
+}
+
+const RESPONSIVE_MERGE_KEYS = new Set(['padding', 'margin', 'gap', 'height']);
+
+function isResponsiveValue(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function mergeBuilderWithNiyiOverflow(
+  native: Record<string, unknown>,
+  niyi: Record<string, unknown>,
+): Record<string, unknown> {
+  const result = { ...native };
+
+  for (const [key, value] of Object.entries(niyi)) {
+    if (
+      RESPONSIVE_MERGE_KEYS.has(key) &&
+      isResponsiveValue(result[key]) &&
+      isResponsiveValue(value)
+    ) {
+      const existing = result[key];
+      result[key] = {
+        ...(typeof existing === 'object' && existing !== null && !Array.isArray(existing)
+          ? existing
+          : {}),
+        ...value,
+      };
+    } else {
+      result[key] = value;
+    }
+  }
+
+  return result;
 }
 
 /** Strip the niyi payload when inspecting raw Gutenberg attrs in tests. */

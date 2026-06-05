@@ -127,24 +127,25 @@ const result = validateDocument(createEmptyDocument());
 
 ## Serialization
 
-Builder attributes are stored on core blocks under a **`niyi`** object in the block comment JSON. Native Gutenberg attrs are kept minimal so content stays editable without the plugin.
+Builder attributes prefer **native Gutenberg block JSON** where core defines a field. Anything without a Gutenberg equivalent is stored under **`niyi`**.
 
 ```ts
 import { serializeToGutenberg, parseFromGutenberg } from '@niyi-builder/serializer';
 
 const markup = serializeToGutenberg(doc);
-// <!-- wp:group {"niyi":{"maxWidth":"1200px"}} --> ...
+// <!-- wp:group {"layout":{"type":"constrained","contentSize":"1200px"}} --> ...
 
 const restored = parseFromGutenberg(markup);
 ```
 
-Example attrs on a group block:
+Example attrs on a group block (responsive mobile padding overflow):
 
 ```json
 {
+  "layout": { "type": "constrained", "contentSize": "1200px" },
+  "style": { "spacing": { "padding": "24px" } },
   "niyi": {
-    "maxWidth": "1200px",
-    "padding": { "desktop": "24px", "mobile": "16px" }
+    "padding": { "mobile": "16px" }
   }
 }
 ```

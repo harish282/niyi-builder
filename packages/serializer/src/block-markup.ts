@@ -1,25 +1,27 @@
 import type { BlockType } from '@niyi-builder/core';
-import { fromNiyiAttrs, withNiyiAttrs } from './niyi-attrs.js';
-
-type ResponsiveValue<T> = { desktop?: T; tablet?: T; mobile?: T };
-
-function isResponsiveString(value: unknown): value is ResponsiveValue<string> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function readResponsiveString(value: unknown): ResponsiveValue<string> | undefined {
-  if (typeof value === 'string' && value) {
-    return { desktop: value };
-  }
-  if (isResponsiveString(value)) {
-    return value;
-  }
-  return undefined;
-}
-
-function pickDesktop(value: ResponsiveValue<string> | undefined): string | undefined {
-  return value?.desktop ?? value?.tablet ?? value?.mobile;
-}
+import { mergeNativeAndNiyi, withNiyiAttrs } from './niyi-attrs.js';
+import {
+  nativeButtonToBuilder,
+  nativeColumnToBuilder,
+  nativeColumnsToBuilder,
+  nativeEmbedToBuilder,
+  nativeGroupToBuilder,
+  nativeHeadingToBuilder,
+  nativeHtmlToBuilder,
+  nativeImageToBuilder,
+  nativeParagraphToBuilder,
+  nativeSpacerToBuilder,
+  splitButtonAttrs,
+  splitColumnAttrs,
+  splitColumnsAttrs,
+  splitEmbedAttrs,
+  splitGroupAttrs,
+  splitHeadingAttrs,
+  splitHtmlAttrs,
+  splitImageAttrs,
+  splitParagraphAttrs,
+  splitSpacerAttrs,
+} from './native-attr-map.js';
 
 function escapeHtml(text: string): string {
   return text
@@ -29,142 +31,71 @@ function escapeHtml(text: string): string {
     .replace(/"/g, '&quot;');
 }
 
-function stripTags(html: string): string {
-  return html.replace(/<[^>]+>/g, '').trim();
-}
-
-function wrapWithNiyi(
-  builderAttrs: Record<string, unknown>,
-  nativeAttrs: Record<string, unknown> = {},
+function toGutenberg(
+  split: (attrs: Record<string, unknown>) => {
+    native: Record<string, unknown>;
+    niyi: Record<string, unknown>;
+  },
+  attrs: Record<string, unknown>,
 ): Record<string, unknown> {
-  return withNiyiAttrs(builderAttrs, nativeAttrs);
+  const { native, niyi } = split(attrs);
+  return withNiyiAttrs(native, niyi);
 }
 
-function unwrapNiyi(
+function fromGutenberg(
   gutenbergAttrs: Record<string, unknown>,
   innerHTML: string,
-  legacyFallback: (attrs: Record<string, unknown>, innerHTML: string) => Record<string, unknown>,
+  nativeToBuilder: (attrs: Record<string, unknown>, innerHTML: string) => Record<string, unknown>,
 ): Record<string, unknown> {
-  return fromNiyiAttrs(gutenbergAttrs, innerHTML, legacyFallback);
-}
-
-/** Minimal native attrs so core blocks remain usable in the block editor without Niyi. */
-function nativeGroupAttrs(_attrs: Record<string, unknown>): Record<string, unknown> {
-  return {};
-}
-
-function nativeColumnsAttrs(_attrs: Record<string, unknown>): Record<string, unknown> {
-  return {};
-}
-
-function nativeSpacerAttrs(attrs: Record<string, unknown>): Record<string, unknown> {
-  const height = pickDesktop(readResponsiveString(attrs.height));
-  return height ? { height } : {};
-}
-
-function nativeHeadingAttrs(attrs: Record<string, unknown>): Record<string, unknown> {
-  const level = typeof attrs.level === 'number' ? attrs.level : 2;
-  return { level };
-}
-
-function nativeButtonAttrs(attrs: Record<string, unknown>): Record<string, unknown> {
-  if (typeof attrs.url === 'string' && attrs.url) {
-    return { url: attrs.url };
-  }
-  return {};
-}
-
-function nativeImageAttrs(attrs: Record<string, unknown>): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  if (typeof attrs.url === 'string') {
-    result.url = attrs.url;
-  }
-  if (typeof attrs.alt === 'string') {
-    result.alt = attrs.alt;
-  }
-  if (typeof attrs.attachmentId === 'number') {
-    result.id = attrs.attachmentId;
-  }
-  return result;
-}
-
-function nativeEmbedAttrs(attrs: Record<string, unknown>): Record<string, unknown> {
-  if (typeof attrs.url === 'string' && attrs.url) {
-    return { url: attrs.url };
-  }
-  return {};
+  return mergeNativeAndNiyi(gutenbergAttrs, nativeToBuilder, innerHTML);
 }
 
 export function groupToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  return wrapWithNiyi(attrs, nativeGroupAttrs(attrs));
+  return toGutenberg(splitGroupAttrs, attrs);
 }
 
 export function groupFromGutenberg(
   gutenbergAttrs: Record<string, unknown>,
   innerHTML: string,
 ): Record<string, unknown> {
-  return unwrapNiyi(gutenbergAttrs, innerHTML, legacyGroupFromGutenberg);
-}
-
-function legacyGroupFromGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  const layout = attrs.layout as Record<string, unknown> | undefined;
-  if (typeof layout?.contentSize === 'string') {
-    return { maxWidth: layout.contentSize };
-  }
-  return {};
+  return fromGutenberg(gutenbergAttrs, innerHTML, nativeGroupToBuilder);
 }
 
 export function columnsToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  return wrapWithNiyi(attrs, nativeColumnsAttrs(attrs));
+  return toGutenberg(splitColumnsAttrs, attrs);
 }
 
 export function columnsFromGutenberg(
   gutenbergAttrs: Record<string, unknown>,
   innerHTML: string,
 ): Record<string, unknown> {
-  return unwrapNiyi(gutenbergAttrs, innerHTML, legacyColumnsFromGutenberg);
-}
-
-function legacyColumnsFromGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  const style = attrs.style as Record<string, unknown> | undefined;
-  const spacing = style?.spacing as Record<string, unknown> | undefined;
-  if (typeof spacing?.blockGap === 'string') {
-    return { gap: { desktop: spacing.blockGap } };
-  }
-  return {};
+  return fromGutenberg(gutenbergAttrs, innerHTML, nativeColumnsToBuilder);
 }
 
 export function columnToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  return wrapWithNiyi(attrs);
+  return toGutenberg(splitColumnAttrs, attrs);
 }
 
 export function columnFromGutenberg(
   gutenbergAttrs: Record<string, unknown>,
   innerHTML: string,
 ): Record<string, unknown> {
-  return unwrapNiyi(gutenbergAttrs, innerHTML, () => ({}));
+  return fromGutenberg(gutenbergAttrs, innerHTML, nativeColumnToBuilder);
 }
 
 export function spacerToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  return wrapWithNiyi(attrs, nativeSpacerAttrs(attrs));
+  return toGutenberg(splitSpacerAttrs, attrs);
 }
 
 export function spacerFromGutenberg(
   gutenbergAttrs: Record<string, unknown>,
   innerHTML: string,
 ): Record<string, unknown> {
-  return unwrapNiyi(gutenbergAttrs, innerHTML, legacySpacerFromGutenberg);
-}
-
-function legacySpacerFromGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  if (typeof attrs.height === 'string') {
-    return { height: { desktop: attrs.height } };
-  }
-  return {};
+  return fromGutenberg(gutenbergAttrs, innerHTML, nativeSpacerToBuilder);
 }
 
 export function headingToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  return wrapWithNiyi(attrs, nativeHeadingAttrs(attrs));
+  return toGutenberg(splitHeadingAttrs, attrs);
 }
 
 export function headingInnerHtml(attrs: Record<string, unknown>): string {
@@ -177,19 +108,11 @@ export function headingFromGutenberg(
   gutenbergAttrs: Record<string, unknown>,
   innerHTML: string,
 ): Record<string, unknown> {
-  return unwrapNiyi(gutenbergAttrs, innerHTML, legacyHeadingFromGutenberg);
-}
-
-function legacyHeadingFromGutenberg(
-  attrs: Record<string, unknown>,
-  innerHTML: string,
-): Record<string, unknown> {
-  const level = typeof attrs.level === 'number' ? attrs.level : 2;
-  return { level, content: stripTags(innerHTML) };
+  return fromGutenberg(gutenbergAttrs, innerHTML, nativeHeadingToBuilder);
 }
 
 export function paragraphToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  return wrapWithNiyi(attrs);
+  return toGutenberg(splitParagraphAttrs, attrs);
 }
 
 export function paragraphInnerHtml(attrs: Record<string, unknown>): string {
@@ -201,11 +124,11 @@ export function paragraphFromGutenberg(
   gutenbergAttrs: Record<string, unknown>,
   innerHTML: string,
 ): Record<string, unknown> {
-  return unwrapNiyi(gutenbergAttrs, innerHTML, (_attrs, html) => ({ content: stripTags(html) }));
+  return fromGutenberg(gutenbergAttrs, innerHTML, nativeParagraphToBuilder);
 }
 
 export function buttonToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  return wrapWithNiyi(attrs, nativeButtonAttrs(attrs));
+  return toGutenberg(splitButtonAttrs, attrs);
 }
 
 export function buttonInnerHtml(attrs: Record<string, unknown>): string {
@@ -219,47 +142,22 @@ export function buttonFromGutenberg(
   gutenbergAttrs: Record<string, unknown>,
   innerHTML: string,
 ): Record<string, unknown> {
-  return unwrapNiyi(gutenbergAttrs, innerHTML, legacyButtonFromGutenberg);
-}
-
-function legacyButtonFromGutenberg(
-  attrs: Record<string, unknown>,
-  innerHTML: string,
-): Record<string, unknown> {
-  const hrefMatch = /href="([^"]*)"/.exec(innerHTML);
-  return {
-    url: typeof attrs.url === 'string' ? attrs.url : hrefMatch?.[1] || '',
-    label: stripTags(innerHTML),
-  };
+  return fromGutenberg(gutenbergAttrs, innerHTML, nativeButtonToBuilder);
 }
 
 export function imageToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  return wrapWithNiyi(attrs, nativeImageAttrs(attrs));
+  return toGutenberg(splitImageAttrs, attrs);
 }
 
 export function imageFromGutenberg(
   gutenbergAttrs: Record<string, unknown>,
   innerHTML: string,
 ): Record<string, unknown> {
-  return unwrapNiyi(gutenbergAttrs, innerHTML, legacyImageFromGutenberg);
-}
-
-function legacyImageFromGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  if (typeof attrs.url === 'string') {
-    result.url = attrs.url;
-  }
-  if (typeof attrs.alt === 'string') {
-    result.alt = attrs.alt;
-  }
-  if (typeof attrs.id === 'number') {
-    result.attachmentId = attrs.id;
-  }
-  return result;
+  return fromGutenberg(gutenbergAttrs, innerHTML, nativeImageToBuilder);
 }
 
 export function htmlToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  return wrapWithNiyi(attrs);
+  return toGutenberg(splitHtmlAttrs, attrs);
 }
 
 export function htmlInnerHtml(attrs: Record<string, unknown>): string {
@@ -278,36 +176,18 @@ export function htmlFromGutenberg(
   gutenbergAttrs: Record<string, unknown>,
   innerHTML: string,
 ): Record<string, unknown> {
-  return unwrapNiyi(gutenbergAttrs, innerHTML, (_attrs, html) => {
-    const trimmed = html.trim();
-    const nameMatch = /data-niyi-icon="([^"]*)"/.exec(trimmed);
-    if (nameMatch?.[1]) {
-      return { name: nameMatch[1] };
-    }
-    if (trimmed.startsWith('<svg')) {
-      return { svg: trimmed, html: trimmed };
-    }
-    return { html: trimmed };
-  });
+  return fromGutenberg(gutenbergAttrs, innerHTML, nativeHtmlToBuilder);
 }
 
 export function embedToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  return wrapWithNiyi(attrs, nativeEmbedAttrs(attrs));
+  return toGutenberg(splitEmbedAttrs, attrs);
 }
 
 export function embedFromGutenberg(
   gutenbergAttrs: Record<string, unknown>,
   innerHTML: string,
 ): Record<string, unknown> {
-  return unwrapNiyi(gutenbergAttrs, innerHTML, legacyEmbedFromGutenberg);
-}
-
-function legacyEmbedFromGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  if (typeof attrs.url === 'string') {
-    result.url = attrs.url;
-  }
-  return result;
+  return fromGutenberg(gutenbergAttrs, innerHTML, nativeEmbedToBuilder);
 }
 
 export interface BlockMarkupStrategy {

@@ -1,24 +1,40 @@
 import { describe, expect, it } from 'vitest';
 import { NIYI_ATTR_KEY, readNiyiAttrs, withNiyiAttrs } from './niyi-attrs.js';
+import { splitGroupAttrs } from './native-attr-map.js';
 
 describe('niyi attribute payload', () => {
-  it('embeds builder attrs under the niyi key', () => {
-    const result = withNiyiAttrs(
-      { maxWidth: '1200px', padding: { desktop: '24px' } },
-      { level: 1 },
-    );
-
-    expect(result.level).toBe(1);
-    expect(readNiyiAttrs(result)).toEqual({
+  it('stores unmapped builder attrs under niyi while native attrs stay top-level', () => {
+    const { native, niyi } = splitGroupAttrs({
       maxWidth: '1200px',
       padding: { desktop: '24px' },
+      customFlag: true,
     });
+
+    const result = withNiyiAttrs(native, niyi);
+
+    expect(result.layout).toMatchObject({ contentSize: '1200px' });
+    expect(readNiyiAttrs(result)).toEqual({ customFlag: true });
+    expect(readNiyiAttrs(result)?.maxWidth).toBeUndefined();
   });
 
-  it('stores only niyi when no native attrs are needed', () => {
-    const result = withNiyiAttrs({ maxWidth: '960px' });
+  it('omits niyi when every field maps to Gutenberg', () => {
+    const { native, niyi } = splitGroupAttrs({
+      maxWidth: '960px',
+    });
 
-    expect(Object.keys(result)).toEqual([NIYI_ATTR_KEY]);
-    expect(readNiyiAttrs(result)).toEqual({ maxWidth: '960px' });
+    const result = withNiyiAttrs(native, niyi);
+
+    expect(result.layout).toMatchObject({ contentSize: '960px' });
+    expect(result[NIYI_ATTR_KEY]).toBeUndefined();
+    expect(readNiyiAttrs(result)).toBeNull();
+  });
+
+  it('keeps responsive overflow in niyi when native only stores desktop', () => {
+    const { native, niyi } = splitGroupAttrs({
+      padding: { desktop: '24px', mobile: '12px' },
+    });
+
+    expect(native.style).toMatchObject({ spacing: { padding: '24px' } });
+    expect(niyi.padding).toEqual({ mobile: '12px' });
   });
 });

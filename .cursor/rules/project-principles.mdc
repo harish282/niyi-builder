@@ -34,9 +34,9 @@ Serialize and deserialize using **WordPress core (default) blocks** only, e.g.:
 | Image           | `core/image`                |
 | Video           | `core/embed` / `core/video` |
 
-- **Map** builder node types to core blocks; store builder attributes under the **`niyi`** key in block JSON (e.g. `"niyi":{"maxWidth":"1200px",...}`).
-- **Native attrs** — only what Gutenberg needs to render/edit without Niyi (e.g. heading `level`, spacer `height`, button `url`).
-- **Parse** reads `attrs.niyi` first; fall back to native attrs for markup saved outside the builder.
+- **Native attrs first** — map builder fields to Gutenberg block JSON when core provides an equivalent (`layout`, `style`, `level`, `url`, `height`, …).
+- **`niyi` overflow** — only attrs with **no** Gutenberg equivalent (responsive tablet/mobile overflow, `variant`, `typography`, `columns` count, etc.) go under `attrs.niyi`.
+- **Parse** merges native extraction + `niyi`; responsive keys deep-merge.
 - **No `block.json`**, PHP render callbacks, or `register_block_type` for `niyi/*` in this plugin.
 - **Goal:** deactivate the plugin → content stays fully readable and editable in Gutenberg with zero custom blocks.
 
