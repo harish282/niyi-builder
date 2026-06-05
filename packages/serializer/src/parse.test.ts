@@ -6,11 +6,11 @@ import { serializeToGutenberg } from './serialize.js';
 import { loadFixture } from './test-helpers.js';
 
 describe('parseFromGutenberg', () => {
-  it('parses an empty container block', () => {
-    const doc = parseFromGutenberg('<!-- wp:niyi/container /-->');
+  it('parses an empty group block', () => {
+    const doc = parseFromGutenberg('<!-- wp:group /-->');
 
     expect(doc.version).toBe(0);
-    expect(doc.root.type).toBe('niyi/container');
+    expect(doc.root.type).toBe('core/group');
     expect(doc.root.children).toEqual([]);
     expect(doc.root.attributes).toEqual({});
   });
@@ -20,15 +20,15 @@ describe('parseFromGutenberg', () => {
     const markup = serializeToGutenberg(original);
     const parsed = parseFromGutenberg(markup);
 
-    expect(parsed.root.type).toBe('niyi/container');
+    expect(parsed.root.type).toBe('core/group');
     expect(parsed.root.attributes).toMatchObject({ maxWidth: '1200px' });
     expect(parsed.root.children).toHaveLength(4);
-    expect(parsed.root.children[0]?.type).toBe('niyi/heading');
+    expect(parsed.root.children[0]?.type).toBe('core/heading');
     expect(parsed.root.children[0]?.attributes).toMatchObject({
       level: 1,
       content: 'Welcome',
     });
-    expect(parsed.root.children[3]?.type).toBe('niyi/spacer');
+    expect(parsed.root.children[3]?.type).toBe('core/spacer');
     expect(parsed.root.children[3]?.attributes).toMatchObject({
       height: { desktop: '32px' },
     });
@@ -38,7 +38,7 @@ describe('parseFromGutenberg', () => {
     const empty = createEmptyDocument();
     const parsed = parseFromGutenberg(serializeToGutenberg(empty));
 
-    expect(parsed.root.type).toBe('niyi/container');
+    expect(parsed.root.type).toBe('core/group');
     expect(parsed.root.children).toEqual([]);
   });
 
@@ -46,10 +46,10 @@ describe('parseFromGutenberg', () => {
     expect(() => parseFromGutenberg('')).toThrow(ParseError);
   });
 
-  it('throws for unsupported core blocks', () => {
-    const markup = `<!-- wp:paragraph -->
-<p>Hello</p>
-<!-- /wp:paragraph -->`;
+  it('throws for unsupported core blocks at document root', () => {
+    const markup = `<!-- wp:quote -->
+<blockquote class="wp-block-quote"><p>Hello</p></blockquote>
+<!-- /wp:quote -->`;
 
     expect(() => parseFromGutenberg(markup)).toThrow(UnsupportedMarkupBlockError);
   });

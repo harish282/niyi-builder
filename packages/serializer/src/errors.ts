@@ -33,7 +33,9 @@ export class UnsupportedMarkupBlockError extends ParseError {
   readonly blockName: string;
 
   constructor(blockName: string) {
-    super(`Unsupported Gutenberg block "${blockName}". Only niyi/* blocks are mapped in v0.`);
+    super(
+      `Unsupported Gutenberg block "${blockName}". Only mapped core/* blocks are supported in v0.`,
+    );
     this.name = 'UnsupportedMarkupBlockError';
     this.blockName = blockName;
   }

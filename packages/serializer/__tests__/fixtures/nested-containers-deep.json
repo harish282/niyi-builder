@@ -2,7 +2,7 @@
   "version": 0,
   "root": {
     "id": "root",
-    "type": "niyi/container",
+    "type": "core/group",
     "attributes": {
       "maxWidth": "1440px",
       "padding": { "desktop": "24px" }
@@ -10,7 +10,7 @@
     "children": [
       {
         "id": "level-1-container",
-        "type": "niyi/container",
+        "type": "core/group",
         "attributes": {
           "background": "#f5f5f5",
           "borderRadius": "8px"
@@ -18,26 +18,33 @@
         "children": [
           {
             "id": "level-2-grid",
-            "type": "niyi/grid",
+            "type": "core/columns",
             "attributes": {
-              "columns": { "desktop": 2, "tablet": 1 },
+              "columns": { "desktop": 1 },
               "gap": { "desktop": "24px" }
             },
             "children": [
               {
-                "id": "level-3-container",
-                "type": "niyi/container",
-                "attributes": {
-                  "maxWidth": "100%"
-                },
+                "id": "level-2-column",
+                "type": "core/column",
+                "attributes": {},
                 "children": [
                   {
-                    "id": "level-4-spacer",
-                    "type": "niyi/spacer",
+                    "id": "level-3-container",
+                    "type": "core/group",
                     "attributes": {
-                      "height": { "desktop": "64px", "mobile": "32px" }
+                      "maxWidth": "100%"
                     },
-                    "children": []
+                    "children": [
+                      {
+                        "id": "level-4-spacer",
+                        "type": "core/spacer",
+                        "attributes": {
+                          "height": { "desktop": "64px" }
+                        },
+                        "children": []
+                      }
+                    ]
                   }
                 ]
               }

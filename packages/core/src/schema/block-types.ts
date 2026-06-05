@@ -1,67 +1,42 @@
 /**
- * MVP block type identifiers (Gutenberg namespaced blocks: `niyi/*`).
+ * MVP block types — WordPress core Gutenberg blocks only (`core/*`).
  * @see docs/LAYOUT_SCHEMA_V0.md
  */
-export const BLOCK_NAMESPACE = 'niyi' as const;
+export const BLOCK_NAMESPACE = 'core' as const;
 
 /** Layout blocks — structural; most accept children. */
-export const LAYOUT_BLOCK_TYPES = ['niyi/container', 'niyi/grid', 'niyi/spacer'] as const;
+export const LAYOUT_BLOCK_TYPES = [
+  'core/group',
+  'core/columns',
+  'core/column',
+  'core/spacer',
+] as const;
 
 /** Content blocks — leaf nodes in v0. */
 export const CONTENT_BLOCK_TYPES = [
-  'niyi/heading',
-  'niyi/text',
-  'niyi/button',
-  'niyi/image',
-  'niyi/icon',
-  'niyi/video',
+  'core/heading',
+  'core/paragraph',
+  'core/button',
+  'core/image',
+  'core/html',
+  'core/embed',
 ] as const;
 
-/** Form blocks — reserved for Phase 6; included in schema for forward compatibility. */
-export const FORM_BLOCK_TYPES = [
-  'niyi/form',
-  'niyi/form-field-name',
-  'niyi/form-field-text',
-  'niyi/form-field-email',
-  'niyi/form-field-phone',
-  'niyi/form-field-number',
-  'niyi/form-field-textarea',
-  'niyi/form-field-select',
-  'niyi/form-field-checkbox',
-  'niyi/form-field-radio',
-  'niyi/form-field-submit',
-] as const;
-
-export const BLOCK_TYPES = [
-  ...LAYOUT_BLOCK_TYPES,
-  ...CONTENT_BLOCK_TYPES,
-  ...FORM_BLOCK_TYPES,
-] as const;
+export const BLOCK_TYPES = [...LAYOUT_BLOCK_TYPES, ...CONTENT_BLOCK_TYPES] as const;
 
 export type LayoutBlockType = (typeof LAYOUT_BLOCK_TYPES)[number];
 export type ContentBlockType = (typeof CONTENT_BLOCK_TYPES)[number];
-export type FormBlockType = (typeof FORM_BLOCK_TYPES)[number];
 export type BlockType = (typeof BLOCK_TYPES)[number];
 
 export const DOCUMENT_VERSION = 0 as const;
 export type DocumentVersion = typeof DOCUMENT_VERSION;
 
-export const ROOT_BLOCK_TYPE = 'niyi/container' as const satisfies LayoutBlockType;
+export const ROOT_BLOCK_TYPE = 'core/group' as const satisfies LayoutBlockType;
 
 /** Leaf blocks — must not have children in v0. */
 export const LEAF_BLOCK_TYPES: readonly BlockType[] = [
-  'niyi/spacer',
+  'core/spacer',
   ...CONTENT_BLOCK_TYPES,
-  'niyi/form-field-name',
-  'niyi/form-field-text',
-  'niyi/form-field-email',
-  'niyi/form-field-phone',
-  'niyi/form-field-number',
-  'niyi/form-field-textarea',
-  'niyi/form-field-select',
-  'niyi/form-field-checkbox',
-  'niyi/form-field-radio',
-  'niyi/form-field-submit',
 ] as const;
 
 export function isBlockType(value: string): value is BlockType {

@@ -1,0 +1,55 @@
+---
+description: Niyi Builder architectural principles — apply when creating or modifying any code
+alwaysApply: true
+---
+
+# Niyi Builder — AI Notes
+
+When creating or modifying anything in this repo, follow these principles.
+Add new items here as the project evolves.
+
+## 1. Gutenberg is the source of truth
+
+Post content is **native Gutenberg block markup** in the database — not shortcodes, not plugin-only blobs, not JSON.
+
+- **Layout JSON** (`BuilderDocument`) is an editing/runtime representation only.
+- **Gutenberg block comments** (`<!-- wp:... -->`) are canonical for storage.
+- **Serializer** (`packages/serializer`) is the boundary: internal JSON ↔ Gutenberg markup must round-trip with **no data loss**.
+- **Visual editor** previews and edits the document tree; save/load always flows through the serializer to Gutenberg.
+
+## 2. Use core Gutenberg blocks only — no `niyi/*` blocks
+
+**Do not register or emit custom `wp:niyi/*` blocks.** We will not create plugin-owned block types.
+
+Serialize and deserialize using **WordPress core (default) blocks** only, e.g.:
+
+| Builder concept | Gutenberg target (examples) |
+| --------------- | --------------------------- |
+| Container       | `core/group`                |
+| Grid / columns  | `core/columns`, `core/column` |
+| Spacer          | `core/spacer`               |
+| Heading         | `core/heading`              |
+| Text            | `core/paragraph`            |
+| Button          | `core/button`               |
+| Image           | `core/image`                |
+| Video           | `core/embed` / `core/video` |
+
+- **Map** builder node types to core blocks; store builder attributes under the **`niyi`** key in block JSON (e.g. `"niyi":{"maxWidth":"1200px",...}`).
+- **Native attrs** — only what Gutenberg needs to render/edit without Niyi (e.g. heading `level`, spacer `height`, button `url`).
+- **Parse** reads `attrs.niyi` first; fall back to native attrs for markup saved outside the builder.
+- **No `block.json`**, PHP render callbacks, or `register_block_type` for `niyi/*` in this plugin.
+- **Goal:** deactivate the plugin → content stays fully readable and editable in Gutenberg with zero custom blocks.
+
+> **Note:** Layout JSON uses `core/*` block type names aligned with Gutenberg. The serializer emits standard block comments (`<!-- wp:group -->`, not `<!-- wp:core/group -->`).
+
+### Do
+
+- Store builder-specific fields in `attrs.niyi` on core blocks; keep native attrs minimal.
+- Validate documents before serialize/parse; keep round-trip tests green.
+- When unsure, prefer `niyi` for anything the builder owns (responsive values, variants, typography).
+
+### Don't
+
+- Add new `niyi/*` block types, namespaces, or registrations.
+- Store layout JSON as post content or as the canonical saved format.
+- Introduce editor-only fields that cannot round-trip to core block attributes.

@@ -1,7 +1,8 @@
 import { parse } from '@wordpress/block-serialization-default-parser';
 import type { BlockNode, BuilderDocument } from '@niyi-builder/core';
 import { DOCUMENT_VERSION, ROOT_BLOCK_TYPE, validateDocument } from '@niyi-builder/core';
-import { isNiyiBlockName, isSerializableBlockType } from './block-registry.js';
+import { BLOCK_MARKUP_STRATEGIES } from './block-markup.js';
+import { isCoreBlockName, isSerializableBlockType } from './block-registry.js';
 import { ParseError, UnsupportedMarkupBlockError } from './errors.js';
 
 export interface ParsedBlock {
@@ -60,24 +61,24 @@ function extractRootBlock(blocks: ParsedBlock[]): ParsedBlock {
   );
 
   for (const block of meaningful) {
-    if (block.blockName !== null && !isNiyiBlockName(block.blockName)) {
+    if (block.blockName !== null && !isCoreBlockName(block.blockName)) {
       throw new UnsupportedMarkupBlockError(block.blockName);
     }
   }
 
-  const niyiBlocks = meaningful.filter((block) => isNiyiBlockName(block.blockName));
+  const coreBlocks = meaningful.filter((block) => isCoreBlockName(block.blockName));
 
-  if (niyiBlocks.length === 0) {
-    throw new ParseError('No niyi/* blocks found in markup.');
+  if (coreBlocks.length === 0) {
+    throw new ParseError('No supported core blocks found in markup.');
   }
 
-  if (niyiBlocks.length > 1) {
+  if (coreBlocks.length > 1) {
     throw new ParseError(
-      'Expected a single root niyi/container block; found multiple top-level niyi blocks.',
+      `Expected a single root ${ROOT_BLOCK_TYPE} block; found multiple top-level core blocks.`,
     );
   }
 
-  return niyiBlocks[0];
+  return coreBlocks[0];
 }
 
 function parsedBlockToNode(block: ParsedBlock, path: string): BlockNode {
@@ -87,13 +88,26 @@ function parsedBlockToNode(block: ParsedBlock, path: string): BlockNode {
     throw new UnsupportedMarkupBlockError(blockName ?? '(empty block)');
   }
 
+  const strategy = BLOCK_MARKUP_STRATEGIES[blockName];
+  const rawAttrs = normalizeAttributes(block.attrs);
+  let attributes = strategy ? strategy.fromGutenbergAttrs(rawAttrs, block.innerHTML) : rawAttrs;
+
+  const children = block.innerBlocks.map((child, index) =>
+    parsedBlockToNode(child, `${path}.children[${index}]`),
+  );
+
+  if (blockName === 'core/columns' && children.length > 0 && attributes.columns === undefined) {
+    attributes = {
+      ...attributes,
+      columns: { desktop: children.length },
+    };
+  }
+
   return {
     id: createBlockId(path),
     type: blockName,
-    attributes: normalizeAttributes(block.attrs),
-    children: block.innerBlocks.map((child, index) =>
-      parsedBlockToNode(child, `${path}.children[${index}]`),
-    ),
+    attributes,
+    children,
   };
 }
 

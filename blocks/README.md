@@ -1,11 +1,5 @@
 # Gutenberg blocks
 
-Native WordPress blocks for Niyi Builder (`niyi/*` block namespace).
+Niyi Builder does **not** register custom block types. Saved content uses **WordPress core blocks** only (`core/group`, `core/columns`, `core/heading`, etc.).
 
-Each block will include:
-
-- `block.json` — block metadata and attributes
-- PHP render callback (dynamic blocks)
-- Optional frontend assets
-
-The visual editor (`admin/`) edits a JSON tree that serializes to these blocks via `packages/serializer`.
+The visual editor (`admin/`) edits a JSON tree that serializes to native Gutenberg markup via `packages/serializer`. No `block.json` or PHP render callbacks live in this folder unless we add optional frontend assets later.

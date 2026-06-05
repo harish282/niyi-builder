@@ -2,58 +2,86 @@
   "version": 0,
   "root": {
     "id": "root",
-    "type": "niyi/container",
+    "type": "core/group",
     "attributes": {},
     "children": [
       {
         "id": "outer-grid",
-        "type": "niyi/grid",
+        "type": "core/columns",
         "attributes": {
-          "columns": { "desktop": 3 },
-          "rows": { "desktop": 1 }
+          "columns": { "desktop": 2 },
+          "gap": { "desktop": "24px" }
         },
         "children": [
           {
-            "id": "column-container-a",
-            "type": "niyi/container",
-            "attributes": { "padding": { "desktop": "16px" } },
+            "id": "column-a",
+            "type": "core/column",
+            "attributes": {},
             "children": [
               {
-                "id": "inner-grid-a",
-                "type": "niyi/grid",
-                "attributes": { "columns": { "desktop": 2 }, "gap": { "desktop": "12px" } },
+                "id": "column-container-a",
+                "type": "core/group",
+                "attributes": { "padding": { "desktop": "16px" } },
                 "children": [
                   {
-                    "id": "spacer-a1",
-                    "type": "niyi/spacer",
-                    "attributes": { "height": { "desktop": "16px" } },
-                    "children": []
-                  },
-                  {
-                    "id": "spacer-a2",
-                    "type": "niyi/spacer",
-                    "attributes": { "height": { "desktop": "24px" } },
-                    "children": []
+                    "id": "inner-grid-a",
+                    "type": "core/columns",
+                    "attributes": { "columns": { "desktop": 2 }, "gap": { "desktop": "12px" } },
+                    "children": [
+                      {
+                        "id": "inner-column-a1",
+                        "type": "core/column",
+                        "attributes": {},
+                        "children": [
+                          {
+                            "id": "spacer-a1",
+                            "type": "core/spacer",
+                            "attributes": { "height": { "desktop": "16px" } },
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "id": "inner-column-a2",
+                        "type": "core/column",
+                        "attributes": {},
+                        "children": [
+                          {
+                            "id": "spacer-a2",
+                            "type": "core/spacer",
+                            "attributes": { "height": { "desktop": "24px" } },
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               }
             ]
           },
           {
-            "id": "column-container-b",
-            "type": "niyi/container",
-            "attributes": { "margin": { "desktop": "0 auto" } },
+            "id": "column-b",
+            "type": "core/column",
+            "attributes": {},
             "children": [
               {
-                "id": "inner-container-b",
-                "type": "niyi/container",
-                "attributes": { "background": "#ffffff" },
+                "id": "column-container-b",
+                "type": "core/group",
+                "attributes": { "margin": { "desktop": "0 auto" } },
                 "children": [
                   {
-                    "id": "spacer-b",
-                    "type": "niyi/spacer",
-                    "attributes": { "height": { "desktop": "48px" } },
-                    "children": []
+                    "id": "inner-container-b",
+                    "type": "core/group",
+                    "attributes": { "background": "#ffffff" },
+                    "children": [
+                      {
+                        "id": "spacer-b",
+                        "type": "core/spacer",
+                        "attributes": { "height": { "desktop": "48px" } },
+                        "children": []
+                      }
+                    ]
                   }
                 ]
               }

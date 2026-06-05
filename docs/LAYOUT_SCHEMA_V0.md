@@ -1,10 +1,10 @@
 # Layout JSON schema v0
 
-The visual builder stores pages as a **JSON block tree** that serializes to native Gutenberg markup. This document is the contract for `packages/core`, `packages/serializer`, and `packages/editor`.
+The visual builder stores pages as a **JSON block tree** that serializes to **WordPress core Gutenberg blocks**. This document is the contract for `packages/core`, `packages/serializer`, and `packages/editor`.
 
 - **JSON Schema:** [schemas/layout-v0.schema.json](./schemas/layout-v0.schema.json)
 - **TypeScript:** `packages/core` (`BlockNode`, `BuilderDocument`, `validateDocument`)
-- **Gutenberg namespace:** `niyi/*`
+- **Gutenberg output:** core blocks (`group`, `columns`, `heading`, …) — no custom `niyi/*` namespace
 
 ## Document shape
 
@@ -13,17 +13,17 @@ The visual builder stores pages as a **JSON block tree** that serializes to nati
   "version": 0,
   "root": {
     "id": "root",
-    "type": "niyi/container",
+    "type": "core/group",
     "attributes": {},
     "children": []
   }
 }
 ```
 
-| Field     | Type        | Rules                                     |
-| --------- | ----------- | ----------------------------------------- |
-| `version` | `0`         | Required; constant for v0                 |
-| `root`    | `BlockNode` | Required; `type` must be `niyi/container` |
+| Field     | Type        | Rules                                 |
+| --------- | ----------- | ------------------------------------- |
+| `version` | `0`         | Required; constant for v0             |
+| `root`    | `BlockNode` | Required; `type` must be `core/group` |
 
 ## Block node
 
@@ -34,44 +34,37 @@ The visual builder stores pages as a **JSON block tree** that serializes to nati
 | `attributes` | object        | Block-specific; may be `{}`           |
 | `children`   | `BlockNode[]` | Required array; `[]` for leaf blocks  |
 
-## MVP block types
+## MVP block types (maps to Gutenberg)
 
 ### Layout
 
-| Type             | Children         | Notes                              |
-| ---------------- | ---------------- | ---------------------------------- |
-| `niyi/container` | layout + content | Width, padding, margin, background |
-| `niyi/grid`      | layout + content | Columns, rows, gap (responsive)    |
-| `niyi/spacer`    | **none** (leaf)  | Height                             |
+| JSON type      | Gutenberg block | Children           | Notes                |
+| -------------- | --------------- | ------------------ | -------------------- |
+| `core/group`   | `core/group`    | layout + content   | Container / sections |
+| `core/columns` | `core/columns`  | `core/column` only | Row of columns       |
+| `core/column`  | `core/column`   | layout + content   | Single column        |
+| `core/spacer`  | `core/spacer`   | **none** (leaf)    | Height               |
 
 ### Content (all leaves in v0)
 
-| Type           |
-| -------------- |
-| `niyi/heading` |
-| `niyi/text`    |
-| `niyi/button`  |
-| `niyi/image`   |
-| `niyi/icon`    |
-| `niyi/video`   |
-
-### Form (reserved — Phase 6)
-
-| Type                | Children                   |
-| ------------------- | -------------------------- |
-| `niyi/form`         | form field blocks + submit |
-| `niyi/form-field-*` | none (leaf)                |
+| JSON type        | Gutenberg block  |
+| ---------------- | ---------------- | --------------------- |
+| `core/heading`   | `core/heading`   |
+| `core/paragraph` | `core/paragraph` |
+| `core/button`    | `core/button`    |
+| `core/image`     | `core/image`     |
+| `core/html`      | `core/html`      | Icons / custom markup |
+| `core/embed`     | `core/embed`     | YouTube, Vimeo, etc.  |
 
 ## Nesting rules (v0)
 
-| Parent           | Allowed child types                                          |
-| ---------------- | ------------------------------------------------------------ |
-| Document `root`  | `niyi/container`, `niyi/grid`, `niyi/spacer`, content blocks |
-| `niyi/container` | Same as root children                                        |
-| `niyi/grid`      | Same as root children                                        |
-| `niyi/spacer`    | _(none)_                                                     |
-| Content blocks   | _(none)_                                                     |
-| `niyi/form`      | `niyi/form-field-*`, `niyi/form-field-submit`                |
+| Parent          | Allowed child types                                         |
+| --------------- | ----------------------------------------------------------- |
+| Document `root` | `core/group`, `core/columns`, `core/spacer`, content blocks |
+| `core/group`    | Same as root children                                       |
+| `core/columns`  | `core/column` only                                          |
+| `core/column`   | `core/group`, `core/columns`, `core/spacer`, content blocks |
+| Leaf blocks     | _(none)_                                                    |
 
 Enforced in code: `validateDocument()` in `@niyi-builder/core`.
 
@@ -82,96 +75,46 @@ Enforced in code: `validateDocument()` in `@niyi-builder/core`.
   "version": 0,
   "root": {
     "id": "root",
-    "type": "niyi/container",
+    "type": "core/group",
     "attributes": { "maxWidth": "1200px" },
     "children": [
       {
-        "id": "hero-grid",
-        "type": "niyi/grid",
-        "attributes": { "columns": { "desktop": 2 } },
+        "id": "hero-columns",
+        "type": "core/columns",
+        "attributes": { "columns": { "desktop": 2 }, "gap": { "desktop": "16px" } },
         "children": [
           {
-            "id": "hero-title",
-            "type": "niyi/heading",
-            "attributes": { "level": 1, "content": "Hello" },
-            "children": []
+            "id": "col-title",
+            "type": "core/column",
+            "attributes": {},
+            "children": [
+              {
+                "id": "hero-title",
+                "type": "core/heading",
+                "attributes": { "level": 1, "content": "Hello" },
+                "children": []
+              }
+            ]
           },
           {
-            "id": "hero-cta",
-            "type": "niyi/button",
-            "attributes": { "label": "Get started", "url": "#" },
-            "children": []
+            "id": "col-cta",
+            "type": "core/column",
+            "attributes": {},
+            "children": [
+              {
+                "id": "hero-cta",
+                "type": "core/button",
+                "attributes": { "label": "Get started", "url": "#" },
+                "children": []
+              }
+            ]
           }
         ]
-      },
-      {
-        "id": "gap",
-        "type": "niyi/spacer",
-        "attributes": { "height": { "desktop": "48px" } },
-        "children": []
       }
     ]
   }
 }
 ```
-
-## Example: invalid trees
-
-**Wrong root type**
-
-```json
-{
-  "version": 0,
-  "root": {
-    "id": "root",
-    "type": "niyi/heading",
-    "attributes": {},
-    "children": []
-  }
-}
-```
-
-→ `root.type` must be `niyi/container`.
-
-**Leaf with children**
-
-```json
-{
-  "id": "bad-spacer",
-  "type": "niyi/spacer",
-  "attributes": {},
-  "children": [
-    {
-      "id": "nested",
-      "type": "niyi/text",
-      "attributes": {},
-      "children": []
-    }
-  ]
-}
-```
-
-→ `niyi/spacer` cannot have children.
-
-**Disallowed nesting**
-
-```json
-{
-  "id": "text-parent",
-  "type": "niyi/text",
-  "attributes": {},
-  "children": [
-    {
-      "id": "child",
-      "type": "niyi/button",
-      "attributes": {},
-      "children": []
-    }
-  ]
-}
-```
-
-→ Content blocks cannot contain children in v0.
 
 ## Validation (TypeScript)
 
@@ -181,3 +124,29 @@ import { validateDocument, createEmptyDocument } from '@niyi-builder/core';
 const result = validateDocument(createEmptyDocument());
 // { valid: true, issues: [] }
 ```
+
+## Serialization
+
+Builder attributes are stored on core blocks under a **`niyi`** object in the block comment JSON. Native Gutenberg attrs are kept minimal so content stays editable without the plugin.
+
+```ts
+import { serializeToGutenberg, parseFromGutenberg } from '@niyi-builder/serializer';
+
+const markup = serializeToGutenberg(doc);
+// <!-- wp:group {"niyi":{"maxWidth":"1200px"}} --> ...
+
+const restored = parseFromGutenberg(markup);
+```
+
+Example attrs on a group block:
+
+```json
+{
+  "niyi": {
+    "maxWidth": "1200px",
+    "padding": { "desktop": "24px", "mobile": "16px" }
+  }
+}
+```
+
+Block comments use the Gutenberg short name (`wp:group`, `wp:paragraph`). The parser normalizes them to `core/*` types in JSON.

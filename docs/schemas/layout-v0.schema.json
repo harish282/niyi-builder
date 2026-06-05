@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/harish282/niyi-builder/schemas/layout-v0.json",
   "title": "Niyi Builder layout document v0",
-  "description": "Internal JSON model for the Gutenberg visual builder. TypeScript source of truth: packages/core.",
+  "description": "Internal JSON model for the Gutenberg visual builder. Serializes to WordPress core blocks only.",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "root"],
@@ -13,33 +13,23 @@
     },
     "root": {
       "$ref": "#/$defs/blockNode",
-      "description": "Must be a niyi/container block."
+      "description": "Must be a core/group block."
     }
   },
   "$defs": {
     "blockType": {
       "type": "string",
       "enum": [
-        "niyi/container",
-        "niyi/grid",
-        "niyi/spacer",
-        "niyi/heading",
-        "niyi/text",
-        "niyi/button",
-        "niyi/image",
-        "niyi/icon",
-        "niyi/video",
-        "niyi/form",
-        "niyi/form-field-name",
-        "niyi/form-field-text",
-        "niyi/form-field-email",
-        "niyi/form-field-phone",
-        "niyi/form-field-number",
-        "niyi/form-field-textarea",
-        "niyi/form-field-select",
-        "niyi/form-field-checkbox",
-        "niyi/form-field-radio",
-        "niyi/form-field-submit"
+        "core/group",
+        "core/columns",
+        "core/column",
+        "core/spacer",
+        "core/heading",
+        "core/paragraph",
+        "core/button",
+        "core/image",
+        "core/html",
+        "core/embed"
       ]
     },
     "blockNode": {
@@ -60,7 +50,7 @@
         "children": {
           "type": "array",
           "items": { "$ref": "#/$defs/blockNode" },
-          "description": "Child blocks; must be [] for leaf types (spacer, content, form fields)."
+          "description": "Child blocks; must be [] for leaf types."
         }
       }
     }

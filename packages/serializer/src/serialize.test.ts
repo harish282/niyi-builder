@@ -10,7 +10,7 @@ function expectParsableMarkup(markup: string): void {
   expect(markup.length).toBeGreaterThan(0);
   const blocks = parse(markup);
   expect(blocks.length).toBeGreaterThan(0);
-  expect(blocks[0]?.blockName).toBe('niyi/container');
+  expect(blocks[0]?.blockName).toBe('core/group');
 
   const walk = (nodes: ReturnType<typeof parse>): void => {
     for (const node of nodes) {
@@ -28,9 +28,9 @@ function expectParsableMarkup(markup: string): void {
 }
 
 describe('serializeToGutenberg', () => {
-  it('serializes an empty document to a root container block', () => {
+  it('serializes an empty document to a root group block', () => {
     const markup = serializeToGutenberg(createEmptyDocument());
-    expect(markup).toBe('<!-- wp:niyi/container /-->');
+    expect(markup).toBe('<!-- wp:group /-->');
     expectParsableMarkup(markup);
   });
 
@@ -38,20 +38,21 @@ describe('serializeToGutenberg', () => {
     const doc = loadFixture('flat-tree.json');
     const markup = serializeToGutenberg(doc);
 
-    expect(markup).toContain('<!-- wp:niyi/container');
-    expect(markup).toContain('<!-- wp:niyi/heading');
-    expect(markup).toContain('<!-- wp:niyi/text');
-    expect(markup).toContain('<!-- wp:niyi/button');
-    expect(markup).toContain('<!-- wp:niyi/spacer');
+    expect(markup).toContain('<!-- wp:group');
+    expect(markup).toContain('<!-- wp:heading');
+    expect(markup).toContain('<!-- wp:paragraph');
+    expect(markup).toContain('<!-- wp:button');
+    expect(markup).toContain('<!-- wp:spacer');
+    expect(markup).toContain('"niyi"');
     expect(markup).toContain('"maxWidth":"1200px"');
-    expect(markup).toContain('"content":"Welcome"');
     expectParsableMarkup(markup);
 
     const blocks = parse(markup);
-    const container = blocks[0];
-    expect(container?.innerBlocks).toHaveLength(4);
-    expect(container?.innerBlocks[0]?.blockName).toBe('niyi/heading');
-    expect(container?.innerBlocks[0]?.attrs).toMatchObject({ level: 1, content: 'Welcome' });
+    const group = blocks[0];
+    expect(group?.innerBlocks).toHaveLength(4);
+    expect(group?.innerBlocks[0]?.blockName).toBe('core/heading');
+    expect(group?.innerBlocks[0]?.attrs).toMatchObject({ level: 1 });
+    expect(group?.innerBlocks[0]?.innerHTML).toContain('Welcome');
   });
 
   it('serializes nested layout blocks', () => {
@@ -59,19 +60,26 @@ describe('serializeToGutenberg', () => {
       version: 0,
       root: {
         id: 'root',
-        type: 'niyi/container',
+        type: 'core/group',
         attributes: {},
         children: [
           {
             id: 'grid-1',
-            type: 'niyi/grid',
-            attributes: { columns: { desktop: 2 } },
+            type: 'core/columns',
+            attributes: { gap: { desktop: '16px' } },
             children: [
               {
-                id: 'cell-heading',
-                type: 'niyi/heading',
-                attributes: { level: 2, content: 'Cell' },
-                children: [],
+                id: 'col-1',
+                type: 'core/column',
+                attributes: {},
+                children: [
+                  {
+                    id: 'cell-heading',
+                    type: 'core/heading',
+                    attributes: { level: 2, content: 'Cell' },
+                    children: [],
+                  },
+                ],
               },
             ],
           },
@@ -80,13 +88,16 @@ describe('serializeToGutenberg', () => {
     };
 
     const markup = serializeToGutenberg(doc);
-    expect(markup).toContain('<!-- wp:niyi/grid');
-    expect(markup).toContain('<!-- /wp:niyi/grid -->');
+    expect(markup).toContain('<!-- wp:columns');
+    expect(markup).toContain('<!-- /wp:columns -->');
     expectParsableMarkup(markup);
 
     const blocks = parse(markup);
-    expect(blocks[0]?.innerBlocks[0]?.blockName).toBe('niyi/grid');
-    expect(blocks[0]?.innerBlocks[0]?.innerBlocks[0]?.blockName).toBe('niyi/heading');
+    expect(blocks[0]?.innerBlocks[0]?.blockName).toBe('core/columns');
+    expect(blocks[0]?.innerBlocks[0]?.innerBlocks[0]?.blockName).toBe('core/column');
+    expect(blocks[0]?.innerBlocks[0]?.innerBlocks[0]?.innerBlocks[0]?.blockName).toBe(
+      'core/heading',
+    );
   });
 
   it('throws SerializeError for invalid documents', () => {
@@ -94,7 +105,7 @@ describe('serializeToGutenberg', () => {
       version: 0,
       root: {
         id: 'root',
-        type: 'niyi/heading',
+        type: 'core/heading',
         attributes: {},
         children: [],
       },
@@ -103,17 +114,17 @@ describe('serializeToGutenberg', () => {
     expect(() => serializeToGutenberg(invalid)).toThrow(SerializeError);
   });
 
-  it('escapes dangerous characters in attribute JSON', () => {
+  it('escapes dangerous characters in attribute JSON and inner HTML', () => {
     const doc: BuilderDocument = {
       version: 0,
       root: {
         id: 'root',
-        type: 'niyi/container',
+        type: 'core/group',
         attributes: {},
         children: [
           {
             id: 'text-1',
-            type: 'niyi/text',
+            type: 'core/paragraph',
             attributes: { content: '<script>alert(1)</script>' },
             children: [],
           },
@@ -123,7 +134,7 @@ describe('serializeToGutenberg', () => {
 
     const markup = serializeToGutenberg(doc);
     expect(markup).not.toContain('<script>');
-    expect(markup).toContain('\\u003c');
+    expect(markup).toContain('&lt;script&gt;');
     expectParsableMarkup(markup);
   });
 });

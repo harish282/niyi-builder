@@ -1,5 +1,5 @@
 /**
- * Per-block attribute shapes (v0). All blocks also allow unknown keys for forward compatibility.
+ * Per-block attribute shapes (v0). Builder-friendly fields; serializer maps to core block attrs.
  */
 
 export interface ResponsiveValue<T> {
@@ -8,8 +8,7 @@ export interface ResponsiveValue<T> {
   mobile?: T;
 }
 
-export interface ContainerAttributes {
-  width?: string;
+export interface GroupAttributes {
   maxWidth?: string;
   padding?: ResponsiveValue<string>;
   margin?: ResponsiveValue<string>;
@@ -18,10 +17,15 @@ export interface ContainerAttributes {
   [key: string]: unknown;
 }
 
-export interface GridAttributes {
+export interface ColumnsAttributes {
   columns?: ResponsiveValue<number>;
   rows?: ResponsiveValue<number>;
   gap?: ResponsiveValue<string>;
+  [key: string]: unknown;
+}
+
+export interface ColumnAttributes {
+  width?: string;
   [key: string]: unknown;
 }
 
@@ -37,7 +41,7 @@ export interface HeadingAttributes {
   [key: string]: unknown;
 }
 
-export interface TextAttributes {
+export interface ParagraphAttributes {
   content?: string;
   typography?: Record<string, unknown>;
   [key: string]: unknown;
@@ -57,30 +61,31 @@ export interface ImageAttributes {
   [key: string]: unknown;
 }
 
-export interface IconAttributes {
-  svg?: string;
+/** Icon / custom markup stored via core/html. */
+export interface HtmlAttributes {
   name?: string;
+  svg?: string;
+  html?: string;
   [key: string]: unknown;
 }
 
-export interface VideoAttributes {
+export interface EmbedAttributes {
   provider?: 'youtube' | 'vimeo' | 'self';
   url?: string;
-  attachmentId?: number;
   [key: string]: unknown;
 }
 
-export interface FormAttributes {
-  name?: string;
-  notificationEmail?: string;
-  storeInDatabase?: boolean;
-  [key: string]: unknown;
-}
+/** @deprecated Use GroupAttributes */
+export type ContainerAttributes = GroupAttributes;
 
-export type FormFieldAttributes = {
-  label?: string;
-  name?: string;
-  required?: boolean;
-  placeholder?: string;
-  [key: string]: unknown;
-};
+/** @deprecated Use ParagraphAttributes */
+export type TextAttributes = ParagraphAttributes;
+
+/** @deprecated Use HtmlAttributes */
+export type IconAttributes = HtmlAttributes;
+
+/** @deprecated Use EmbedAttributes */
+export type VideoAttributes = EmbedAttributes;
+
+/** @deprecated Use ColumnsAttributes */
+export type GridAttributes = ColumnsAttributes;

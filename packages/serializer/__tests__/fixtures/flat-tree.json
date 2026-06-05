@@ -2,14 +2,14 @@
   "version": 0,
   "root": {
     "id": "root",
-    "type": "niyi/container",
+    "type": "core/group",
     "attributes": {
       "maxWidth": "1200px"
     },
     "children": [
       {
         "id": "hero-heading",
-        "type": "niyi/heading",
+        "type": "core/heading",
         "attributes": {
           "level": 1,
           "content": "Welcome"
@@ -18,7 +18,7 @@
       },
       {
         "id": "hero-text",
-        "type": "niyi/text",
+        "type": "core/paragraph",
         "attributes": {
           "content": "Build pages with native Gutenberg blocks."
         },
@@ -26,7 +26,7 @@
       },
       {
         "id": "hero-cta",
-        "type": "niyi/button",
+        "type": "core/button",
         "attributes": {
           "label": "Get started",
           "url": "https://example.com"
@@ -35,7 +35,7 @@
       },
       {
         "id": "hero-spacer",
-        "type": "niyi/spacer",
+        "type": "core/spacer",
         "attributes": {
           "height": {
             "desktop": "32px"

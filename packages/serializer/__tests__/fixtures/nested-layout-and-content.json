@@ -2,14 +2,14 @@
   "version": 0,
   "root": {
     "id": "root",
-    "type": "niyi/container",
+    "type": "core/group",
     "attributes": {
       "maxWidth": "1200px"
     },
     "children": [
       {
         "id": "hero-section",
-        "type": "niyi/container",
+        "type": "core/group",
         "attributes": {
           "padding": { "desktop": "48px 24px" },
           "background": "#1e293b"
@@ -17,38 +17,58 @@
         "children": [
           {
             "id": "hero-grid",
-            "type": "niyi/grid",
+            "type": "core/columns",
             "attributes": {
-              "columns": { "desktop": 2, "mobile": 1 },
+              "columns": { "desktop": 3 },
               "gap": { "desktop": "32px" }
             },
             "children": [
               {
-                "id": "hero-heading",
-                "type": "niyi/heading",
-                "attributes": {
-                  "level": 1,
-                  "content": "Ship faster with Gutenberg"
-                },
-                "children": []
+                "id": "hero-col-heading",
+                "type": "core/column",
+                "attributes": {},
+                "children": [
+                  {
+                    "id": "hero-heading",
+                    "type": "core/heading",
+                    "attributes": {
+                      "level": 1,
+                      "content": "Ship faster with Gutenberg"
+                    },
+                    "children": []
+                  }
+                ]
               },
               {
-                "id": "hero-text",
-                "type": "niyi/text",
-                "attributes": {
-                  "content": "Visual editing that saves native blocks."
-                },
-                "children": []
+                "id": "hero-col-text",
+                "type": "core/column",
+                "attributes": {},
+                "children": [
+                  {
+                    "id": "hero-text",
+                    "type": "core/paragraph",
+                    "attributes": {
+                      "content": "Visual editing that saves native blocks."
+                    },
+                    "children": []
+                  }
+                ]
               },
               {
-                "id": "hero-button",
-                "type": "niyi/button",
-                "attributes": {
-                  "label": "Start building",
-                  "url": "/builder",
-                  "variant": "primary"
-                },
-                "children": []
+                "id": "hero-col-button",
+                "type": "core/column",
+                "attributes": {},
+                "children": [
+                  {
+                    "id": "hero-button",
+                    "type": "core/button",
+                    "attributes": {
+                      "label": "Start building",
+                      "url": "/builder"
+                    },
+                    "children": []
+                  }
+                ]
               }
             ]
           }
@@ -56,62 +76,69 @@
       },
       {
         "id": "features-grid",
-        "type": "niyi/grid",
+        "type": "core/columns",
         "attributes": {
-          "columns": { "desktop": 3, "tablet": 2, "mobile": 1 },
+          "columns": { "desktop": 1 },
           "gap": { "desktop": "24px" }
         },
         "children": [
           {
-            "id": "feature-card",
-            "type": "niyi/container",
-            "attributes": {
-              "borderRadius": "12px",
-              "padding": { "desktop": "20px" }
-            },
+            "id": "feature-column",
+            "type": "core/column",
+            "attributes": {},
             "children": [
               {
-                "id": "feature-icon",
-                "type": "niyi/icon",
+                "id": "feature-card",
+                "type": "core/group",
                 "attributes": {
-                  "name": "layout"
+                  "borderRadius": "12px",
+                  "padding": { "desktop": "20px" }
                 },
-                "children": []
-              },
-              {
-                "id": "feature-title",
-                "type": "niyi/heading",
-                "attributes": {
-                  "level": 3,
-                  "content": "Layout blocks"
-                },
-                "children": []
-              },
-              {
-                "id": "feature-copy",
-                "type": "niyi/text",
-                "attributes": {
-                  "content": "Container, grid, and spacer."
-                },
-                "children": []
-              },
-              {
-                "id": "feature-image",
-                "type": "niyi/image",
-                "attributes": {
-                  "url": "https://example.com/feature.png",
-                  "alt": "Feature"
-                },
-                "children": []
-              },
-              {
-                "id": "feature-video",
-                "type": "niyi/video",
-                "attributes": {
-                  "provider": "youtube",
-                  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                },
-                "children": []
+                "children": [
+                  {
+                    "id": "feature-icon",
+                    "type": "core/html",
+                    "attributes": {
+                      "name": "layout"
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "feature-title",
+                    "type": "core/heading",
+                    "attributes": {
+                      "level": 3,
+                      "content": "Layout blocks"
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "feature-copy",
+                    "type": "core/paragraph",
+                    "attributes": {
+                      "content": "Group, columns, and spacer."
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "feature-image",
+                    "type": "core/image",
+                    "attributes": {
+                      "url": "https://example.com/feature.png",
+                      "alt": "Feature"
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "feature-video",
+                    "type": "core/embed",
+                    "attributes": {
+                      "provider": "youtube",
+                      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    },
+                    "children": []
+                  }
+                ]
               }
             ]
           }
@@ -119,7 +146,7 @@
       },
       {
         "id": "section-spacer",
-        "type": "niyi/spacer",
+        "type": "core/spacer",
         "attributes": {
           "height": { "desktop": "80px" }
         },

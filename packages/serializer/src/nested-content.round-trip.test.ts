@@ -9,45 +9,46 @@ describe('JSON → Gutenberg → JSON round-trip (content in layout)', () => {
     expectRoundTrip(original);
   });
 
-  it('preserves flat-tree fixture (content siblings under root container)', () => {
+  it('preserves flat-tree fixture (content siblings under root group)', () => {
     expectRoundTrip(loadFixture('flat-tree.json'));
   });
 
-  it('preserves content block types and order inside grid', () => {
+  it('preserves content block types and order inside columns', () => {
     const original = loadFixture('nested-layout-and-content.json');
     const restored = roundTrip(original);
 
     expect(canonicalizeDocument(restored)).toEqual(canonicalizeDocument(original));
 
-    const heroGrid = restored.root.children[0]?.children[0];
-    expect(heroGrid?.type).toBe('niyi/grid');
-    expect(heroGrid?.children.map((child) => child.type)).toEqual([
-      'niyi/heading',
-      'niyi/text',
-      'niyi/button',
+    const heroColumns = restored.root.children[0]?.children[0];
+    expect(heroColumns?.type).toBe('core/columns');
+    expect(heroColumns?.children.map((child) => child.type)).toEqual([
+      'core/column',
+      'core/column',
+      'core/column',
     ]);
-    expect(heroGrid?.children[0]?.attributes).toMatchObject({
+    expect(heroColumns?.children[0]?.children[0]?.type).toBe('core/heading');
+    expect(heroColumns?.children[0]?.children[0]?.attributes).toMatchObject({
       level: 1,
       content: 'Ship faster with Gutenberg',
     });
-    expect(heroGrid?.children[2]?.attributes).toMatchObject({
+    expect(heroColumns?.children[2]?.children[0]?.type).toBe('core/button');
+    expect(heroColumns?.children[2]?.children[0]?.attributes).toMatchObject({
       label: 'Start building',
       url: '/builder',
-      variant: 'primary',
     });
   });
 
-  it('preserves mixed content blocks inside nested container', () => {
+  it('preserves mixed content blocks inside nested group', () => {
     const restored = roundTrip(loadFixture('nested-layout-and-content.json'));
-    const featureCard = restored.root.children[1]?.children[0];
+    const featureCard = restored.root.children[1]?.children[0]?.children[0];
 
-    expect(featureCard?.type).toBe('niyi/container');
+    expect(featureCard?.type).toBe('core/group');
     expect(featureCard?.children.map((child) => child.type)).toEqual([
-      'niyi/icon',
-      'niyi/heading',
-      'niyi/text',
-      'niyi/image',
-      'niyi/video',
+      'core/html',
+      'core/heading',
+      'core/paragraph',
+      'core/image',
+      'core/embed',
     ]);
     expect(featureCard?.children[4]?.attributes).toMatchObject({
       provider: 'youtube',

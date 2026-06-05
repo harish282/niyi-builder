@@ -3,7 +3,6 @@ export {
   BLOCK_TYPES,
   CONTENT_BLOCK_TYPES,
   DOCUMENT_VERSION,
-  FORM_BLOCK_TYPES,
   LAYOUT_BLOCK_TYPES,
   LEAF_BLOCK_TYPES,
   ROOT_BLOCK_TYPE,
@@ -16,7 +15,6 @@ export type {
   BlockType,
   ContentBlockType,
   DocumentVersion,
-  FormBlockType,
   LayoutBlockType,
 } from './block-types.js';
 
@@ -24,13 +22,17 @@ export { ALLOWED_CHILDREN, canNest, getAllowedChildTypes } from './nesting.js';
 
 export type {
   ButtonAttributes,
+  ColumnAttributes,
+  ColumnsAttributes,
   ContainerAttributes,
-  FormAttributes,
-  FormFieldAttributes,
+  EmbedAttributes,
   GridAttributes,
+  GroupAttributes,
   HeadingAttributes,
+  HtmlAttributes,
   IconAttributes,
   ImageAttributes,
+  ParagraphAttributes,
   ResponsiveValue,
   SpacerAttributes,
   TextAttributes,

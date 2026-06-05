@@ -19,19 +19,26 @@ describe('validateDocument', () => {
       version: 0,
       root: node({
         id: 'root',
-        type: 'niyi/container',
+        type: 'core/group',
         attributes: {},
         children: [
           node({
             id: 'grid-1',
-            type: 'niyi/grid',
+            type: 'core/columns',
             attributes: {},
             children: [
               node({
-                id: 'h1',
-                type: 'niyi/heading',
-                attributes: { level: 1 },
-                children: [],
+                id: 'col-1',
+                type: 'core/column',
+                attributes: {},
+                children: [
+                  node({
+                    id: 'h1',
+                    type: 'core/heading',
+                    attributes: { level: 1 },
+                    children: [],
+                  }),
+                ],
               }),
             ],
           }),
@@ -42,12 +49,12 @@ describe('validateDocument', () => {
     expect(validateDocument(doc).valid).toBe(true);
   });
 
-  it('rejects non-container root', () => {
+  it('rejects non-group root', () => {
     const doc: BuilderDocument = {
       version: 0,
       root: node({
         id: 'root',
-        type: 'niyi/grid',
+        type: 'core/columns',
         attributes: {},
         children: [],
       }),
@@ -63,17 +70,17 @@ describe('validateDocument', () => {
       version: 0,
       root: node({
         id: 'root',
-        type: 'niyi/container',
+        type: 'core/group',
         attributes: {},
         children: [
           node({
             id: 'spacer-1',
-            type: 'niyi/spacer',
+            type: 'core/spacer',
             attributes: {},
             children: [
               node({
                 id: 'nested',
-                type: 'niyi/text',
+                type: 'core/paragraph',
                 attributes: {},
                 children: [],
               }),
@@ -93,17 +100,17 @@ describe('validateDocument', () => {
       version: 0,
       root: node({
         id: 'root',
-        type: 'niyi/container',
+        type: 'core/group',
         attributes: {},
         children: [
           node({
             id: 'text-1',
-            type: 'niyi/text',
+            type: 'core/paragraph',
             attributes: {},
             children: [
               node({
                 id: 'btn-1',
-                type: 'niyi/button',
+                type: 'core/button',
                 attributes: {},
                 children: [],
               }),
@@ -128,11 +135,11 @@ describe('validateDocument', () => {
       version: 0,
       root: node({
         id: 'root',
-        type: 'niyi/container',
+        type: 'core/group',
         attributes: {},
         children: [
-          node({ id: 'dup', type: 'niyi/spacer', attributes: {}, children: [] }),
-          node({ id: 'dup', type: 'niyi/spacer', attributes: {}, children: [] }),
+          node({ id: 'dup', type: 'core/spacer', attributes: {}, children: [] }),
+          node({ id: 'dup', type: 'core/spacer', attributes: {}, children: [] }),
         ],
       }),
     };
@@ -147,7 +154,7 @@ describe('validateDocument', () => {
       version: 0,
       root: {
         id: 'root',
-        type: 'niyi/unknown',
+        type: 'core/unknown',
         attributes: {},
         children: [],
       },
@@ -156,5 +163,35 @@ describe('validateDocument', () => {
     const result = validateDocument(doc);
     expect(result.valid).toBe(false);
     expect(result.issues.some((i) => i.path === 'root.type')).toBe(true);
+  });
+
+  it('rejects direct children under core/columns that are not columns', () => {
+    const doc: BuilderDocument = {
+      version: 0,
+      root: node({
+        id: 'root',
+        type: 'core/group',
+        attributes: {},
+        children: [
+          node({
+            id: 'cols',
+            type: 'core/columns',
+            attributes: {},
+            children: [
+              node({
+                id: 'bad',
+                type: 'core/heading',
+                attributes: {},
+                children: [],
+              }),
+            ],
+          }),
+        ],
+      }),
+    };
+
+    const result = validateDocument(doc);
+    expect(result.valid).toBe(false);
+    expect(result.issues.some((i) => i.message.includes('not allowed inside'))).toBe(true);
   });
 });
