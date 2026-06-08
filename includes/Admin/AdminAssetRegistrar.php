@@ -103,11 +103,19 @@ final class AdminAssetRegistrar
 
     private function localizeBootstrapConfig(?WP_Post $post): void
     {
+        $restPostUrl = '';
+
+        if ($post instanceof WP_Post) {
+            $route = rest_get_route_for_post($post);
+            $restPostUrl = is_string($route) && $route !== '' ? rest_url($route) : '';
+        }
+
         $config = [
             'postId' => $post?->ID ?? 0,
             'postType' => $post?->post_type ?? '',
             'postTitle' => $post instanceof WP_Post ? get_the_title($post) : '',
             'restUrl' => rest_url('wp/v2/'),
+            'restPostUrl' => $restPostUrl,
             'nonce' => wp_create_nonce('wp_rest'),
             'content' => $post instanceof WP_Post ? (string) $post->post_content : '',
             'exitUrl' => $post instanceof WP_Post ? PostEditorIntegration::getBlockEditorUrl($post->ID) : '',

@@ -7,6 +7,7 @@ export interface NiyiBuilderConfig {
   postType: string;
   postTitle: string;
   restUrl: string;
+  restPostUrl: string;
   nonce: string;
   content: string;
   exitUrl: string;
@@ -28,12 +29,14 @@ export function initializeEditorFromBootstrap(): void {
   const content = config?.content?.trim() ?? '';
 
   if (!content) {
+    useEditorStore.getState().setDocument(createEmptyDocument(), { clean: true });
+
     return;
   }
 
   try {
-    useEditorStore.getState().setDocument(parseFromGutenberg(content));
+    useEditorStore.getState().setDocument(parseFromGutenberg(content), { clean: true });
   } catch {
-    useEditorStore.getState().setDocument(createEmptyDocument());
+    useEditorStore.getState().setDocument(createEmptyDocument(), { clean: true });
   }
 }

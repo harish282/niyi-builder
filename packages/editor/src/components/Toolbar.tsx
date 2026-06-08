@@ -1,3 +1,6 @@
+import { useEffect } from 'react';
+
+import { getBuilderSaveConfig } from '../save-config.js';
 import { useEditorStore, type EditorDevice } from '../store.js';
 
 interface ToolbarBootstrap {
@@ -27,8 +30,29 @@ export function Toolbar() {
   const setDevice = useEditorStore((state) => state.setDevice);
   const isInserterOpen = useEditorStore((state) => state.isInserterOpen);
   const toggleInserter = useEditorStore((state) => state.toggleInserter);
+  const isDirty = useEditorStore((state) => state.isDirty);
+  const isSaving = useEditorStore((state) => state.isSaving);
+  const saveStatus = useEditorStore((state) => state.saveStatus);
+  const saveError = useEditorStore((state) => state.saveError);
+  const saveDocument = useEditorStore((state) => state.saveDocument);
+  const clearSaveFeedback = useEditorStore((state) => state.clearSaveFeedback);
   const bootstrap = getToolbarBootstrap();
   const postTitle = bootstrap.postTitle?.trim();
+  const canSave = getBuilderSaveConfig() !== null;
+
+  useEffect(() => {
+    if (saveStatus !== 'saved') {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      clearSaveFeedback();
+    }, 3000);
+
+    return () => window.clearTimeout(timer);
+  }, [saveStatus, clearSaveFeedback]);
+
+  const saveLabel = isSaving ? 'Saving…' : saveStatus === 'saved' ? 'Saved' : 'Save';
 
   return (
     <header className="niyi-editor__toolbar" aria-label="Builder toolbar">
@@ -40,6 +64,7 @@ export function Toolbar() {
             Default Editor
           </a>
         ) : null}
+        {isDirty ? <span className="niyi-editor__dirty-indicator">Unsaved changes</span> : null}
       </div>
 
       <div className="niyi-editor__toolbar-center">
@@ -68,6 +93,11 @@ export function Toolbar() {
       </div>
 
       <div className="niyi-editor__toolbar-end">
+        {saveError ? (
+          <span className="niyi-editor__save-error" role="alert">
+            {saveError}
+          </span>
+        ) : null}
         <button
           type="button"
           className={isInserterOpen ? 'niyi-editor__btn is-active' : 'niyi-editor__btn'}
@@ -79,11 +109,22 @@ export function Toolbar() {
         </button>
         <button
           type="button"
-          className="niyi-editor__btn niyi-editor__btn--primary"
-          disabled
-          title="Coming soon"
+          className={
+            saveStatus === 'saved'
+              ? 'niyi-editor__btn niyi-editor__btn--primary is-saved'
+              : 'niyi-editor__btn niyi-editor__btn--primary'
+          }
+          disabled={!canSave || isSaving || !isDirty}
+          title={
+            !canSave
+              ? 'Save is available when editing a post or page'
+              : !isDirty
+                ? 'No changes to save'
+                : 'Save to WordPress'
+          }
+          onClick={() => void saveDocument()}
         >
-          Save
+          {saveLabel}
         </button>
       </div>
     </header>
