@@ -1,3 +1,4 @@
+export { createBlockNode, getInsertableBlockTypes } from './create-block.js';
 export { ensureDefaultBlocksRegistered } from './register-defaults.js';
 export {
   getBlockDefinition,

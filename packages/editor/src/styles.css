@@ -96,7 +96,17 @@
   background: #f6f7f7;
   color: #50575e;
   font-size: 13px;
+  cursor: pointer;
+}
+
+.niyi-editor__btn:disabled {
   cursor: not-allowed;
+}
+
+.niyi-editor__btn.is-active {
+  border-color: #2271b1;
+  background: #f0f6fc;
+  color: #135e96;
 }
 
 .niyi-editor__btn--primary {
@@ -266,6 +276,116 @@
     rgba(0, 0, 0, 0.04) 8px
   );
   border-radius: 2px;
+}
+
+.niyi-editor__inserter-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.niyi-editor__inserter {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(360px, 100%);
+  height: 100%;
+  background: #fff;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+}
+
+.niyi-editor__inserter-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #dcdcde;
+}
+
+.niyi-editor__inserter-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.niyi-editor__inserter-target {
+  margin: 0.35rem 0 0;
+  font-size: 12px;
+  color: #646970;
+}
+
+.niyi-editor__inserter-close {
+  margin: 0;
+  padding: 0.15rem 0.5rem;
+  border: 0;
+  background: transparent;
+  color: #50575e;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.niyi-editor__inserter-body {
+  flex: 1;
+  overflow: auto;
+  padding: 0.75rem 1.25rem 1.25rem;
+}
+
+.niyi-editor__inserter-section + .niyi-editor__inserter-section {
+  margin-top: 1.25rem;
+}
+
+.niyi-editor__inserter-section-title {
+  margin: 0 0 0.5rem;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #646970;
+}
+
+.niyi-editor__inserter-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.niyi-editor__inserter-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  background: #f6f7f7;
+  text-align: left;
+  cursor: pointer;
+}
+
+.niyi-editor__inserter-item:hover {
+  border-color: #2271b1;
+  background: #f0f6fc;
+}
+
+.niyi-editor__inserter-item-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.niyi-editor__inserter-item-type {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  color: #646970;
 }
 
 @media (max-width: 782px) {

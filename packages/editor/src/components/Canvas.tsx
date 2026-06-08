@@ -20,7 +20,8 @@ export function Canvas() {
         <div className="niyi-editor__canvas-inner" onClick={() => selectBlock(null)}>
           {blockCount === 0 ? (
             <p className="niyi-editor__canvas-empty">
-              Empty page — use <strong>Add element</strong> (coming next) to insert blocks.
+              Empty page — click <strong>Add element</strong> in the toolbar to insert your first
+              block.
             </p>
           ) : null}
 

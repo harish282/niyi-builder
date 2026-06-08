@@ -25,6 +25,8 @@ const DEVICES: { id: EditorDevice; label: string }[] = [
 export function Toolbar() {
   const device = useEditorStore((state) => state.device);
   const setDevice = useEditorStore((state) => state.setDevice);
+  const isInserterOpen = useEditorStore((state) => state.isInserterOpen);
+  const toggleInserter = useEditorStore((state) => state.toggleInserter);
   const bootstrap = getToolbarBootstrap();
   const postTitle = bootstrap.postTitle?.trim();
 
@@ -66,7 +68,13 @@ export function Toolbar() {
       </div>
 
       <div className="niyi-editor__toolbar-end">
-        <button type="button" className="niyi-editor__btn" disabled title="Coming soon">
+        <button
+          type="button"
+          className={isInserterOpen ? 'niyi-editor__btn is-active' : 'niyi-editor__btn'}
+          aria-expanded={isInserterOpen}
+          aria-haspopup="dialog"
+          onClick={() => toggleInserter()}
+        >
           Add element
         </button>
         <button

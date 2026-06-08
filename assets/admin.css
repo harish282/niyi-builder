@@ -34,7 +34,9 @@ body.niyi-builder-editor-screen #screen-meta,
 body.niyi-builder-editor-screen #screen-meta-links,
 body.niyi-builder-editor-screen #local-storage-notice,
 body.niyi-builder-editor-screen #lost-connection-notice,
-body.niyi-builder-editor-screen #wpbody-content > div:not(.niyi-builder-admin__root):not(#screen-meta) {
+body.niyi-builder-editor-screen
+  #wpbody-content
+  > div:not(.niyi-builder-admin__root):not(#screen-meta) {
   display: none;
 }
 
