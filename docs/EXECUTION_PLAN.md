@@ -27,7 +27,7 @@
 
 **Working title:** Open Visual Gutenberg Builder (Niyi Builder)
 
-Build an open-source visual WordPress page builder that feels like Elementor/Divi but stores **native Gutenberg blocks** — no shortcode lock-in, lightweight frontend, responsive by default, developer-friendly and extensible.
+Build an open-source visual WordPress page builder that feels like other visual editors but stores **native Gutenberg blocks** — no shortcode lock-in, lightweight frontend, responsive by default, developer-friendly and extensible.
 
 | Principle               | Meaning                             |
 | ----------------------- | ----------------------------------- |

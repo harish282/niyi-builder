@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
 #
 # Package Niyi Builder for WordPress.
+# Always runs `npm run build` first, then copies runtime files (no symlink deploy).
 # Excludes tests, dev tooling, git metadata, and Node/TypeScript sources.
 # Ships readme.txt and license.txt (required for WordPress.org).
 #
+# Runtime tree staged (whitelist):
+#   niyi-builder.php, bootstrap/, config/, includes/, resources/, assets/,
+#   build/, blocks/, languages/, readme.txt, license.txt,
+#   docs/LAYOUT_SCHEMA_V0.md, docs/EDITOR_INTEGRATION.md, docs/schemas/
+#
 # Usage (from repo root):
 #   npm run release
-#     Build production assets and write ./build/niyi-builder-x.y.z.zip
+#     Build + write ./build/niyi-builder-x.y.z.zip
 #   npm run release:dev
-#     Copy runtime files to ../plugins/niyi-builder (local WordPress plugins dir).
+#     Build + copy runtime files to wp-content/plugins/niyi-builder
 #   bash scripts/build-release-zip.sh dev
 #   bash scripts/build-release-zip.sh prod
 #   bash scripts/build-release-zip.sh prod /path/to/output-dir
-#
-# Legacy (prod with custom output dir, mode omitted):
-#   bash scripts/build-release-zip.sh /path/to/output-dir
 #
 set -euo pipefail
 
@@ -56,20 +59,102 @@ if [[ -z "$VERSION" ]]; then
   exit 1
 fi
 
-ensure_built() {
-  if [[ -f "$ROOT/build/manifest.json" && -f "$ROOT/build/admin.js" ]]; then
-    return 0
-  fi
+root_realpath() {
+  (cd "$ROOT" && pwd -P)
+}
 
-  if command -v npm >/dev/null 2>&1 && [[ -f "$ROOT/package.json" ]]; then
-    echo "Running npm run build ..."
-    (cd "$ROOT" && npm run build)
-  fi
+is_source_repo() {
+  local path="$1"
+  local root_real path_real
 
-  if [[ ! -f "$ROOT/build/manifest.json" || ! -f "$ROOT/build/admin.js" ]]; then
-    echo "error: build output missing; run npm run build" >&2
+  root_real="$(root_realpath)"
+  path_real="$(cd "$path" && pwd -P 2>/dev/null)" || return 1
+
+  [[ "$path_real" == "$root_real" ]]
+}
+
+run_build() {
+  if ! command -v npm >/dev/null 2>&1 || [[ ! -f "$ROOT/package.json" ]]; then
+    echo "error: npm and package.json are required to build" >&2
     exit 1
   fi
+
+  echo "Running npm run build ..."
+  (cd "$ROOT" && npm run build)
+  verify_built_assets
+}
+
+verify_built_assets() {
+  local manifest="$ROOT/build/manifest.json"
+  local missing=0
+  local css_rel
+
+  if [[ ! -f "$ROOT/build/admin.js" ]]; then
+    echo "error: missing build/admin.js" >&2
+    missing=1
+  fi
+
+  if [[ ! -f "$manifest" ]]; then
+    echo "error: missing build/manifest.json" >&2
+    missing=1
+  fi
+
+  if ! compgen -G "$ROOT/build/assets/*.css" > /dev/null; then
+    echo "error: missing build/assets/*.css bundle" >&2
+    missing=1
+  fi
+
+  if [[ -f "$manifest" ]] && command -v php >/dev/null 2>&1; then
+    while IFS= read -r css_rel; do
+      [[ -z "$css_rel" ]] && continue
+      if [[ ! -f "$ROOT/build/$css_rel" ]]; then
+        echo "error: manifest references missing stylesheet build/$css_rel" >&2
+        missing=1
+      fi
+    done < <(php -r '
+      $manifest = json_decode(file_get_contents($argv[1]), true);
+      if (!is_array($manifest)) { exit(0); }
+      foreach ($manifest as $entry) {
+        if (!is_array($entry) || empty($entry["css"]) || !is_array($entry["css"])) {
+          continue;
+        }
+        foreach ($entry["css"] as $css) {
+          if (is_string($css) && $css !== "") {
+            echo $css, PHP_EOL;
+          }
+        }
+      }
+    ' "$manifest")
+  fi
+
+  if [[ "$missing" -ne 0 ]]; then
+    return 1
+  fi
+
+  return 0
+}
+
+# Replace symlink or previous deploy with an empty directory ready for copy.
+prepare_deploy_destination() {
+  local dest="$1"
+
+  # Remove symlink first (pwd -P would otherwise resolve to the source repo).
+  if [[ -L "$dest" ]]; then
+    echo "Removing symlink at $dest"
+    rm "$dest"
+  fi
+
+  if [[ -e "$dest" ]] && is_source_repo "$dest"; then
+    echo "error: deploy destination is the source repo ($dest); refusing to overwrite" >&2
+    exit 1
+  fi
+
+  if [[ -e "$dest" ]]; then
+    echo "Removing previous deploy at $dest"
+    rm -rf "$dest"
+  fi
+
+  mkdir -p "$dest"
 }
 
 # WordPress.org readme Stable tag should match the plugin header version.
@@ -111,9 +196,41 @@ copy_required() {
   cp -a "$ROOT/$rel" "$dest/"
 }
 
+verify_runtime_files() {
+  local dest="$1"
+  local missing=0
+  local required_files=(
+    "niyi-builder.php"
+    "bootstrap/constants.php"
+    "config/plugin.php"
+    "includes/Plugin.php"
+    "includes/Admin/PostEditorIntegration.php"
+    "includes/Admin/BuilderPageRenderer.php"
+    "includes/Admin/AdminAssetRegistrar.php"
+    "resources/views/builder-app.php"
+    "assets/admin.css"
+    "assets/gutenberg-bridge.js"
+    "assets/gutenberg-bridge.css"
+    "build/admin.js"
+    "build/manifest.json"
+    "readme.txt"
+    "license.txt"
+  )
+
+  for rel in "${required_files[@]}"; do
+    if [[ ! -e "$dest/$rel" ]]; then
+      echo "error: staged release missing required file: $rel" >&2
+      missing=1
+    fi
+  done
+
+  if [[ "$missing" -ne 0 ]]; then
+    exit 1
+  fi
+}
+
 stage_plugin_to() {
   local dest="$1"
-  mkdir -p "$dest"
 
   copy_if_exists "$dest" "niyi-builder.php"
   copy_if_exists "$dest" "bootstrap"
@@ -124,7 +241,11 @@ stage_plugin_to() {
   copy_if_exists "$dest" "build"
   copy_if_exists "$dest" "blocks"
   copy_if_exists "$dest" "languages"
-  for doc in docs/LAYOUT_SCHEMA_V0.md docs/schemas/layout-v0.schema.json; do
+  for doc in \
+    docs/LAYOUT_SCHEMA_V0.md \
+    docs/EDITOR_INTEGRATION.md \
+    docs/schemas/layout-v0.schema.json
+  do
     if [[ -f "$ROOT/$doc" ]]; then
       mkdir -p "$dest/$(dirname "$doc")"
       cp -a "$ROOT/$doc" "$dest/$doc"
@@ -140,7 +261,7 @@ stage_plugin_to() {
   # Production bundles only — drop source maps if present.
   find "$dest/build" -name '*.map' -delete 2>/dev/null || true
 
-  # Drop legacy paths removed from source (cp -a does not delete stale deploy files).
+  # Drop dev-only paths that must not ship.
   rm -rf \
     "$dest/admin" \
     "$dest/packages" \
@@ -149,13 +270,16 @@ stage_plugin_to() {
     "$dest/docs/EXECUTION_PLAN.md" \
     "$dest/docs/STACKS_USED.txt" \
     2>/dev/null || true
+
+  verify_runtime_files "$dest"
 }
 
-ensure_built
+run_build
 
 if [[ "$MODE" == "dev" ]]; then
   DEV_DEST="$(cd "$ROOT/../../plugins" && pwd)/$PLUGIN_SLUG"
   mkdir -p "$(dirname "$DEV_DEST")"
+  prepare_deploy_destination "$DEV_DEST"
   stage_plugin_to "$DEV_DEST"
   echo "Deployed to $DEV_DEST (version $VERSION)"
   exit 0
@@ -165,6 +289,7 @@ STAGE="$(mktemp -d "${TMPDIR:-/tmp}/niyi-builder-release.XXXXXX")"
 trap 'rm -rf "$STAGE"' EXIT
 
 DEST="$STAGE/$PLUGIN_SLUG"
+mkdir -p "$DEST"
 stage_plugin_to "$DEST"
 
 mkdir -p "$OUT_DIR"

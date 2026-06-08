@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace NiyiBuilder\Admin;
 
 use NiyiBuilder\Config\Config;
+use NiyiBuilder\Support\PluginAssets;
+use WP_Post;
 
 final class AdminAssetRegistrar
 {
     private const MENU_SLUG = 'niyi-builder';
+    private const SCRIPT_HANDLE = 'niyi-builder-admin';
     private const MANIFEST_ENTRY = 'src/main.tsx';
 
     public function register(): void
@@ -22,20 +25,30 @@ final class AdminAssetRegistrar
             return;
         }
 
+        $this->enqueueAssets(null);
+    }
+
+    public function enqueueBuilderAssets(WP_Post $post): void
+    {
+        $this->enqueueAssets($post);
+    }
+
+    private function enqueueAssets(?WP_Post $post): void
+    {
         wp_enqueue_style(
             'niyi-builder-admin-shell',
-            plugins_url('assets/admin.css', NIYI_BUILDER_FILE),
+            PluginAssets::url('assets/admin.css'),
             [],
             NIYI_BUILDER_VERSION
         );
 
         if ($this->isViteDevServer()) {
-            $this->enqueueViteDevAssets();
+            $this->enqueueViteDevAssets($post);
 
             return;
         }
 
-        $this->enqueueProductionAssets();
+        $this->enqueueProductionAssets($post);
     }
 
     private function isViteDevServer(): bool
@@ -43,15 +56,16 @@ final class AdminAssetRegistrar
         return (bool) Config::instance()->get('assets.vite_dev.enabled', false);
     }
 
-    private function enqueueViteDevAssets(): void
+    private function enqueueViteDevAssets(?WP_Post $post): void
     {
         $origin = $this->viteDevOrigin();
 
         $this->enqueueModuleScript('niyi-builder-vite-client', $origin . '/@vite/client', []);
-        $this->enqueueModuleScript('niyi-builder-admin', $origin . '/src/main.tsx', ['niyi-builder-vite-client']);
+        $this->enqueueModuleScript(self::SCRIPT_HANDLE, $origin . '/src/main.tsx', ['niyi-builder-vite-client']);
+        $this->localizeBootstrapConfig($post);
     }
 
-    private function enqueueProductionAssets(): void
+    private function enqueueProductionAssets(?WP_Post $post): void
     {
         $manifest = $this->loadManifest();
 
@@ -61,18 +75,19 @@ final class AdminAssetRegistrar
 
         $entry = $manifest[self::MANIFEST_ENTRY] ?? null;
 
-        if (!is_array($entry) || empty($entry['file']) || !is_string($entry['file'])) {
+        if (! is_array($entry) || empty($entry['file']) || ! is_string($entry['file'])) {
             return;
         }
 
-        $buildUrl = plugins_url('build/', NIYI_BUILDER_FILE);
+        $buildUrl = PluginAssets::url('build/');
         $scriptUrl = $buildUrl . ltrim($entry['file'], '/');
 
-        $this->enqueueModuleScript('niyi-builder-admin', $scriptUrl, []);
+        $this->enqueueModuleScript(self::SCRIPT_HANDLE, $scriptUrl, []);
+        $this->localizeBootstrapConfig($post);
 
-        if (!empty($entry['css']) && is_array($entry['css'])) {
+        if (! empty($entry['css']) && is_array($entry['css'])) {
             foreach ($entry['css'] as $index => $stylesheet) {
-                if (!is_string($stylesheet) || $stylesheet === '') {
+                if (! is_string($stylesheet) || $stylesheet === '') {
                     continue;
                 }
 
@@ -86,6 +101,33 @@ final class AdminAssetRegistrar
         }
     }
 
+    private function localizeBootstrapConfig(?WP_Post $post): void
+    {
+        $config = [
+            'postId' => $post?->ID ?? 0,
+            'postType' => $post?->post_type ?? '',
+            'postTitle' => $post instanceof WP_Post ? get_the_title($post) : '',
+            'restUrl' => rest_url('wp/v2/'),
+            'nonce' => wp_create_nonce('wp_rest'),
+            'content' => $post instanceof WP_Post ? (string) $post->post_content : '',
+            'exitUrl' => $post instanceof WP_Post ? $this->getBlockEditorUrl($post) : '',
+            'isDevShell' => ! ($post instanceof WP_Post),
+        ];
+
+        wp_localize_script(self::SCRIPT_HANDLE, 'niyiBuilderConfig', $config);
+    }
+
+    private function getBlockEditorUrl(WP_Post $post): string
+    {
+        $editUrl = get_edit_post_link($post->ID, 'raw');
+
+        if (! is_string($editUrl) || $editUrl === '') {
+            return '';
+        }
+
+        return remove_query_arg(PostEditorIntegration::BUILDER_QUERY_FLAG, $editUrl);
+    }
+
     /**
      * @return array<string, mixed>|null
      */
@@ -93,7 +135,7 @@ final class AdminAssetRegistrar
     {
         $manifestPath = NIYI_BUILDER_BUILD_PATH . '/manifest.json';
 
-        if (!is_readable($manifestPath)) {
+        if (! is_readable($manifestPath)) {
             return null;
         }
 

@@ -20,8 +20,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "release": "npm run build && bash scripts/build-release-zip.sh prod",
-    "release:dev": "npm run build && bash scripts/build-release-zip.sh dev",
+    "release": "bash scripts/build-release-zip.sh prod",
+    "release:dev": "bash scripts/build-release-zip.sh dev",
     "clean": "npm run clean --workspaces --if-present && rm -f tsconfig.tsbuildinfo"
   },
   "dependencies": {

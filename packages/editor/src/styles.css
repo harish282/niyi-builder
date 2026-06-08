@@ -1,7 +1,7 @@
 .niyi-editor {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 32px);
+  min-height: 100vh;
   background: #f0f0f1;
   color: #1d2327;
   font-size: 13px;
@@ -34,6 +34,26 @@
 .niyi-editor__toolbar-center {
   display: flex;
   justify-content: center;
+}
+
+.niyi-editor__post-title {
+  color: #50575e;
+  font-size: 13px;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.niyi-editor__exit-link {
+  color: #2271b1;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.niyi-editor__exit-link:hover {
+  color: #135e96;
+  text-decoration: underline;
 }
 
 .niyi-editor__brand {

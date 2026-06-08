@@ -15,7 +15,11 @@ if (!defined('NIYI_BUILDER_VERSION')) {
 }
 
 if (!defined('NIYI_BUILDER_PATH')) {
-    define('NIYI_BUILDER_PATH', dirname(NIYI_BUILDER_FILE));
+    define('NIYI_BUILDER_PATH', plugin_dir_path(NIYI_BUILDER_FILE));
+}
+
+if (!defined('NIYI_BUILDER_URL')) {
+    define('NIYI_BUILDER_URL', plugin_dir_url(NIYI_BUILDER_FILE));
 }
 
 if (!defined('NIYI_BUILDER_CONFIG_PATH')) {

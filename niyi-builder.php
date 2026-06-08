@@ -20,6 +20,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/** Canonical plugin file path for hooks and asset URLs (must be __FILE__, not a derived path). */
+define('NIYI_BUILDER_FILE', __FILE__);
+
 require_once __DIR__ . '/bootstrap/constants.php';
 require_once NIYI_BUILDER_INCLUDES_PATH . '/Support/Autoloader.php';
 

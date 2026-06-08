@@ -1,7 +1,8 @@
-/* Full-width builder screen within wp-admin (see BuilderAdminPage::filterAdminBodyClass). */
+/* Full-screen builder on post edit (BuilderPageRenderer) and dev shell (BuilderAdminPage). */
 
-body.niyi-builder-editor-screen #wpcontent {
-  padding-left: 0;
+body.niyi-builder-editor-screen #wpcontent,
+body.niyi-builder-editor-screen #wpfooter {
+  display: none;
 }
 
 body.niyi-builder-editor-screen #wpbody-content {
@@ -10,7 +11,7 @@ body.niyi-builder-editor-screen #wpbody-content {
 
 body.niyi-builder-editor-screen .niyi-builder-admin__root {
   margin: 0;
-  min-height: calc(100vh - 32px);
+  min-height: 100vh;
 }
 
 @media screen and (max-width: 782px) {

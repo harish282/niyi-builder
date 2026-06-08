@@ -55,4 +55,10 @@ export default tseslint.config(
       globals: globals.node,
     },
   },
+  {
+    files: ['assets/**/*.js'],
+    languageOptions: {
+      globals: globals.browser,
+    },
+  },
 );

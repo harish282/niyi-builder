@@ -1,0 +1,30 @@
+---
+description: How Niyi Builder loads in WordPress — post/page edit integration
+alwaysApply: true
+---
+
+# WordPress editor integration
+
+**Full reference (Other Editors + Niyi):** [docs/EDITOR_INTEGRATION.md](../../docs/EDITOR_INTEGRATION.md)
+
+## Niyi Builder (current)
+
+- **Primary:** `PostEditorIntegration` — `replace_editor` when `?niyi-builder=1` on `post.php?post={id}&action=edit`.
+- **Entry points:** row action; block editor button (`assets/gutenberg-bridge.js`, launch link pattern used by other editors).
+- **Render:** `BuilderPageRenderer` → `admin-header.php` + `resources/views/builder-app.php`.
+- **Bootstrap:** `niyiBuilderConfig` via `AdminAssetRegistrar` (postId, content, REST URL, exitUrl).
+- **Load:** `admin/src/bootstrap.ts` → `parseFromGutenberg()` → Zustand store.
+- **Dev shell:** `BuilderAdminPage` menu — temporary, no post context.
+
+## Other Editors (reference only — do not copy)
+
+- Common pattern: frontend builder on permalink + query flag; shortcodes/custom markup in `post_content`; AJAX save.
+- Gutenberg coexistence via launch link, often not `replace_editor`.
+- See doc §2 for typical hooks and patterns.
+
+## Rules
+
+- Gutenberg markup in `post_content` is canonical — never save layout JSON to DB.
+- Save (TODO #18): `serializeToGutenberg()` → REST `PUT` `content` field.
+- Supported types: `post`, `page` (`PostEditorIntegration::SUPPORTED_POST_TYPES`).
+- Do not use standalone admin menu as primary UX.

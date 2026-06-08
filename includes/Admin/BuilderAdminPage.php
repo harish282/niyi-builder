@@ -28,9 +28,10 @@ final class BuilderAdminPage
 
     public function registerMenu(): void
     {
+        // Dev shell only — primary entry is post/page edit (see PostEditorIntegration).
         add_menu_page(
-            __('Niyi Builder', 'niyi-builder'),
-            __('Niyi Builder', 'niyi-builder'),
+            __('Niyi Builder (Dev)', 'niyi-builder'),
+            __('Niyi Builder (Dev)', 'niyi-builder'),
             'edit_posts',
             self::MENU_SLUG,
             [$this, 'renderPage'],

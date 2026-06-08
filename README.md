@@ -5,7 +5,7 @@ WordPress plugin — open-source **visual page builder** that outputs **native G
 ## Plugin layout
 
 ```
-niyi-builder/                 # WordPress plugin root (symlink into wp-content/plugins/)
+niyi-builder/                 # Dev repo — deploy copy to wp-content/plugins/ via release:dev
 ├── niyi-builder.php          # Plugin bootstrap
 ├── config/plugin.php         # Plugin settings (Vite dev, app env, …)
 ├── bootstrap/                # Constants
@@ -21,10 +21,12 @@ niyi-builder/                 # WordPress plugin root (symlink into wp-content/p
 
 ## WordPress
 
-Install by symlinking or copying this repo into `wp-content/plugins/niyi-builder`.
+Deploy a runtime copy into WordPress with `npm run release:dev` (builds first, then copies to `wp-content/plugins/niyi-builder`).
 
-- **Admin:** WP Admin → **Niyi Builder**
+- **Editor:** Edit a post/page → **Edit with Niyi Builder** (list row or block editor header)
+- **Dev shell:** WP Admin → **Niyi Builder (Dev)** (no post context)
 - **Config:** `config/plugin.php` (see `config/plugin.sample.php`)
+- **Architecture:** [docs/EDITOR_INTEGRATION.md](docs/EDITOR_INTEGRATION.md) — other editors reference + how Niyi loads
 - **Requires:** WordPress 6.4+, PHP 8.1+
 
 ## Development
@@ -39,7 +41,7 @@ npm test
 npm run lint         # TypeScript + ESLint + Prettier check
 npm run format       # Prettier write
 npm run release      # build + production zip in build/
-npm run release:dev  # build + copy to wp-content/plugins/niyi-builder
+npm run release:dev  # build + deploy copy to wp-content/plugins/niyi-builder
 ```
 
 Editor settings: `.editorconfig` and `.vscode/settings.json` (format on save + ESLint fix).

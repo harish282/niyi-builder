@@ -1,5 +1,21 @@
 import { useEditorStore, type EditorDevice } from '../store.js';
 
+interface ToolbarBootstrap {
+  postTitle?: string;
+  exitUrl?: string;
+  isDevShell?: boolean;
+}
+
+function getToolbarBootstrap(): ToolbarBootstrap {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  const config = (window as Window & { niyiBuilderConfig?: ToolbarBootstrap }).niyiBuilderConfig;
+
+  return config ?? {};
+}
+
 const DEVICES: { id: EditorDevice; label: string }[] = [
   { id: 'desktop', label: 'Desktop' },
   { id: 'tablet', label: 'Tablet' },
@@ -9,11 +25,19 @@ const DEVICES: { id: EditorDevice; label: string }[] = [
 export function Toolbar() {
   const device = useEditorStore((state) => state.device);
   const setDevice = useEditorStore((state) => state.setDevice);
+  const bootstrap = getToolbarBootstrap();
+  const postTitle = bootstrap.postTitle?.trim();
 
   return (
     <header className="niyi-editor__toolbar" aria-label="Builder toolbar">
       <div className="niyi-editor__toolbar-start">
         <span className="niyi-editor__brand">Niyi Builder</span>
+        {postTitle ? <span className="niyi-editor__post-title">{postTitle}</span> : null}
+        {bootstrap.exitUrl ? (
+          <a className="niyi-editor__exit-link" href={bootstrap.exitUrl}>
+            Block editor
+          </a>
+        ) : null}
       </div>
 
       <div className="niyi-editor__toolbar-center">
