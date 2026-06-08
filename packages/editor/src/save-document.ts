@@ -12,6 +12,13 @@ export function documentToGutenbergMarkup(document: BuilderDocument): string {
   return serializeToGutenberg(document);
 }
 
+/** Log the Gutenberg markup that would be persisted on save (dev/debug). */
+export function printSavePayload(document: BuilderDocument): string {
+  const markup = documentToGutenbergMarkup(document);
+  console.log('[Niyi Builder] Save payload (Gutenberg markup):\n', markup);
+  return markup;
+}
+
 export function syncBootstrapContent(markup: string): void {
   if (typeof window === 'undefined') {
     return;

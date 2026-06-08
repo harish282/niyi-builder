@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { getBuilderSaveConfig } from '../save-config.js';
+import { printSavePayload } from '../save-document.js';
 import { useEditorStore, type EditorDevice } from '../store.js';
 
 interface ToolbarBootstrap {
@@ -34,6 +35,7 @@ export function Toolbar() {
   const isSaving = useEditorStore((state) => state.isSaving);
   const saveStatus = useEditorStore((state) => state.saveStatus);
   const saveError = useEditorStore((state) => state.saveError);
+  const document = useEditorStore((state) => state.document);
   const saveDocument = useEditorStore((state) => state.saveDocument);
   const saveBeforeEditorSwitch = useEditorStore((state) => state.saveBeforeEditorSwitch);
   const clearSaveFeedback = useEditorStore((state) => state.clearSaveFeedback);
@@ -127,18 +129,23 @@ export function Toolbar() {
         </button>
         <button
           type="button"
+          className="niyi-editor__btn"
+          disabled={isSaving}
+          title="Print Gutenberg markup to the browser console"
+          onClick={() => printSavePayload(document)}
+        >
+          Print Save
+        </button>
+        <button
+          type="button"
           className={
             saveStatus === 'saved'
               ? 'niyi-editor__btn niyi-editor__btn--primary is-saved'
               : 'niyi-editor__btn niyi-editor__btn--primary'
           }
-          disabled={!canSave || isSaving || !isDirty}
+          disabled={!canSave || isSaving}
           title={
-            !canSave
-              ? 'Save is available when editing a post or page'
-              : !isDirty
-                ? 'No changes to save'
-                : 'Save to WordPress'
+            !canSave ? 'Save is available when editing a post or page' : 'Save to WordPress'
           }
           onClick={() => void saveDocument()}
         >

@@ -31,6 +31,17 @@ function escapeHtml(text: string): string {
     .replace(/"/g, '&quot;');
 }
 
+function pickDesktopString(value: unknown): string | undefined {
+  if (typeof value === 'string' && value) {
+    return value;
+  }
+  if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    const responsive = value as { desktop?: string; tablet?: string; mobile?: string };
+    return responsive.desktop ?? responsive.tablet ?? responsive.mobile;
+  }
+  return undefined;
+}
+
 function toGutenberg(
   split: (attrs: Record<string, unknown>) => {
     native: Record<string, unknown>;
@@ -92,6 +103,11 @@ export function spacerFromGutenberg(
   innerHTML: string,
 ): Record<string, unknown> {
   return fromGutenberg(gutenbergAttrs, innerHTML, nativeSpacerToBuilder);
+}
+
+export function spacerInnerHtml(attrs: Record<string, unknown>): string {
+  const height = pickDesktopString(attrs.height) ?? '100px';
+  return `<div style="height:${escapeHtml(height)}" aria-hidden="true" class="wp-block-spacer"></div>`;
 }
 
 export function headingToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
@@ -156,6 +172,15 @@ export function imageFromGutenberg(
   return fromGutenberg(gutenbergAttrs, innerHTML, nativeImageToBuilder);
 }
 
+export function imageInnerHtml(attrs: Record<string, unknown>): string {
+  const url = typeof attrs.url === 'string' ? attrs.url : '';
+  const alt = typeof attrs.alt === 'string' ? attrs.alt : '';
+  const attachmentId = typeof attrs.attachmentId === 'number' ? attrs.attachmentId : undefined;
+  const src = url ? ` src="${escapeHtml(url)}"` : '';
+  const imgClass = attachmentId !== undefined ? ` class="wp-image-${attachmentId}"` : '';
+  return `<figure class="wp-block-image"><img${src} alt="${escapeHtml(alt)}"${imgClass}/></figure>`;
+}
+
 export function htmlToGutenberg(attrs: Record<string, unknown>): Record<string, unknown> {
   return toGutenberg(splitHtmlAttrs, attrs);
 }
@@ -190,6 +215,15 @@ export function embedFromGutenberg(
   return fromGutenberg(gutenbergAttrs, innerHTML, nativeEmbedToBuilder);
 }
 
+export function embedInnerHtml(attrs: Record<string, unknown>): string {
+  const url = typeof attrs.url === 'string' ? attrs.url : '';
+  const provider = typeof attrs.provider === 'string' ? attrs.provider : '';
+  const typeClass =
+    provider === 'youtube' || provider === 'vimeo' || provider === 'twitter' ? ' is-type-video' : '';
+  const providerClass = provider ? ` is-provider-${provider} wp-block-embed-${provider}` : '';
+  return `<figure class="wp-block-embed${typeClass}${providerClass}"><div class="wp-block-embed__wrapper">\n${escapeHtml(url)}\n</div></figure>`;
+}
+
 export interface BlockMarkupStrategy {
   toGutenbergAttrs: (attrs: Record<string, unknown>) => Record<string, unknown>;
   fromGutenbergAttrs: (
@@ -216,7 +250,7 @@ export const BLOCK_MARKUP_STRATEGIES: Partial<Record<BlockType, BlockMarkupStrat
   'core/spacer': {
     toGutenbergAttrs: spacerToGutenberg,
     fromGutenbergAttrs: spacerFromGutenberg,
-    selfClosing: true,
+    innerHtml: spacerInnerHtml,
   },
   'core/heading': {
     toGutenbergAttrs: headingToGutenberg,
@@ -236,7 +270,7 @@ export const BLOCK_MARKUP_STRATEGIES: Partial<Record<BlockType, BlockMarkupStrat
   'core/image': {
     toGutenbergAttrs: imageToGutenberg,
     fromGutenbergAttrs: imageFromGutenberg,
-    selfClosing: true,
+    innerHtml: imageInnerHtml,
   },
   'core/html': {
     toGutenbergAttrs: htmlToGutenberg,
@@ -246,6 +280,6 @@ export const BLOCK_MARKUP_STRATEGIES: Partial<Record<BlockType, BlockMarkupStrat
   'core/embed': {
     toGutenbergAttrs: embedToGutenberg,
     fromGutenbergAttrs: embedFromGutenberg,
-    selfClosing: true,
+    innerHtml: embedInnerHtml,
   },
 };

@@ -78,10 +78,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       return false;
     }
 
-    if (!state.isDirty) {
-      return true;
-    }
-
     set({ isSaving: true, saveStatus: null, saveError: null });
 
     try {

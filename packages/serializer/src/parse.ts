@@ -32,7 +32,7 @@ export function parseFromGutenberg(markup: string, options: ParseOptions = {}): 
   }
 
   idCounter = 0;
-  const blocks = parse(trimmed) as ParsedBlock[];
+  const blocks = normalizeTopLevelBlocks(parse(trimmed) as ParsedBlock[]);
   const rootBlock = extractRootBlock(blocks);
   const root = parsedBlockToNode(rootBlock, 'root');
 
@@ -94,6 +94,46 @@ function topLevelBlocksExcept(blocks: ParsedBlock[], skip: ParsedBlock): ParsedB
   return blocks.filter((block) => block !== skip);
 }
 
+/** Promote `core/button` children when Gutenberg wraps them in `core/buttons` at the post root. */
+function normalizeTopLevelBlocks(blocks: ParsedBlock[]): ParsedBlock[] {
+  const normalized: ParsedBlock[] = [];
+
+  for (const block of blocks) {
+    if (block.blockName === 'core/buttons') {
+      for (const child of block.innerBlocks) {
+        if (child.blockName === 'core/button') {
+          normalized.push(child);
+        }
+      }
+      continue;
+    }
+
+    normalized.push(block);
+  }
+
+  return normalized;
+}
+
+/** Gutenberg stores buttons inside `core/buttons`; the builder edits `core/button` directly. */
+function flattenParsedChildren(blocks: ParsedBlock[]): ParsedBlock[] {
+  const flattened: ParsedBlock[] = [];
+
+  for (const block of blocks) {
+    if (block.blockName === 'core/buttons') {
+      for (const child of block.innerBlocks) {
+        if (child.blockName === 'core/button') {
+          flattened.push(child);
+        }
+      }
+      continue;
+    }
+
+    flattened.push(block);
+  }
+
+  return flattened;
+}
+
 function parsedBlockToNode(block: ParsedBlock, path: string): BlockNode {
   const blockName = block.blockName;
 
@@ -105,7 +145,7 @@ function parsedBlockToNode(block: ParsedBlock, path: string): BlockNode {
   const rawAttrs = normalizeAttributes(block.attrs);
   let attributes = strategy ? strategy.fromGutenbergAttrs(rawAttrs, block.innerHTML) : rawAttrs;
 
-  const children = block.innerBlocks.map((child, index) =>
+  const children = flattenParsedChildren(block.innerBlocks).map((child, index) =>
     parsedBlockToNode(child, `${path}.children[${index}]`),
   );
 

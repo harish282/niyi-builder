@@ -6,6 +6,17 @@ import { isSerializableBlockType, SERIALIZABLE_BLOCK_TYPES } from './block-regis
 import { SerializeError, UnsupportedBlockError } from './errors.js';
 import { shouldUnwrapDocumentRoot } from './gutenberg-export.js';
 
+/** Layout blocks whose inner blocks must live inside a wrapper div for Gutenberg validation. */
+const INNER_BLOCKS_WRAPPER_CLASS: Partial<Record<BlockType, string>> = {
+  'core/group': 'wp-block-group',
+  'core/columns': 'wp-block-columns',
+  'core/column': 'wp-block-column',
+};
+
+function wrapInnerBlocks(className: string, innerBlocks: string): string {
+  return `<div class="${className}">\n${innerBlocks}\n</div>`;
+}
+
 /** Gutenberg saves core blocks as `wp:paragraph`, not `wp:core/paragraph`. */
 export function toBlockCommentName(blockType: BlockType): string {
   return blockType.startsWith('core/') ? blockType.slice('core/'.length) : blockType;
@@ -44,6 +55,17 @@ export function serializeToGutenberg(
 }
 
 export function serializeBlockNode(node: BlockNode, path = 'root'): string {
+  const markup = serializeBlockMarkup(node, path);
+
+  // Gutenberg requires core/button inside core/buttons — wrap on export only.
+  if (node.type === 'core/button') {
+    return `<!-- wp:buttons -->\n<div class="wp-block-buttons">\n${markup}\n</div>\n<!-- /wp:buttons -->`;
+  }
+
+  return markup;
+}
+
+function serializeBlockMarkup(node: BlockNode, path = 'root'): string {
   if (!isBlockType(node.type)) {
     throw new UnsupportedBlockError(node.type, path);
   }
@@ -70,13 +92,22 @@ export function serializeBlockNode(node: BlockNode, path = 'root'): string {
     .join('\n\n');
 
   const innerHtml = strategy.innerHtml?.(node.attributes);
+  const wrapperClass = INNER_BLOCKS_WRAPPER_CLASS[node.type];
   const hasInnerContent = (innerHtml?.length ?? 0) > 0 || innerBlocks.length > 0;
 
   if (!hasInnerContent) {
+    if (wrapperClass && Object.keys(gutenbergAttrs).length > 0) {
+      return `<!-- wp:${blockName}${attrs} -->\n<div class="${wrapperClass}"></div>\n<!-- /wp:${blockName} -->`;
+    }
     return `<!-- wp:${blockName}${attrs} /-->`;
   }
 
-  const body = [innerHtml, innerBlocks].filter((part) => part && part.length > 0).join('\n\n');
+  let body: string;
+  if (wrapperClass && innerBlocks.length > 0) {
+    body = wrapInnerBlocks(wrapperClass, innerBlocks);
+  } else {
+    body = [innerHtml, innerBlocks].filter((part) => part && part.length > 0).join('\n\n');
+  }
 
   return `<!-- wp:${blockName}${attrs} -->\n${body}\n<!-- /wp:${blockName} -->`;
 }
