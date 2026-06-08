@@ -7,4 +7,6 @@ if (!defined('ABSPATH')) {
 }
 
 ?>
-<div id="niyi-builder-root" class="niyi-builder-admin__root" aria-live="polite"></div>
+<div id="niyi-builder-root" class="niyi-builder-admin__root" aria-live="polite">
+    <p class="niyi-builder-admin__loading"><?php echo esc_html__('Loading editor…', 'niyi-builder'); ?></p>
+</div>

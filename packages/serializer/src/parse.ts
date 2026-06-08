@@ -60,25 +60,33 @@ function extractRootBlock(blocks: ParsedBlock[]): ParsedBlock {
     (block) => block.blockName !== null || block.innerHTML.trim().length > 0,
   );
 
-  for (const block of meaningful) {
-    if (block.blockName !== null && !isCoreBlockName(block.blockName)) {
-      throw new UnsupportedMarkupBlockError(block.blockName);
-    }
-  }
-
   const coreBlocks = meaningful.filter((block) => isCoreBlockName(block.blockName));
 
   if (coreBlocks.length === 0) {
     throw new ParseError('No supported core blocks found in markup.');
   }
 
-  if (coreBlocks.length > 1) {
-    throw new ParseError(
-      `Expected a single root ${ROOT_BLOCK_TYPE} block; found multiple top-level core blocks.`,
-    );
+  const rootGroup = coreBlocks.find((block) => block.blockName === ROOT_BLOCK_TYPE);
+
+  // Native builder save: one top-level group is the document root.
+  if (coreBlocks.length === 1 && rootGroup !== undefined) {
+    return rootGroup;
   }
 
-  return coreBlocks[0];
+  // Gutenberg default: multiple top-level blocks (or a single non-group block) without a wrapper.
+  return {
+    blockName: ROOT_BLOCK_TYPE,
+    attrs: rootGroup?.attrs ?? null,
+    innerBlocks:
+      rootGroup !== undefined
+        ? [...rootGroup.innerBlocks, ...topLevelBlocksExcept(coreBlocks, rootGroup)]
+        : coreBlocks,
+    innerHTML: rootGroup?.innerHTML ?? '',
+  };
+}
+
+function topLevelBlocksExcept(blocks: ParsedBlock[], skip: ParsedBlock): ParsedBlock[] {
+  return blocks.filter((block) => block !== skip);
 }
 
 function parsedBlockToNode(block: ParsedBlock, path: string): BlockNode {

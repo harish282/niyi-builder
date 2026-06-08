@@ -9,8 +9,15 @@ if (!defined('ABSPATH')) {
 return [
     'app' => [
         /** production | development */
-        'env' => 'production',
-        'debug' => false,
+        'env' => 'development',
+        'debug' => true,
+        /**
+         * Visual editor console logging (admin.js).
+         * Set enabled => true while developing; keep false in production.
+         */
+        'logging' => [
+            'enabled' => true,
+        ],
     ],
     /**
      * Admin React bundle. When vite_dev.enabled is true, scripts load from the

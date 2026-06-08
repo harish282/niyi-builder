@@ -120,6 +120,7 @@ final class AdminAssetRegistrar
             'content' => $post instanceof WP_Post ? (string) $post->post_content : '',
             'exitUrl' => $post instanceof WP_Post ? PostEditorIntegration::getBlockEditorUrl($post->ID) : '',
             'isDevShell' => ! ($post instanceof WP_Post),
+            'loggingEnabled' => (bool) Config::instance()->get('app.logging.enabled', false),
         ];
 
         wp_localize_script(self::SCRIPT_HANDLE, 'niyiBuilderConfig', $config);

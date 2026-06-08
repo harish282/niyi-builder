@@ -64,6 +64,15 @@ final class Config
         $config['app']['env'] = (string) ($config['app']['env'] ?? 'production');
         $config['app']['debug'] = (bool) ($config['app']['debug'] ?? false);
 
+        if (!is_array($config['app']['logging'] ?? null)) {
+            $config['app']['logging'] = [];
+        }
+
+        $config['app']['logging']['enabled'] = (bool) (
+            $config['app']['logging']['enabled']
+            ?? $config['app']['debug']
+        );
+
         if (!is_array($config['assets'] ?? null)) {
             $config['assets'] = [];
         }
