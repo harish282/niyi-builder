@@ -24,18 +24,11 @@ final class BuilderPageRenderer
             $screen->is_block_editor(false);
         }
 
+        BuilderChrome::suppress();
+
         remove_action('admin_print_scripts', 'print_emoji_detection_script');
         add_filter('screen_options_show_screen', '__return_false');
         add_filter('admin_body_class', [$this, 'filterAdminBodyClass']);
-
-        $registrar = new AdminAssetRegistrar();
-
-        add_action(
-            'admin_enqueue_scripts',
-            static function () use ($registrar, $post): void {
-                $registrar->enqueueBuilderAssets($post);
-            }
-        );
 
         require ABSPATH . 'wp-admin/admin-header.php';
 

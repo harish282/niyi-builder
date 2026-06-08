@@ -14,6 +14,7 @@
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
+    "@niyi-builder/blocks": "0.0.0",
     "@niyi-builder/core": "0.0.0",
     "react": "^19.1.0",
     "zustand": "^5.0.6"

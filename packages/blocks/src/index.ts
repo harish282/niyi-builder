@@ -1,2 +1,13 @@
-/** Block definitions & renderers — implemented in Phase 3. */
-export const PACKAGE_NAME = '@niyi-builder/blocks' as const;
+export { ensureDefaultBlocksRegistered } from './register-defaults.js';
+export {
+  getBlockDefinition,
+  getRegisteredBlocks,
+  getRegisteredBlockTypes,
+  isBlockRegistered,
+  registerBlock,
+  type BlockCategory,
+  type BlockDefinition,
+  type BlockPreviewComponent,
+  type BlockPreviewProps,
+} from './registry.js';
+export { resolveResponsiveValue, type PreviewDevice } from './responsive.js';

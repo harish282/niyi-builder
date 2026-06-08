@@ -48,6 +48,8 @@ final class PostEditorIntegration
             $_GET['action'] = 'edit';
             $_REQUEST['action'] = 'edit';
         }
+
+        add_action('admin_enqueue_scripts', [$this, 'enqueueBuilderAppAssets']);
     }
 
     public function preparePostNewScreen(): void
@@ -61,6 +63,39 @@ final class PostEditorIntegration
             $_GET['action'] = 'edit';
             $_REQUEST['action'] = 'edit';
         }
+
+        add_action('admin_enqueue_scripts', [$this, 'enqueueBuilderAppAssets']);
+    }
+
+    public function enqueueBuilderAppAssets(): void
+    {
+        $post = $this->resolveBuilderPost();
+
+        if (! $post instanceof WP_Post || ! $this->canOpenBuilder($post)) {
+            return;
+        }
+
+        (new AdminAssetRegistrar())->enqueueBuilderAssets($post);
+    }
+
+    private function resolveBuilderPost(): ?WP_Post
+    {
+        $post = get_post();
+
+        if ($post instanceof WP_Post) {
+            return $post;
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- routing only
+        $postId = isset($_GET['post']) ? (int) $_GET['post'] : 0;
+
+        if ($postId <= 0) {
+            return null;
+        }
+
+        $resolved = get_post($postId);
+
+        return $resolved instanceof WP_Post ? $resolved : null;
     }
 
     public function replaceEditor(bool $replace, WP_Post $post): bool
@@ -73,11 +108,39 @@ final class PostEditorIntegration
             return $replace;
         }
 
+        // WP_Screen probes replace_editor during admin.php set_current_screen() — before
+        // load-post.php / post.php case 'edit'. Signal replacement only; render later.
+        if (! $this->isPostEditScreenReady()) {
+            return true;
+        }
+
         self::$isReplacingEditor = true;
 
         (new BuilderPageRenderer())->render($post);
 
         return true;
+    }
+
+    /**
+     * True only when post.php / post-new.php has finished load-* hooks (safe to print admin UI).
+     */
+    private function isPostEditScreenReady(): bool
+    {
+        global $pagenow;
+
+        if (! is_string($pagenow)) {
+            return false;
+        }
+
+        if ($pagenow === 'post.php') {
+            return did_action('load-post.php') > 0;
+        }
+
+        if ($pagenow === 'post-new.php') {
+            return did_action('load-post-new.php') > 0;
+        }
+
+        return false;
     }
 
     /**

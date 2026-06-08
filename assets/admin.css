@@ -1,21 +1,63 @@
-/* Full-screen builder on post edit (BuilderPageRenderer) and dev shell (BuilderAdminPage). */
+/* Full-screen builder — hide WP admin chrome (same goals as Gutenberg block-editor-page). */
 
-body.niyi-builder-editor-screen #wpcontent,
+body.niyi-builder-editor-screen {
+  background: #f0f0f1;
+}
+
+body.niyi-builder-editor-screen #wpadminbar,
+body.niyi-builder-editor-screen #adminmenumain,
+body.niyi-builder-editor-screen #adminmenuback,
+body.niyi-builder-editor-screen #adminmenuwrap {
+  display: none;
+}
+
+body.niyi-builder-editor-screen #wpcontent {
+  margin-left: 0;
+  padding-left: 0;
+}
+
 body.niyi-builder-editor-screen #wpfooter {
   display: none;
 }
 
 body.niyi-builder-editor-screen #wpbody-content {
   padding-bottom: 0;
+  padding-top: 0;
+}
+
+/* Notices and legacy admin UI above the canvas */
+body.niyi-builder-editor-screen .notice,
+body.niyi-builder-editor-screen div.updated,
+body.niyi-builder-editor-screen div.error,
+body.niyi-builder-editor-screen #message,
+body.niyi-builder-editor-screen #screen-meta,
+body.niyi-builder-editor-screen #screen-meta-links,
+body.niyi-builder-editor-screen #local-storage-notice,
+body.niyi-builder-editor-screen #lost-connection-notice,
+body.niyi-builder-editor-screen #wpbody-content > div:not(.niyi-builder-admin__root):not(#screen-meta) {
+  display: none;
+}
+
+/* Cancel body.admin-bar top offset so the builder fills the viewport */
+@media screen and (min-width: 782px) {
+  body.admin-bar.niyi-builder-editor-screen {
+    margin-top: -32px;
+    height: calc(100% + 32px);
+  }
+}
+
+@media screen and (max-width: 781px) {
+  body.admin-bar.niyi-builder-editor-screen {
+    margin-top: -46px;
+    height: calc(100% + 46px);
+  }
+}
+
+body.niyi-builder-editor-screen #wpwrap {
+  min-height: 100vh;
 }
 
 body.niyi-builder-editor-screen .niyi-builder-admin__root {
   margin: 0;
   min-height: 100vh;
-}
-
-@media screen and (max-width: 782px) {
-  body.niyi-builder-editor-screen .niyi-builder-admin__root {
-    min-height: calc(100vh - 46px);
-  }
 }

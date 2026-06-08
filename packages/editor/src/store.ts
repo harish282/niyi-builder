@@ -6,13 +6,17 @@ export type EditorDevice = 'desktop' | 'tablet' | 'mobile';
 export interface EditorState {
   document: BuilderDocument;
   device: EditorDevice;
+  selectedBlockId: string | null;
   setDocument: (document: BuilderDocument) => void;
   setDevice: (device: EditorDevice) => void;
+  selectBlock: (blockId: string | null) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
   document: createEmptyDocument(),
   device: 'desktop',
-  setDocument: (document) => set({ document }),
+  selectedBlockId: null,
+  setDocument: (document) => set({ document, selectedBlockId: null }),
   setDevice: (device) => set({ device }),
+  selectBlock: (blockId) => set({ selectedBlockId: blockId }),
 }));

@@ -38,7 +38,7 @@ final class AdminAssetRegistrar
         wp_enqueue_style(
             'niyi-builder-admin-shell',
             PluginAssets::url('assets/admin.css'),
-            [],
+            ['wp-admin', 'common'],
             NIYI_BUILDER_VERSION
         );
 
