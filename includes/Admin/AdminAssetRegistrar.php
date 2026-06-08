@@ -110,22 +110,11 @@ final class AdminAssetRegistrar
             'restUrl' => rest_url('wp/v2/'),
             'nonce' => wp_create_nonce('wp_rest'),
             'content' => $post instanceof WP_Post ? (string) $post->post_content : '',
-            'exitUrl' => $post instanceof WP_Post ? $this->getBlockEditorUrl($post) : '',
+            'exitUrl' => $post instanceof WP_Post ? PostEditorIntegration::getBlockEditorUrl($post->ID) : '',
             'isDevShell' => ! ($post instanceof WP_Post),
         ];
 
         wp_localize_script(self::SCRIPT_HANDLE, 'niyiBuilderConfig', $config);
-    }
-
-    private function getBlockEditorUrl(WP_Post $post): string
-    {
-        $editUrl = get_edit_post_link($post->ID, 'raw');
-
-        if (! is_string($editUrl) || $editUrl === '') {
-            return '';
-        }
-
-        return remove_query_arg(PostEditorIntegration::BUILDER_QUERY_FLAG, $editUrl);
     }
 
     /**

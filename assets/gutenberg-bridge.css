@@ -1,13 +1,46 @@
-.niyi-builder-launch-btn {
-  margin-left: 8px;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
+/* Document sidebar — editor choice panel */
+.niyi-builder-editor-choice-panel .components-panel__body-title {
+  font-weight: 600;
 }
 
-.niyi-builder-launch-btn--panel {
-  margin-left: 0;
-  margin-top: 8px;
-  width: 100%;
+.niyi-builder-editor-choice__lead {
+  margin: 0 0 12px;
+  color: #1e1e1e;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.niyi-builder-editor-choice__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.niyi-builder-editor-choice__btn {
   justify-content: center;
+  text-decoration: none;
+  width: 100%;
+}
+
+.niyi-builder-editor-choice__btn.is-active {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.niyi-builder-editor-choice__hint {
+  margin: 12px 0 0;
+  color: #757575;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* Block editor header toolbar */
+.niyi-builder-toolbar-launch {
+  margin-left: 8px;
+  text-decoration: none;
+}
+
+/* Posts list — highlight builder row action */
+.row-actions .niyi-builder a {
+  font-weight: 600;
 }

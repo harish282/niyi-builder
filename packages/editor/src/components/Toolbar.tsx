@@ -35,7 +35,7 @@ export function Toolbar() {
         {postTitle ? <span className="niyi-editor__post-title">{postTitle}</span> : null}
         {bootstrap.exitUrl ? (
           <a className="niyi-editor__exit-link" href={bootstrap.exitUrl}>
-            Block editor
+            Default Editor
           </a>
         ) : null}
       </div>

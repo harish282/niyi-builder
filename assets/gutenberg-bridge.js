@@ -1,89 +1,127 @@
 /**
- * Adds "Edit with Niyi Builder" in the block editor (sidebar + header fallback).
+ * Block editor integration — choose Default Editor or Niyi Builder.
  */
 (function (wp) {
-  if (typeof window.niyiBuilderBridge === 'undefined') {
+  if (typeof window.niyiBuilderBridge === 'undefined' || !wp || !wp.element) {
     return;
   }
 
   var bridge = window.niyiBuilderBridge;
-  var mounted = false;
+  var el = wp.element.createElement;
 
-  function launchLink(props) {
-    var className = props.className || 'components-button is-secondary niyi-builder-launch-btn';
+  function EditorChoicePanel() {
+    if (!wp.editPost || !wp.editPost.PluginDocumentSettingPanel) {
+      return null;
+    }
 
-    return wp.element.createElement(
-      'a',
+    var Panel = wp.editPost.PluginDocumentSettingPanel;
+    var Button = wp.components.Button;
+
+    return el(
+      Panel,
       {
-        id: 'niyi-builder-launch',
-        href: bridge.builderUrl,
-        className: className,
+        name: 'niyi-builder-editor-choice',
+        title: bridge.panelTitle,
+        className: 'niyi-builder-editor-choice-panel',
       },
-      bridge.label,
+      el('p', { className: 'niyi-builder-editor-choice__lead' }, bridge.panelDescription),
+      el(
+        'div',
+        { className: 'niyi-builder-editor-choice__actions' },
+        el(
+          Button,
+          {
+            variant: 'primary',
+            href: bridge.builderUrl,
+            className: 'niyi-builder-editor-choice__btn',
+          },
+          bridge.builderLabel,
+        ),
+        el(
+          Button,
+          {
+            variant: 'secondary',
+            href: bridge.blockEditorUrl,
+            className: 'niyi-builder-editor-choice__btn is-active',
+            'aria-current': 'page',
+          },
+          bridge.defaultLabel,
+        ),
+      ),
+      el('p', { className: 'niyi-builder-editor-choice__hint' }, bridge.panelHint),
     );
   }
 
-  function registerSidebarPlugin() {
-    if (!wp.plugins || !wp.editPost || !wp.editPost.PluginPostStatusInfo) {
+  function HeaderLaunchButton() {
+    if (!wp.plugins || !wp.plugins.PluginMoreMenuItem) {
+      return null;
+    }
+
+    var PluginMoreMenuItem = wp.plugins.PluginMoreMenuItem;
+
+    return el(
+      PluginMoreMenuItem,
+      {
+        icon: 'layout',
+        href: bridge.builderUrl,
+      },
+      bridge.builderLabel,
+    );
+  }
+
+  function registerEditorChoicePlugin() {
+    if (!wp.plugins || !wp.plugins.registerPlugin) {
       return false;
     }
 
-    wp.plugins.registerPlugin('niyi-builder-launch', {
+    wp.plugins.registerPlugin('niyi-builder-editor-choice', {
+      icon: 'layout',
       render: function () {
-        return wp.element.createElement(
-          wp.editPost.PluginPostStatusInfo,
-          {},
-          launchLink({ className: 'niyi-builder-launch-btn niyi-builder-launch-btn--panel' }),
-        );
+        return el(wp.element.Fragment, null, el(EditorChoicePanel), el(HeaderLaunchButton));
       },
     });
 
     return true;
   }
 
-  function mountHeaderFallback() {
-    if (mounted) {
+  function mountToolbarButton() {
+    if (document.getElementById('niyi-builder-toolbar-launch')) {
       return true;
     }
 
     var toolbar =
       document.querySelector('.editor-header__toolbar') ||
-      document.querySelector('.edit-post-header__toolbar') ||
-      document.querySelector('.edit-post-header');
+      document.querySelector('.edit-post-header__toolbar');
 
-    if (!toolbar || document.getElementById('niyi-builder-launch')) {
-      return Boolean(document.getElementById('niyi-builder-launch'));
+    if (!toolbar) {
+      return false;
     }
 
     var link = document.createElement('a');
-    link.id = 'niyi-builder-launch';
+    link.id = 'niyi-builder-toolbar-launch';
     link.href = bridge.builderUrl;
-    link.className = 'components-button is-secondary niyi-builder-launch-btn';
-    link.textContent = bridge.label;
+    link.className = 'components-button is-primary niyi-builder-toolbar-launch';
+    link.textContent = bridge.builderLabel;
     toolbar.appendChild(link);
-    mounted = true;
 
     return true;
   }
 
   function boot() {
-    registerSidebarPlugin();
+    registerEditorChoicePlugin();
 
-    if (mountHeaderFallback()) {
-      return;
+    if (!mountToolbarButton()) {
+      var attempts = 0;
+      var timer = window.setInterval(function () {
+        attempts += 1;
+        if (mountToolbarButton() || attempts >= 40) {
+          window.clearInterval(timer);
+        }
+      }, 250);
     }
-
-    var attempts = 0;
-    var timer = window.setInterval(function () {
-      attempts += 1;
-
-      if (mountHeaderFallback() || attempts >= 40) {
-        window.clearInterval(timer);
-      }
-    }, 250);
   }
 
-  if (wp && wp.domReady) {
+  if (wp.domReady) {
     wp.domReady(boot);
   } else {
     document.addEventListener('DOMContentLoaded', boot);
