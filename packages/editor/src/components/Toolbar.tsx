@@ -35,6 +35,7 @@ export function Toolbar() {
   const saveStatus = useEditorStore((state) => state.saveStatus);
   const saveError = useEditorStore((state) => state.saveError);
   const saveDocument = useEditorStore((state) => state.saveDocument);
+  const saveBeforeEditorSwitch = useEditorStore((state) => state.saveBeforeEditorSwitch);
   const clearSaveFeedback = useEditorStore((state) => state.clearSaveFeedback);
   const bootstrap = getToolbarBootstrap();
   const postTitle = bootstrap.postTitle?.trim();
@@ -60,7 +61,24 @@ export function Toolbar() {
         <span className="niyi-editor__brand">Niyi Builder</span>
         {postTitle ? <span className="niyi-editor__post-title">{postTitle}</span> : null}
         {bootstrap.exitUrl ? (
-          <a className="niyi-editor__exit-link" href={bootstrap.exitUrl}>
+          <a
+            className="niyi-editor__exit-link"
+            href={bootstrap.exitUrl}
+            onClick={(event) => {
+              if (!isDirty || isSaving) {
+                return;
+              }
+
+              event.preventDefault();
+              void (async () => {
+                const saved = await saveBeforeEditorSwitch();
+
+                if (saved) {
+                  window.location.assign(bootstrap.exitUrl as string);
+                }
+              })();
+            }}
+          >
             Default Editor
           </a>
         ) : null}

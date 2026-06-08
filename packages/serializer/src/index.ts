@@ -8,6 +8,7 @@ export {
   isSerializableBlockType,
 } from './block-registry.js';
 export { canonicalizeDocument } from './canonicalize.js';
+export { isStructuralDocumentRoot, shouldUnwrapDocumentRoot } from './gutenberg-export.js';
 export {
   SerializeError,
   ParseError,

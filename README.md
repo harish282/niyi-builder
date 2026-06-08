@@ -7,7 +7,7 @@ WordPress plugin — open-source **visual page builder** that outputs **native G
 ```
 niyi-builder/                 # Dev repo — deploy copy to wp-content/plugins/ via release:dev
 ├── niyi-builder.php          # Plugin bootstrap
-├── config/plugin.php         # Plugin settings (Vite dev, app env, …)
+├── config/plugin.php         # Plugin settings (app env, logging, …)
 ├── bootstrap/                # Constants
 ├── includes/                 # PHP (`NiyiBuilder\` namespace)
 ├── resources/views/          # Admin PHP templates
@@ -36,7 +36,6 @@ Requires Node 20+.
 ```bash
 npm install
 npm run build        # packages + admin bundle → build/
-npm run dev          # Vite HMR for admin/ (port 5173)
 npm test
 npm run lint         # TypeScript + ESLint + Prettier check
 npm run format       # Prettier write
@@ -46,21 +45,7 @@ npm run release:dev  # build + deploy copy to wp-content/plugins/niyi-builder
 
 Editor settings: `.editorconfig` and `.vscode/settings.json` (format on save + ESLint fix).
 
-### Vite HMR (local)
-
-Enable in `config/plugin.php`:
-
-```php
-'assets' => [
-    'vite_dev' => [
-        'enabled' => true,
-        'host' => 'localhost',
-        'port' => 5173,
-    ],
-],
-```
-
-Run `npm run dev`, then open **Niyi Builder** in wp-admin.
+WordPress always loads the compiled bundle from `build/` (same as production). After code changes, run `npm run release:dev` and refresh wp-admin.
 
 ### TypeScript packages (`packages/`)
 

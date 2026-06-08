@@ -73,19 +73,6 @@ final class Config
             ?? $config['app']['debug']
         );
 
-        if (!is_array($config['assets'] ?? null)) {
-            $config['assets'] = [];
-        }
-
-        if (!is_array($config['assets']['vite_dev'] ?? null)) {
-            $config['assets']['vite_dev'] = [];
-        }
-
-        $viteDev = $config['assets']['vite_dev'];
-        $config['assets']['vite_dev']['enabled'] = (bool) ($viteDev['enabled'] ?? false);
-        $config['assets']['vite_dev']['host'] = (string) ($viteDev['host'] ?? 'localhost');
-        $config['assets']['vite_dev']['port'] = max(1, min(65535, (int) ($viteDev['port'] ?? 5173)));
-
         if (function_exists('apply_filters')) {
             $filtered = apply_filters('niyi_builder_config', $config);
 

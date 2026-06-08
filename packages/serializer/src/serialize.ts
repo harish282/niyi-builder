@@ -4,6 +4,7 @@ import { encodeAttributes } from './attributes.js';
 import { BLOCK_MARKUP_STRATEGIES } from './block-markup.js';
 import { isSerializableBlockType, SERIALIZABLE_BLOCK_TYPES } from './block-registry.js';
 import { SerializeError, UnsupportedBlockError } from './errors.js';
+import { shouldUnwrapDocumentRoot } from './gutenberg-export.js';
 
 /** Gutenberg saves core blocks as `wp:paragraph`, not `wp:core/paragraph`. */
 export function toBlockCommentName(blockType: BlockType): string {
@@ -26,6 +27,17 @@ export function serializeToGutenberg(
     if (!result.valid) {
       throw new SerializeError('Cannot serialize invalid builder document.', result.issues);
     }
+  }
+
+  if (shouldUnwrapDocumentRoot(document)) {
+    if (document.root.children.length === 0) {
+      return '';
+    }
+
+    return document.root.children
+      .map((child, index) => serializeBlockNode(child, `root.children[${index}]`))
+      .join('\n\n')
+      .trim();
   }
 
   return serializeBlockNode(document.root, 'root').trim();

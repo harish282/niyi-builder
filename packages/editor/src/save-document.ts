@@ -12,6 +12,19 @@ export function documentToGutenbergMarkup(document: BuilderDocument): string {
   return serializeToGutenberg(document);
 }
 
+export function syncBootstrapContent(markup: string): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const config = (window as Window & { niyiBuilderConfig?: { content?: string } })
+    .niyiBuilderConfig;
+
+  if (config) {
+    config.content = markup;
+  }
+}
+
 export async function persistPostContent(
   config: BuilderSaveConfig,
   content: string,
@@ -23,7 +36,11 @@ export async function persistPostContent(
       'Content-Type': 'application/json',
       'X-WP-Nonce': config.nonce,
     },
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({
+      content: {
+        raw: content,
+      },
+    }),
   });
 
   if (response.ok) {
@@ -51,6 +68,7 @@ export async function saveBuilderDocument(
 ): Promise<string> {
   const markup = documentToGutenbergMarkup(document);
   await persistPostContent(config, markup);
+  syncBootstrapContent(markup);
 
   return markup;
 }

@@ -28,7 +28,8 @@ export interface EditorState {
   selectBlock: (blockId: string | null) => void;
   toggleInserter: (open?: boolean) => void;
   insertBlock: (blockType: BlockType) => void;
-  saveDocument: () => Promise<void>;
+  saveDocument: () => Promise<boolean>;
+  saveBeforeEditorSwitch: () => Promise<boolean>;
   clearSaveFeedback: () => void;
 }
 
@@ -73,8 +74,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const state = get();
     const saveConfig = getBuilderSaveConfig();
 
-    if (!saveConfig || state.isSaving || !state.isDirty) {
-      return;
+    if (!saveConfig || state.isSaving) {
+      return false;
+    }
+
+    if (!state.isDirty) {
+      return true;
     }
 
     set({ isSaving: true, saveStatus: null, saveError: null });
@@ -82,6 +87,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     try {
       await saveBuilderDocument(saveConfig, state.document);
       set({ isSaving: false, isDirty: false, saveStatus: 'saved' });
+
+      return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Save failed.';
 
@@ -90,7 +97,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         saveStatus: 'error',
         saveError: message,
       });
+
+      return false;
     }
+  },
+  saveBeforeEditorSwitch: async () => {
+    const state = get();
+
+    if (!state.isDirty) {
+      return true;
+    }
+
+    return get().saveDocument();
   },
   clearSaveFeedback: () => set({ saveStatus: null, saveError: null }),
 }));

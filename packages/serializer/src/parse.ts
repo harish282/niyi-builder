@@ -1,6 +1,11 @@
 import { parse } from '@wordpress/block-serialization-default-parser';
 import type { BlockNode, BuilderDocument } from '@niyi-builder/core';
-import { DOCUMENT_VERSION, ROOT_BLOCK_TYPE, validateDocument } from '@niyi-builder/core';
+import {
+  createEmptyDocument,
+  DOCUMENT_VERSION,
+  ROOT_BLOCK_TYPE,
+  validateDocument,
+} from '@niyi-builder/core';
 import { BLOCK_MARKUP_STRATEGIES } from './block-markup.js';
 import { isCoreBlockName, isSerializableBlockType } from './block-registry.js';
 import { ParseError, UnsupportedMarkupBlockError } from './errors.js';
@@ -23,7 +28,7 @@ export function parseFromGutenberg(markup: string, options: ParseOptions = {}): 
   const trimmed = markup.trim();
 
   if (trimmed.length === 0) {
-    throw new ParseError('Cannot parse empty Gutenberg markup.');
+    return createEmptyDocument();
   }
 
   idCounter = 0;

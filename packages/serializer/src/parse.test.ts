@@ -61,8 +61,27 @@ describe('parseFromGutenberg', () => {
     expect(doc.root.children[1]?.attributes).toMatchObject({ level: 2, content: 'Title' });
   });
 
-  it('throws for empty markup', () => {
-    expect(() => parseFromGutenberg('')).toThrow(ParseError);
+  it('parses empty markup as an empty builder document', () => {
+    const doc = parseFromGutenberg('');
+
+    expect(doc.root.type).toBe('core/group');
+    expect(doc.root.children).toEqual([]);
+  });
+
+  it('round-trips flat Gutenberg blocks without a wrapper group', () => {
+    const markup = `<!-- wp:paragraph -->
+<p>Hello world</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Title</h2>
+<!-- /wp:heading -->`;
+
+    const exported = serializeToGutenberg(parseFromGutenberg(markup));
+
+    expect(exported).toContain('<!-- wp:paragraph');
+    expect(exported).toContain('<!-- wp:heading');
+    expect(exported).not.toContain('<!-- wp:group');
   });
 
   it('throws when markup has no supported blocks', () => {

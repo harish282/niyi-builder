@@ -16,12 +16,8 @@ return [
     'app' => [
         'env' => 'development',
         'debug' => true,
-    ],
-    'assets' => [
-        'vite_dev' => [
+        'logging' => [
             'enabled' => true,
-            'host' => 'localhost',
-            'port' => 5173,
         ],
     ],
 ];

@@ -42,27 +42,7 @@ final class AdminAssetRegistrar
             NIYI_BUILDER_VERSION
         );
 
-        if ($this->isViteDevServer()) {
-            $this->enqueueViteDevAssets($post);
-
-            return;
-        }
-
         $this->enqueueProductionAssets($post);
-    }
-
-    private function isViteDevServer(): bool
-    {
-        return (bool) Config::instance()->get('assets.vite_dev.enabled', false);
-    }
-
-    private function enqueueViteDevAssets(?WP_Post $post): void
-    {
-        $origin = $this->viteDevOrigin();
-
-        $this->enqueueModuleScript('niyi-builder-vite-client', $origin . '/@vite/client', []);
-        $this->enqueueModuleScript(self::SCRIPT_HANDLE, $origin . '/src/main.tsx', ['niyi-builder-vite-client']);
-        $this->localizeBootstrapConfig($post);
     }
 
     private function enqueueProductionAssets(?WP_Post $post): void
@@ -155,14 +135,5 @@ final class AdminAssetRegistrar
     {
         wp_enqueue_script($handle, $src, $dependencies, null, true);
         wp_script_add_data($handle, 'type', 'module');
-    }
-
-    private function viteDevOrigin(): string
-    {
-        $config = Config::instance();
-        $host = (string) $config->get('assets.vite_dev.host', 'localhost');
-        $port = (int) $config->get('assets.vite_dev.port', 5173);
-
-        return 'http://' . $host . ':' . $port;
     }
 }

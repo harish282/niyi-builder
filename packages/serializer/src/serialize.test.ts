@@ -10,7 +10,7 @@ function expectParsableMarkup(markup: string): void {
   expect(markup.length).toBeGreaterThan(0);
   const blocks = parse(markup);
   expect(blocks.length).toBeGreaterThan(0);
-  expect(blocks[0]?.blockName).toBe('core/group');
+  expect(blocks[0]?.blockName).not.toBeNull();
 
   const walk = (nodes: ReturnType<typeof parse>): void => {
     for (const node of nodes) {
@@ -28,10 +28,9 @@ function expectParsableMarkup(markup: string): void {
 }
 
 describe('serializeToGutenberg', () => {
-  it('serializes an empty document to a root group block', () => {
+  it('serializes an empty document to empty post content for Gutenberg', () => {
     const markup = serializeToGutenberg(createEmptyDocument());
-    expect(markup).toBe('<!-- wp:group /-->');
-    expectParsableMarkup(markup);
+    expect(markup).toBe('');
   });
 
   it('serializes a flat fixture tree for parse_blocks()', () => {
@@ -93,11 +92,9 @@ describe('serializeToGutenberg', () => {
     expectParsableMarkup(markup);
 
     const blocks = parse(markup);
-    expect(blocks[0]?.innerBlocks[0]?.blockName).toBe('core/columns');
-    expect(blocks[0]?.innerBlocks[0]?.innerBlocks[0]?.blockName).toBe('core/column');
-    expect(blocks[0]?.innerBlocks[0]?.innerBlocks[0]?.innerBlocks[0]?.blockName).toBe(
-      'core/heading',
-    );
+    expect(blocks[0]?.blockName).toBe('core/columns');
+    expect(blocks[0]?.innerBlocks[0]?.blockName).toBe('core/column');
+    expect(blocks[0]?.innerBlocks[0]?.innerBlocks[0]?.blockName).toBe('core/heading');
   });
 
   it('throws SerializeError for invalid documents', () => {

@@ -12,7 +12,6 @@
     "build": "npm run build:packages && npm run build:admin",
     "build:packages": "npm run build --workspaces --if-present",
     "build:admin": "vite build",
-    "dev": "vite",
     "test": "vitest run",
     "lint": "npm run lint:types && npm run lint:eslint && npm run format:check",
     "lint:types": "tsc -b && tsc --noEmit -p tsconfig.admin.json",

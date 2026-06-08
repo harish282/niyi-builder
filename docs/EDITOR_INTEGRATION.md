@@ -220,13 +220,12 @@ To add e.g. `portfolio`: extend that list and confirm REST route (`wp/v2/portfol
 
 ```bash
 # From repo root
-npm run dev          # Vite on :5173 — enable in config/plugin.php:
-                     #   assets.vite_dev.enabled = true
-
 npm run build        # Production bundles → build/ (also run automatically by release scripts)
-npm run release:dev  # Build + deploy copy to wp-content/plugins/niyi-builder (replaces symlink)
+npm run release:dev  # Build + deploy copy to wp-content/plugins/niyi-builder
 npm test             # Serializer + core tests
 ```
+
+WordPress always uses the compiled `build/` assets — the same path production uses. Re-run `npm run release:dev` after admin changes.
 
 **Try the builder**
 
