@@ -2,7 +2,7 @@ import { createBlockNode } from '@niyi-builder/blocks';
 import { createEmptyDocument, type BlockType, type BuilderDocument } from '@niyi-builder/core';
 import { create } from 'zustand';
 
-import { savePostToWordPress } from '../../../api.js';
+import { savePostToWordPress } from './api.js';
 import { insertChild, reorderSiblings, resolveInsertParentId } from './document-ops.js';
 import { getBuilderSaveConfig } from './save-config.js';
 
