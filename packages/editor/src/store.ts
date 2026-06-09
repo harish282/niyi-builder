@@ -2,7 +2,7 @@ import { createBlockNode } from '@niyi-builder/blocks';
 import { createEmptyDocument, type BlockType, type BuilderDocument } from '@niyi-builder/core';
 import { create } from 'zustand';
 
-import { insertChild, resolveInsertParentId } from './document-ops.js';
+import { insertChild, reorderSiblings, resolveInsertParentId } from './document-ops.js';
 import { getBuilderSaveConfig } from './save-config.js';
 import { saveBuilderDocument } from './save-document.js';
 
@@ -28,6 +28,7 @@ export interface EditorState {
   selectBlock: (blockId: string | null) => void;
   toggleInserter: (open?: boolean) => void;
   insertBlock: (blockType: BlockType) => void;
+  reorderBlocks: (activeId: string, overId: string) => void;
   saveDocument: () => Promise<boolean>;
   saveBeforeEditorSwitch: () => Promise<boolean>;
   clearSaveFeedback: () => void;
@@ -65,6 +66,22 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       document: insertChild(state.document, parentId, newBlock),
       selectedBlockId: newBlock.id,
       isInserterOpen: false,
+      isDirty: true,
+      saveStatus: null,
+      saveError: null,
+    });
+  },
+  reorderBlocks: (activeId, overId) => {
+    const state = get();
+    const reordered = reorderSiblings(state.document, activeId, overId);
+
+    if (reordered === null) {
+      return;
+    }
+
+    set({
+      document: reordered,
+      selectedBlockId: activeId,
       isDirty: true,
       saveStatus: null,
       saveError: null,

@@ -1,14 +1,21 @@
 import { getBlockDefinition } from '@niyi-builder/blocks';
 import { isContentBlockType, type BlockNode } from '@niyi-builder/core';
-import type { MouseEvent, ReactNode } from 'react';
+import type { HTMLAttributes, MouseEvent, ReactNode } from 'react';
 
 import { useEditorStore } from '../store.js';
+import { BlockList } from './BlockList.js';
 
 interface BlockRendererProps {
   node: BlockNode;
+  dragHandleProps?: HTMLAttributes<HTMLButtonElement>;
+  isDragging?: boolean;
 }
 
-export function BlockRenderer({ node }: BlockRendererProps): ReactNode {
+export function BlockRenderer({
+  node,
+  dragHandleProps,
+  isDragging,
+}: BlockRendererProps): ReactNode {
   const device = useEditorStore((state) => state.device);
   const selectedBlockId = useEditorStore((state) => state.selectedBlockId);
   const selectBlock = useEditorStore((state) => state.selectBlock);
@@ -23,6 +30,8 @@ export function BlockRenderer({ node }: BlockRendererProps): ReactNode {
     selectBlock(node.id);
   };
 
+  const renderChildren = () => <BlockList parentId={node.id} blocks={node.children} />;
+
   if (!definition) {
     return (
       <div
@@ -30,15 +39,22 @@ export function BlockRenderer({ node }: BlockRendererProps): ReactNode {
         data-block-id={node.id}
         data-block-type={node.type}
         data-selected={isSelected || undefined}
+        data-dragging={isDragging || undefined}
         onClick={handleClick}
       >
+        {dragHandleProps ? (
+          <button
+            type="button"
+            className="niyi-block-shell__drag-handle"
+            aria-label="Drag to reorder"
+            {...dragHandleProps}
+            onClick={(event) => event.stopPropagation()}
+          />
+        ) : null}
         <div className="niyi-preview__placeholder">Unsupported block: {node.type}</div>
       </div>
     );
   }
-
-  const renderChildren = () =>
-    node.children.map((child) => <BlockRenderer key={child.id} node={child} />);
 
   return (
     <div
@@ -46,8 +62,18 @@ export function BlockRenderer({ node }: BlockRendererProps): ReactNode {
       data-block-id={node.id}
       data-block-type={node.type}
       data-selected={isSelected || undefined}
+      data-dragging={isDragging || undefined}
       onClick={handleClick}
     >
+      {dragHandleProps ? (
+        <button
+          type="button"
+          className="niyi-block-shell__drag-handle"
+          aria-label="Drag to reorder"
+          {...dragHandleProps}
+          onClick={(event) => event.stopPropagation()}
+        />
+      ) : null}
       <definition.Preview node={node} device={device} renderChildren={renderChildren} />
     </div>
   );

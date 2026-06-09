@@ -67,7 +67,11 @@ export function Toolbar() {
             className="niyi-editor__exit-link"
             href={bootstrap.exitUrl}
             onClick={(event) => {
-              if (!isDirty || isSaving) {
+              if (isSaving) {
+                event.preventDefault();
+                return;
+              }
+              if (!isDirty) {
                 return;
               }
 

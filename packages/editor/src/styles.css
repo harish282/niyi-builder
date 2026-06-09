@@ -173,6 +173,7 @@
   margin: 0;
   padding: var(--wp--style--root--padding-top, 2rem) var(--wp--style--root--padding-right, 2rem)
     var(--wp--style--root--padding-bottom, 2rem) var(--wp--style--root--padding-left, 2rem);
+  padding-left: max(2rem, calc(var(--wp--style--root--padding-left, 2rem) + 1.25rem));
 }
 
 .niyi-editor__canvas[data-device='tablet'] .niyi-editor__canvas-inner .is-root-container {
@@ -205,12 +206,59 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+.niyi-sortable-block.is-dragging {
+  opacity: 0.35;
+}
+
+.niyi-sortable-block.is-overlay .niyi-block-shell {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  cursor: grabbing;
+}
+
 .niyi-block-shell {
   position: relative;
   outline: 1px solid transparent;
   outline-offset: 2px;
   border-radius: 2px;
   transition: outline-color 0.12s ease;
+}
+
+.niyi-block-shell__drag-handle {
+  position: absolute;
+  top: 0.35rem;
+  left: -1.5rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #c3c4c7;
+  border-radius: 3px;
+  background: #fff;
+  color: #646970;
+  font-size: 10px;
+  line-height: 1;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.niyi-block-shell:hover .niyi-block-shell__drag-handle,
+.niyi-block-shell[data-selected] .niyi-block-shell__drag-handle,
+.niyi-block-shell[data-dragging] .niyi-block-shell__drag-handle {
+  opacity: 1;
+}
+
+.niyi-block-shell__drag-handle:active {
+  cursor: grabbing;
+}
+
+.niyi-block-shell__drag-handle::before {
+  content: '⋮⋮';
+  letter-spacing: -0.15em;
 }
 
 /* Layout blocks span the full parent width — unlike leaf blocks (840px via .wp-block). */

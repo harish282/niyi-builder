@@ -77,3 +77,64 @@ function insertChildInNode(node: BlockNode, parentId: string, child: BlockNode):
     children: node.children.map((existing) => insertChildInNode(existing, parentId, child)),
   };
 }
+
+function replaceNodeChildren(
+  node: BlockNode,
+  targetId: string,
+  children: BlockNode[],
+): BlockNode {
+  if (node.id === targetId) {
+    return { ...node, children };
+  }
+
+  return {
+    ...node,
+    children: node.children.map((child) => replaceNodeChildren(child, targetId, children)),
+  };
+}
+
+function moveArrayItem<T>(items: readonly T[], fromIndex: number, toIndex: number): T[] {
+  const next = [...items];
+  const [moved] = next.splice(fromIndex, 1);
+
+  if (moved === undefined) {
+    return next;
+  }
+
+  next.splice(toIndex, 0, moved);
+
+  return next;
+}
+
+/** Reorder siblings that share the same parent (drag-and-drop within a container). */
+export function reorderSiblings(
+  document: BuilderDocument,
+  activeId: string,
+  overId: string,
+): BuilderDocument | null {
+  const parent = findParentBlock(document.root, activeId);
+
+  if (parent === null) {
+    return null;
+  }
+
+  const overParent = findParentBlock(document.root, overId);
+
+  if (overParent?.id !== parent.id) {
+    return null;
+  }
+
+  const oldIndex = parent.children.findIndex((child) => child.id === activeId);
+  const newIndex = parent.children.findIndex((child) => child.id === overId);
+
+  if (oldIndex < 0 || newIndex < 0 || oldIndex === newIndex) {
+    return null;
+  }
+
+  const children = moveArrayItem(parent.children, oldIndex, newIndex);
+
+  return {
+    ...document,
+    root: replaceNodeChildren(document.root, parent.id, children),
+  };
+}
