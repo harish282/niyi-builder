@@ -1,7 +1,7 @@
 /* Full-screen builder — hide WP admin chrome (same goals as Gutenberg block-editor-page). */
 
 body.niyi-builder-editor-screen {
-  background: #f0f0f1;
+  background: var(--wp--preset--color--base, #fff);
 }
 
 body.niyi-builder-editor-screen #wpadminbar,

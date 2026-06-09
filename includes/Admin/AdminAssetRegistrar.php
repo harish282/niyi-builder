@@ -42,6 +42,8 @@ final class AdminAssetRegistrar
             NIYI_BUILDER_VERSION
         );
 
+        (new BuilderThemeStyles())->enqueue();
+
         $this->enqueueProductionAssets($post);
     }
 

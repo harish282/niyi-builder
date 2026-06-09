@@ -1,6 +1,5 @@
 import type {
   ButtonAttributes,
-  ColumnsAttributes,
   EmbedAttributes,
   GroupAttributes,
   HeadingAttributes,
@@ -28,35 +27,35 @@ function renderChildrenOrPlaceholder(
 
 export function GroupPreview({ node, device, renderChildren }: BlockPreviewProps): ReactNode {
   const attrs = node.attributes as GroupAttributes;
+  const hasContentSize = Boolean(attrs.maxWidth);
   const style: CSSProperties = {
-    maxWidth: attrs.maxWidth,
     padding: resolveResponsiveValue(attrs.padding, device),
     margin: resolveResponsiveValue(attrs.margin, device),
     background: attrs.background,
     borderRadius: attrs.borderRadius,
     minHeight: node.children.length === 0 ? '3rem' : undefined,
+    ...(attrs.maxWidth
+      ? ({ '--wp--style--global--content-size': attrs.maxWidth } as CSSProperties)
+      : {}),
   };
 
+  const className = hasContentSize
+    ? 'wp-block-group is-layout-constrained'
+    : 'wp-block-group';
+
   return (
-    <div className="niyi-preview-group" style={style}>
+    <div className={className} style={style}>
       {renderChildrenOrPlaceholder(node.children, renderChildren, 'Empty container')}
     </div>
   );
 }
 
-export function ColumnsPreview({ node, device, renderChildren }: BlockPreviewProps): ReactNode {
-  const attrs = node.attributes as ColumnsAttributes;
-  const columns = resolveResponsiveValue(attrs.columns, device) ?? 1;
-  const gap = resolveResponsiveValue(attrs.gap, device) ?? '16px';
-  const style: CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: `repeat(${Math.max(1, columns)}, minmax(0, 1fr))`,
-    gap,
-    minHeight: node.children.length === 0 ? '3rem' : undefined,
-  };
-
+export function ColumnsPreview({ node, renderChildren }: BlockPreviewProps): ReactNode {
   return (
-    <div className="niyi-preview-columns" style={style}>
+    <div
+      className="wp-block-columns"
+      style={{ minHeight: node.children.length === 0 ? '3rem' : undefined }}
+    >
       {renderChildrenOrPlaceholder(node.children, renderChildren, 'Add columns')}
     </div>
   );
@@ -65,7 +64,7 @@ export function ColumnsPreview({ node, device, renderChildren }: BlockPreviewPro
 export function ColumnPreview({ node, renderChildren }: BlockPreviewProps): ReactNode {
   return (
     <div
-      className="niyi-preview-column"
+      className="wp-block-column"
       style={{ minHeight: node.children.length === 0 ? '2rem' : undefined }}
     >
       {renderChildrenOrPlaceholder(node.children, renderChildren, 'Empty column')}
@@ -79,7 +78,7 @@ export function SpacerPreview({ node, device }: BlockPreviewProps): ReactNode {
 
   return (
     <div
-      className="niyi-preview-spacer"
+      className="wp-block-spacer"
       style={{ height }}
       aria-hidden="true"
       title={`Spacer (${height})`}
@@ -91,7 +90,7 @@ export function HeadingPreview({ node }: BlockPreviewProps): ReactNode {
   const attrs = node.attributes as HeadingAttributes;
   const level = attrs.level ?? 2;
   const content = attrs.content?.trim() || 'Heading';
-  const headingProps = { className: 'niyi-preview-heading', children: content };
+  const headingProps = { className: 'wp-block-heading', children: content };
 
   switch (level) {
     case 1:
@@ -114,7 +113,7 @@ export function ParagraphPreview({ node }: BlockPreviewProps): ReactNode {
   const attrs = node.attributes as ParagraphAttributes;
   const content = attrs.content?.trim() || 'Start writing…';
 
-  return <p className="niyi-preview-paragraph">{content}</p>;
+  return <p>{content}</p>;
 }
 
 export function ButtonPreview({ node }: BlockPreviewProps): ReactNode {
@@ -123,9 +122,17 @@ export function ButtonPreview({ node }: BlockPreviewProps): ReactNode {
   const url = attrs.url?.trim() || '#';
 
   return (
-    <a className="niyi-preview-button" href={url} onClick={(event) => event.preventDefault()}>
-      {label}
-    </a>
+    <div className="wp-block-buttons">
+      <div className="wp-block-button">
+        <a
+          className="wp-block-button__link wp-element-button"
+          href={url}
+          onClick={(event) => event.preventDefault()}
+        >
+          {label}
+        </a>
+      </div>
+    </div>
   );
 }
 
@@ -137,7 +144,14 @@ export function ImagePreview({ node }: BlockPreviewProps): ReactNode {
     return <div className="niyi-preview-image niyi-preview-image--empty">Image</div>;
   }
 
-  return <img className="niyi-preview-image" src={url} alt={attrs.alt ?? ''} loading="lazy" />;
+  const imgClass =
+    typeof attrs.attachmentId === 'number' ? `wp-image-${attrs.attachmentId}` : undefined;
+
+  return (
+    <figure className="wp-block-image">
+      <img src={url} alt={attrs.alt ?? ''} className={imgClass} loading="lazy" />
+    </figure>
+  );
 }
 
 export function HtmlPreview({ node }: BlockPreviewProps): ReactNode {
@@ -161,9 +175,10 @@ export function EmbedPreview({ node }: BlockPreviewProps): ReactNode {
   const url = attrs.url?.trim();
 
   return (
-    <div className="niyi-preview-embed">
-      <span className="niyi-preview-embed__label">{provider}</span>
-      {url ? <span className="niyi-preview-embed__url">{url}</span> : null}
-    </div>
+    <figure className={`wp-block-embed is-provider-${provider}`}>
+      <div className="wp-block-embed__wrapper">
+        {url ? url : <span className="niyi-preview-embed__empty">{provider}</span>}
+      </div>
+    </figure>
   );
 }

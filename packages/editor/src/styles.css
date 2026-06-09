@@ -140,37 +140,49 @@
   flex: 1;
   display: flex;
   min-height: 0;
-  padding: 1rem;
+  padding: 0;
+  background: var(--wp--preset--color--base, #fff);
 }
 
 .niyi-editor__canvas {
   flex: 1;
   display: flex;
-  justify-content: center;
+  justify-content: stretch;
   min-height: 0;
   overflow: auto;
 }
 
-.niyi-editor__canvas-inner {
+/* Gutenberg-like full-width writing canvas; theme + block styles apply inside. */
+.niyi-editor__canvas-inner.editor-styles-wrapper {
+  flex: 1;
   width: 100%;
-  max-width: 1200px;
-  min-height: 480px;
-  padding: 2rem;
-  background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px), #fff;
-  background-size: 24px 24px;
-  border: 1px solid #c3c4c7;
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  max-width: none;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.niyi-editor__canvas[data-device='tablet'] .niyi-editor__canvas-inner {
+.niyi-editor__canvas-inner .is-root-container {
+  width: 100%;
+  max-width: none;
+  min-height: calc(100vh - 48px);
+  margin: 0;
+  padding: var(--wp--style--root--padding-top, 2rem) var(--wp--style--root--padding-right, 2rem)
+    var(--wp--style--root--padding-bottom, 2rem) var(--wp--style--root--padding-left, 2rem);
+}
+
+.niyi-editor__canvas[data-device='tablet'] .niyi-editor__canvas-inner .is-root-container {
   max-width: 768px;
+  margin-inline: auto;
 }
 
-.niyi-editor__canvas[data-device='mobile'] .niyi-editor__canvas-inner {
+.niyi-editor__canvas[data-device='mobile'] .niyi-editor__canvas-inner .is-root-container {
   max-width: 375px;
+  margin-inline: auto;
 }
 
 .niyi-editor__canvas-empty {
@@ -201,6 +213,12 @@
   transition: outline-color 0.12s ease;
 }
 
+/* Layout blocks span the full parent width — unlike leaf blocks (840px via .wp-block). */
+.niyi-block-shell--layout {
+  width: 100%;
+  max-width: none;
+}
+
 .niyi-block-shell:hover {
   outline-color: rgba(34, 113, 177, 0.35);
 }
@@ -221,48 +239,12 @@
   background: rgba(255, 255, 255, 0.6);
 }
 
-.niyi-preview-group,
-.niyi-preview-column {
-  width: 100%;
-}
-
-.niyi-preview-heading {
-  margin: 0 0 0.5rem;
-  line-height: 1.25;
-}
-
-.niyi-preview-paragraph {
-  margin: 0 0 0.75rem;
-  line-height: 1.6;
-}
-
-.niyi-preview-button {
-  display: inline-block;
-  margin: 0.25rem 0;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  background: #2271b1;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.niyi-preview-image {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-}
-
 .niyi-preview-image--empty,
 .niyi-preview-html--empty,
-.niyi-preview-embed {
+.niyi-preview-embed__empty {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
   min-height: 120px;
   padding: 1rem;
   border: 1px dashed #c3c4c7;
@@ -273,30 +255,10 @@
   text-align: center;
 }
 
-.niyi-preview-embed__label {
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.niyi-preview-embed__url {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
-
-.niyi-preview-spacer {
+/* Layout shells must not inherit Gutenberg's 840px .wp-block content width. */
+.editor-styles-wrapper .niyi-block-shell--layout.wp-block {
+  max-width: none;
   width: 100%;
-  background: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 4px,
-    rgba(0, 0, 0, 0.04) 4px,
-    rgba(0, 0, 0, 0.04) 8px
-  );
-  border-radius: 2px;
 }
 
 .niyi-editor__inserter-backdrop {
