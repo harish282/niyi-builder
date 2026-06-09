@@ -81,6 +81,8 @@ export function Toolbar() {
 
                 if (saved) {
                   window.location.assign(bootstrap.exitUrl as string);
+                } else {
+                  alert('Failed to save changes. Please try again before leaving.');
                 }
               })();
             }}

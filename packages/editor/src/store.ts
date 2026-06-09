@@ -2,9 +2,9 @@ import { createBlockNode } from '@niyi-builder/blocks';
 import { createEmptyDocument, type BlockType, type BuilderDocument } from '@niyi-builder/core';
 import { create } from 'zustand';
 
+import { savePostToWordPress } from '../../../api.js';
 import { insertChild, reorderSiblings, resolveInsertParentId } from './document-ops.js';
 import { getBuilderSaveConfig } from './save-config.js';
-import { saveBuilderDocument } from './save-document.js';
 
 export type EditorDevice = 'desktop' | 'tablet' | 'mobile';
 export type SaveStatus = 'saved' | 'error' | null;
@@ -98,7 +98,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set({ isSaving: true, saveStatus: null, saveError: null });
 
     try {
-      await saveBuilderDocument(saveConfig, state.document);
+      const result = await savePostToWordPress(state.document, saveConfig);
+
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+
       set({ isSaving: false, isDirty: false, saveStatus: 'saved' });
 
       return true;
