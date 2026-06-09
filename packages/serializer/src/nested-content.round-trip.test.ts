@@ -50,6 +50,10 @@ describe('JSON → Gutenberg → JSON round-trip (content in layout)', () => {
       'core/image',
       'core/embed',
     ]);
+    expect(featureCard?.children[3]?.attributes).toMatchObject({
+      url: 'https://example.com/feature.png',
+      alt: 'Feature',
+    });
     expect(featureCard?.children[4]?.attributes).toMatchObject({
       provider: 'youtube',
       url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',

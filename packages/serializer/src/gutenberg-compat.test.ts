@@ -39,6 +39,20 @@ describe('Gutenberg-compatible markup', () => {
     });
   });
 
+  it('preserves image src and alt through parse and serialize', () => {
+    const gutenbergMarkup = `<!-- wp:image {"id":123,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://example.com/wp-content/uploads/photo.jpg" alt="Photo" class="wp-image-123"/></figure>
+<!-- /wp:image -->`;
+
+    const exported = serializeToGutenberg(parseFromGutenberg(gutenbergMarkup));
+
+    expect(exported).toContain('src="https://example.com/wp-content/uploads/photo.jpg"');
+    expect(exported).toContain('alt="Photo"');
+    expect(exported).toContain('"id":123');
+    expect(exported).not.toContain('"url"');
+    expect(exported).not.toContain('"alt"');
+  });
+
   it('emits image and embed inner HTML instead of self-closing comments', () => {
     const markup = serializeToGutenberg(loadFixture('nested-layout-and-content.json'));
 
@@ -49,6 +63,13 @@ describe('Gutenberg-compatible markup', () => {
     expect(markup).toContain('<!-- wp:embed');
     expect(markup).toContain('class="wp-block-embed');
     expect(markup).not.toMatch(/<!-- wp:embed[^>]*\/-->/);
+  });
+
+  it('emits empty layout blocks with wrapper divs, not self-closing comments', () => {
+    const markup = serializeToGutenberg(loadFixture('nested-layout-and-content.json'));
+
+    expect(markup).not.toMatch(/<!-- wp:column[^>]*\/-->/);
+    expect(markup).toContain('<div class="wp-block-column">');
   });
 
   it('round-trips Gutenberg markup with buttons wrapper and layout divs', () => {

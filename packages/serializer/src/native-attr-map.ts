@@ -98,6 +98,51 @@ function stripTags(html: string): string {
   return html.replace(/<[^>]+>/g, '').trim();
 }
 
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+}
+
+function readHtmlAttribute(tag: string, name: string): string | undefined {
+  const pattern = new RegExp(`\\b${name}\\s*=\\s*("([^"]*)"|'([^']*)')`, 'i');
+  const match = pattern.exec(tag);
+
+  if (!match) {
+    return undefined;
+  }
+
+  return decodeHtmlEntities(match[2] ?? match[3] ?? '');
+}
+
+/** Gutenberg stores image src/alt on the <img> element; block JSON often only has `id`. */
+function extractImgTagAttrs(innerHTML: string): {
+  src?: string;
+  alt?: string;
+  attachmentId?: number;
+} {
+  const tagMatch = /<img\b[^>]*>/i.exec(innerHTML);
+
+  if (!tagMatch) {
+    return {};
+  }
+
+  const tag = tagMatch[0];
+  const src = readHtmlAttribute(tag, 'src');
+  const alt = readHtmlAttribute(tag, 'alt');
+  const classAttr = readHtmlAttribute(tag, 'class') ?? '';
+  const idMatch = /\bwp-image-(\d+)\b/.exec(classAttr);
+
+  return {
+    src: src || undefined,
+    alt: alt !== undefined ? alt : undefined,
+    attachmentId: idMatch?.[1] ? Number(idMatch[1]) : undefined,
+  };
+}
+
 export function splitGroupAttrs(attrs: Record<string, unknown>): SplitAttrs {
   const niyi: Record<string, unknown> = {};
   let native: Record<string, unknown> = {};
@@ -350,12 +395,7 @@ export function splitImageAttrs(attrs: Record<string, unknown>): SplitAttrs {
   const native: Record<string, unknown> = {};
   const niyi = omitKeys(attrs, ['url', 'alt', 'attachmentId']);
 
-  if (typeof attrs.url === 'string') {
-    native.url = attrs.url;
-  }
-  if (typeof attrs.alt === 'string') {
-    native.alt = attrs.alt;
-  }
+  // `url` and `alt` are carried in inner HTML (Gutenberg content attrs), not block JSON.
   if (typeof attrs.attachmentId === 'number') {
     native.id = attrs.attachmentId;
   }
@@ -365,18 +405,31 @@ export function splitImageAttrs(attrs: Record<string, unknown>): SplitAttrs {
 
 export function nativeImageToBuilder(
   gutenbergAttrs: Record<string, unknown>,
-  _innerHTML: string,
+  innerHTML: string,
 ): Record<string, unknown> {
   const builder: Record<string, unknown> = {};
-  if (typeof gutenbergAttrs.url === 'string') {
-    builder.url = gutenbergAttrs.url;
-  }
-  if (typeof gutenbergAttrs.alt === 'string') {
-    builder.alt = gutenbergAttrs.alt;
-  }
+  const img = extractImgTagAttrs(innerHTML);
+
   if (typeof gutenbergAttrs.id === 'number') {
     builder.attachmentId = gutenbergAttrs.id;
+  } else if (img.attachmentId !== undefined) {
+    builder.attachmentId = img.attachmentId;
   }
+
+  const url =
+    typeof gutenbergAttrs.url === 'string' && gutenbergAttrs.url
+      ? gutenbergAttrs.url
+      : img.src;
+  if (url) {
+    builder.url = url;
+  }
+
+  const alt =
+    typeof gutenbergAttrs.alt === 'string' ? gutenbergAttrs.alt : img.alt;
+  if (alt !== undefined) {
+    builder.alt = alt;
+  }
+
   return builder;
 }
 

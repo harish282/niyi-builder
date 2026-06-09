@@ -96,7 +96,8 @@ function serializeBlockMarkup(node: BlockNode, path = 'root'): string {
   const hasInnerContent = (innerHtml?.length ?? 0) > 0 || innerBlocks.length > 0;
 
   if (!hasInnerContent) {
-    if (wrapperClass && Object.keys(gutenbergAttrs).length > 0) {
+    // Layout blocks always need a wrapper div — Gutenberg rejects self-closing column/group markup.
+    if (wrapperClass) {
       return `<!-- wp:${blockName}${attrs} -->\n<div class="${wrapperClass}"></div>\n<!-- /wp:${blockName} -->`;
     }
     return `<!-- wp:${blockName}${attrs} /-->`;
