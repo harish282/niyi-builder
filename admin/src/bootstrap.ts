@@ -5,6 +5,7 @@ import {
   type BuilderDocument,
 } from '@niyi-builder/core';
 import { useEditorStore } from '@niyi-builder/editor';
+import { ensureDefaultBlocksRegistered } from '@niyi-builder/blocks';
 import { parseFromGutenberg } from '@niyi-builder/serializer';
 
 import { fetchPostContentRaw } from './load-content.js';
@@ -54,6 +55,9 @@ function logLoadedDocument(
 }
 
 export async function initializeEditorFromBootstrap(): Promise<void> {
+  // Ensure the block registry is populated before we try to render or parse.
+  ensureDefaultBlocksRegistered();
+
   const config = getBootstrapConfig();
   let content = config?.content?.trim() ?? '';
   let source: 'inline' | 'rest' = 'inline';
