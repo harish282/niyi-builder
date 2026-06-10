@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import logoIcon from '../../../../assets/images/icon-1.png';
 import { getBuilderSaveConfig } from '../save-config.js';
 import { printSavePayload } from '../save-document.js';
 import { useEditorStore, type EditorDevice } from '../store.js';
@@ -60,7 +61,7 @@ export function Toolbar() {
   return (
     <header className="niyi-editor__toolbar" aria-label="Builder toolbar">
       <div className="niyi-editor__toolbar-start">
-        <span className="niyi-editor__brand">Niyi Builder</span>
+        <span><img src={logoIcon} alt="Niyi Builder" className="h-8 w-auto" /></span>
         {postTitle ? <span className="niyi-editor__post-title">{postTitle}</span> : null}
         {bootstrap.exitUrl ? (
           <a

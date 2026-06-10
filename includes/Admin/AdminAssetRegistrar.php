@@ -17,6 +17,7 @@ final class AdminAssetRegistrar
     public function register(): void
     {
         add_action('admin_enqueue_scripts', [$this, 'enqueue']);
+        add_filter('script_loader_tag', [$this, 'transformToModule'], 10, 3);
     }
 
     public function enqueue(string $hookSuffix): void
@@ -137,5 +138,17 @@ final class AdminAssetRegistrar
     {
         wp_enqueue_script($handle, $src, $dependencies, null, true);
         wp_script_add_data($handle, 'type', 'module');
+    }
+
+    /**
+     * Filters the HTML script tag of an enqueued script to add type="module".
+     */
+    public function transformToModule(string $tag, string $handle, string $src): string
+    {
+        if (wp_scripts()->get_data($handle, 'type') !== 'module') {
+            return $tag;
+        }
+
+        return str_replace(' src=', ' type="module" src=', $tag);
     }
 }
