@@ -1,8 +1,8 @@
 # Niyi Builder — Execution Plan
 
-> **Status:** Live on GitHub — [86 issues](https://github.com/harish282/niyi-builder/issues), [10 milestones](https://github.com/harish282/niyi-builder/milestones), labels applied. Kickoff **T0 = 2026-06-02**.  
-> **Source:** [Open Visual Gutenberg Builder.pdf](../Open%20Visual%20Gutenberg%20Builder.pdf)  
-> **Repo:** [harish282/niyi-builder](https://github.com/harish282/niyi-builder)  
+> **Status:** Phase 1 Complete. Phase 2 (Core Editor) in progress.
+> **Source:** [Open Visual Gutenberg Builder.pdf](../Open%20Visual%20Gutenberg%20Builder.pdf)
+> **Repo:** [harish282/niyi-builder](https://github.com/harish282/niyi-builder)
 > **Issue map:** [scripts/github-issue-map.json](../scripts/github-issue-map.json) (draft ID → GitHub #)
 
 ---
@@ -142,23 +142,23 @@ _Durations are from the spec; calendar dates should be set when work starts._
 
 ### Phase 1 — Architecture Validation (2 weeks)
 
-**Milestone:** `M1: Architecture Validated`  
+**Milestone:** `M1: Architecture Validated` (COMPLETED)
 **Success criteria:** JSON → Gutenberg → JSON round-trip with **no data loss** (including nested containers/blocks).
 
 #### Sprint 0 — Serializer proof of concept
 
 | #    | Task                                   | Notes                                                 |
 | ---- | -------------------------------------- | ----------------------------------------------------- |
-| 0.1  | Monorepo & package scaffolding         | `packages/*`, workspace tooling (pnpm/npm workspaces) |
-| 0.2  | WordPress plugin scaffold              | Main plugin file, activation, autoload (`includes/`)  |
-| 0.3  | React + TypeScript + Vite in `admin/`  | Dev server, build to `build/`                         |
-| 0.4  | ESLint + Prettier + CI lint job (stub) | Consistent TS across packages                         |
-| 0.5  | Layout JSON schema (v0)                | Document block tree shape                             |
-| 0.6  | JSON → Gutenberg conversion            | `packages/serializer`                                 |
-| 0.7  | Gutenberg → JSON conversion            | Parse existing block markup                           |
-| 0.8  | Round-trip tests                       | Automated: simple + nested                            |
-| 0.9  | Nested container validation            | Multi-level layout trees                              |
-| 0.10 | Nested block validation                | Content inside layout                                 |
+| 0.1  | Monorepo & package scaffolding         | Done                                                  |
+| 0.2  | WordPress plugin scaffold              | Done                                                  |
+| 0.3  | React + TypeScript + Vite in `admin/`  | Done                                                  |
+| 0.4  | ESLint + Prettier + CI lint job (stub) | Done                                                  |
+| 0.5  | Layout JSON schema (v0)                | Done                                                  |
+| 0.6  | JSON → Gutenberg conversion            | Done                                                  |
+| 0.7  | Gutenberg → JSON conversion            | Done                                                  |
+| 0.8  | Round-trip tests                       | Done                                                  |
+| 0.9  | Nested container validation            | Done                                                  |
+| 0.10 | Nested block validation                | Done                                                  |
 
 **Deliverable:** Serializer package with passing round-trip tests; minimal admin entry to trigger test page (optional).
 
@@ -172,12 +172,12 @@ _Durations are from the spec; calendar dates should be set when work starts._
 
 | #   | Task                         | Notes                                     |
 | --- | ---------------------------- | ----------------------------------------- |
-| 1.1 | Editor shell UI              | Full-screen / iframe canvas area          |
+| 1.1 | Editor shell UI              | Done (`EditorShell.tsx`)                  |
 | 1.2 | Component registry           | Register block types for canvas           |
 | 1.3 | Rendering engine             | JSON tree → React preview                 |
 | 1.4 | Selection system             | Click to select, highlight, breadcrumb    |
 | 1.5 | Add element flow             | Insert from palette (stub blocks OK)      |
-| 1.6 | Wire serializer to save/load | Persist to post via REST or existing APIs |
+| 1.6 | Wire serializer to save/load | Done (Issue #18 - REST API wired)         |
 
 **Deliverable:** User can add and select elements on canvas.
 
@@ -346,7 +346,7 @@ _Durations are from the spec; calendar dates should be set when work starts._
 
 ### Phase 10 — Public Beta (2 weeks)
 
-**Milestone:** `M10: Public Beta (v1.0.0-beta)`  
+**Milestone:** `M10: Public Beta (v1.0.0-beta)`
 **Tag:** `v1.0.0-beta.1` → `v1.0.0`
 
 #### Sprint 11 — Release prep (2 weeks)
@@ -416,7 +416,7 @@ Create **10 milestones** on [harish282/niyi-builder](https://github.com/harish28
 
 ## GitHub Issues (Draft)
 
-Below are **82 draft issues**. Each maps to one task above. Copy/adjust before creating on GitHub.  
+Below are **82 draft issues**. Each maps to one task above. Copy/adjust before creating on GitHub.
 **Format:** `#[draft-id]` Title — Milestone — Labels — Description stub.
 
 ---

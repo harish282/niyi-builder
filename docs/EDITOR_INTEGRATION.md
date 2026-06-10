@@ -270,7 +270,7 @@ WordPress always uses the compiled `build/` assets — the same path production 
 | Component registry           | #14    | Not started      |
 | Canvas rendering             | #15    | Placeholder text |
 | Selection / inserter         | #16–17 | Buttons disabled |
-| REST save                    | #18    | Not started      |
+| REST save                    | #18    | COMPLETED        |
 | New post → builder redirect  | —      | Not started      |
 | Post meta “edited with Niyi” | —      | Optional         |
 
