@@ -99,7 +99,7 @@ verify_built_assets() {
     missing=1
   fi
 
-  if ! compgen -G "$ROOT/build/assets/*.css" > /dev/null; then
+  if ! compgen -G "$ROOT/build/assets/*.css" > /dev/null && ! compgen -G "$ROOT/build/*.css" > /dev/null; then
     echo "error: missing build/assets/*.css bundle" >&2
     missing=1
   fi

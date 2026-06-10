@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// Variables
+@niyi-sidebar-width: 300px;
+@niyi-transition: all 0.2s ease-in-out;
+
+// Scope the builder UI to prevent WordPress admin or theme styles from interfering
+.niyi-builder-shell {
+  @apply antialiased text-gray-900 bg-gray-50;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+
+  // Example of custom LESS nesting
+  .niyi-canvas-container {
+    transition: @niyi-transition;
+
+    &.is-dragging {
+      @apply cursor-grabbing;
+    }
+  }
+}
+
+// Add more specific resets for typography if needed
