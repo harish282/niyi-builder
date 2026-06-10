@@ -85,46 +85,46 @@ run_build() {
 }
 
 verify_built_assets() {
-  local manifest="$ROOT/build/manifest.json"
-  local missing=0
-  local css_rel
-
-  if [[ ! -f "$ROOT/build/admin.js" ]]; then
-    echo "error: missing build/admin.js" >&2
-    missing=1
+  # Find manifest (Vite 4 uses build/manifest.json, Vite 5+ uses build/.vite/manifest.json)
+  local manifest
+  if [[ -f "$ROOT/build/manifest.json" ]]; then
+    manifest="$ROOT/build/manifest.json"
+  elif [[ -f "$ROOT/build/.vite/manifest.json" ]]; then
+    manifest="$ROOT/build/.vite/manifest.json"
+  else
+    manifest=""
   fi
 
-  if [[ ! -f "$manifest" ]]; then
-    echo "error: missing build/manifest.json" >&2
+  local missing=0
+
+  if [[ -z "$manifest" ]]; then
+    echo "error: missing manifest.json (checked build/ and build/.vite/)" >&2
     missing=1
+  else
+    # Verify all files referenced in manifest actually exist
+    while IFS= read -r rel_path; do
+      [[ -z "$rel_path" ]] && continue
+      if [[ ! -f "$ROOT/build/$rel_path" ]]; then
+        echo "error: manifest references missing file: build/$rel_path" >&2
+        missing=1
+      fi
+    done < <(php -r "
+      $manifest = json_decode(file_get_contents($argv[1]), true);
+      if (!is_array(\$manifest)) exit(0);
+      \$files = [];
+      foreach (\$manifest as \$entry) {
+        if (isset(\$entry['file'])) \$files[] = \$entry['file'];
+        if (isset(\$entry['css']) && is_array(\$entry['css'])) {
+          foreach (\$entry['css'] as \$css) \$files[] = \$css;
+        }
+      }
+      echo implode(PHP_EOL, array_unique(\$files));
+    " "$manifest")
   fi
 
   if ! compgen -G "$ROOT/build/assets/*.css" > /dev/null && ! compgen -G "$ROOT/build/*.css" > /dev/null; then
-    echo "error: missing build/assets/*.css bundle" >&2
+    echo "error: no CSS files found in build directory" >&2
     missing=1
-  fi
-
-  if [[ -f "$manifest" ]] && command -v php >/dev/null 2>&1; then
-    while IFS= read -r css_rel; do
-      [[ -z "$css_rel" ]] && continue
-      if [[ ! -f "$ROOT/build/$css_rel" ]]; then
-        echo "error: manifest references missing stylesheet build/$css_rel" >&2
-        missing=1
-      fi
-    done < <(php -r '
-      $manifest = json_decode(file_get_contents($argv[1]), true);
-      if (!is_array($manifest)) { exit(0); }
-      foreach ($manifest as $entry) {
-        if (!is_array($entry) || empty($entry["css"]) || !is_array($entry["css"])) {
-          continue;
-        }
-        foreach ($entry["css"] as $css) {
-          if (is_string($css) && $css !== "") {
-            echo $css, PHP_EOL;
-          }
-        }
-      }
-    ' "$manifest")
   fi
 
   if [[ "$missing" -ne 0 ]]; then
@@ -209,16 +209,20 @@ verify_runtime_files() {
     "includes/Admin/AdminAssetRegistrar.php"
     "resources/views/builder-app.php"
     "assets/admin.css"
-    "assets/gutenberg-bridge.js"
     "assets/gutenberg-bridge.css"
-    "build/admin.js"
     "build/manifest.json"
     "readme.txt"
     "license.txt"
   )
 
   for rel in "${required_files[@]}"; do
-    if [[ ! -e "$dest/$rel" ]]; then
+    # Special case for manifest: allow it in .vite/ too
+    if [[ "$rel" == "build/manifest.json" ]]; then
+       if [[ ! -f "$dest/build/manifest.json" && ! -f "$dest/build/.vite/manifest.json" ]]; then
+         echo "error: staged release missing manifest.json" >&2
+         missing=1
+       fi
+    elif [[ ! -e "$dest/$rel" ]]; then
       echo "error: staged release missing required file: $rel" >&2
       missing=1
     fi

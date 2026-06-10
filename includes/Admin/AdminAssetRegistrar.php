@@ -12,7 +12,9 @@ final class AdminAssetRegistrar
 {
     private const MENU_SLUG = 'niyi-builder';
     private const SCRIPT_HANDLE = 'niyi-builder-admin';
-    private const MANIFEST_ENTRY = 'src/main.tsx';
+
+    /** @var string[] Potential manifest keys for the entry point */
+    private const MANIFEST_ENTRIES = ['admin/src/main.tsx', 'src/main.tsx'];
 
     public function register(): void
     {
@@ -56,7 +58,13 @@ final class AdminAssetRegistrar
             return;
         }
 
-        $entry = $manifest[self::MANIFEST_ENTRY] ?? null;
+        $entry = null;
+        foreach (self::MANIFEST_ENTRIES as $key) {
+            if (isset($manifest[$key])) {
+                $entry = $manifest[$key];
+                break;
+            }
+        }
 
         if (! is_array($entry) || empty($entry['file']) || ! is_string($entry['file'])) {
             return;
@@ -114,21 +122,25 @@ final class AdminAssetRegistrar
      */
     private function loadManifest(): ?array
     {
-        $manifestPath = NIYI_BUILDER_BUILD_PATH . '/manifest.json';
+        // Check standard location and Vite 5+ hidden subdirectory
+        $paths = [
+            NIYI_BUILDER_BUILD_PATH . '/manifest.json',
+            NIYI_BUILDER_BUILD_PATH . '/.vite/manifest.json',
+        ];
 
-        if (! is_readable($manifestPath)) {
-            return null;
+        foreach ($paths as $path) {
+            if (is_readable($path)) {
+                $contents = file_get_contents($path);
+                if ($contents !== false) {
+                    $decoded = json_decode($contents, true);
+                    if (is_array($decoded)) {
+                        return $decoded;
+                    }
+                }
+            }
         }
 
-        $contents = file_get_contents($manifestPath);
-
-        if ($contents === false) {
-            return null;
-        }
-
-        $decoded = json_decode($contents, true);
-
-        return is_array($decoded) ? $decoded : null;
+        return null;
     }
 
     /**
