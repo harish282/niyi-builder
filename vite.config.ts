@@ -32,6 +32,13 @@ export default defineConfig(({ command }) => ({
       '@niyi-builder/serializer': resolve(__dirname, 'packages/serializer/src/index.ts'),
     },
   },
+  optimizeDeps: {
+    include: [
+      '@emotion/react',
+      '@emotion/styled',
+      '@mui/material/styles',
+    ],
+  },
   server: {
     port: DEV_PORT,
     strictPort: true,

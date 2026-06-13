@@ -1,6 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
+import DesktopIcon from '@mui/icons-material/DesktopWindows';
+import TabletIcon from '@mui/icons-material/TabletAndroid';
+import MobileIcon from '@mui/icons-material/Smartphone';
 
-import logoIcon from '../../../../assets/images/icon-1.png';
+import logoIcon from '../../../../assets/images/icon-1.svg';
 import { getBuilderSaveConfig } from '../save-config.js';
 import { printSavePayload } from '../save-document.js';
 import { useEditorStore, type EditorDevice } from '../store.js';
@@ -21,10 +24,22 @@ function getToolbarBootstrap(): ToolbarBootstrap {
   return config ?? {};
 }
 
-const DEVICES: { id: EditorDevice; label: string }[] = [
-  { id: 'desktop', label: 'Desktop' },
-  { id: 'tablet', label: 'Tablet' },
-  { id: 'mobile', label: 'Mobile' },
+const DEVICES: { id: EditorDevice; label: string; icon: ReactNode }[] = [
+  {
+    id: 'desktop',
+    label: 'Desktop',
+    icon: <DesktopIcon fontSize="small" />,
+  },
+  {
+    id: 'tablet',
+    label: 'Tablet',
+    icon: <TabletIcon fontSize="small" />,
+  },
+  {
+    id: 'mobile',
+    label: 'Mobile',
+    icon: <MobileIcon fontSize="small" />,
+  },
 ];
 
 export function Toolbar() {
@@ -100,7 +115,7 @@ export function Toolbar() {
           role="group"
           aria-label="Responsive preview (coming soon)"
         >
-          {DEVICES.map(({ id, label }) => (
+          {DEVICES.map(({ id, label, icon }) => (
             <button
               key={id}
               type="button"
@@ -113,7 +128,7 @@ export function Toolbar() {
               disabled
               onClick={() => setDevice(id)}
             >
-              {label}
+              {icon}
             </button>
           ))}
         </div>
