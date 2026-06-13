@@ -68,7 +68,14 @@ function extractRootBlock(blocks: ParsedBlock[]): ParsedBlock {
   const coreBlocks = meaningful.filter((block) => isCoreBlockName(block.blockName));
 
   if (coreBlocks.length === 0) {
-    throw new ParseError('No supported core blocks found in markup.');
+    // If no supported core blocks are found, return an empty root block.
+    // This prevents the editor from crashing when opened on posts with foreign or legacy content.
+    return {
+      blockName: ROOT_BLOCK_TYPE,
+      attrs: null,
+      innerBlocks: [],
+      innerHTML: '',
+    };
   }
 
   const rootGroup = coreBlocks.find((block) => block.blockName === ROOT_BLOCK_TYPE);

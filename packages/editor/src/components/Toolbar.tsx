@@ -124,8 +124,7 @@ export function Toolbar() {
               }
               aria-pressed={device === id}
               aria-label={label}
-              title={`${label} preview (coming soon)`}
-              disabled
+              title={`${label} preview`}
               onClick={() => setDevice(id)}
             >
               {icon}

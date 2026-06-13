@@ -9,6 +9,7 @@
 // Scope the builder UI to prevent WordPress admin or theme styles from interfering
 .niyi-builder-shell {
   @apply antialiased text-gray-900 bg-gray-50;
+  @apply flex flex-col h-screen overflow-hidden;
   font-family: Inter, system-ui, -apple-system, sans-serif;
 
   // Example of custom LESS nesting
@@ -21,4 +22,43 @@
   }
 }
 
-// Add more specific resets for typography if needed
+.niyi-editor__main-area {
+  @apply flex flex-1 overflow-hidden;
+}
+
+.niyi-editor__inserter {
+  width: @niyi-sidebar-width;
+  @apply border-l border-gray-200 bg-white overflow-y-auto;
+
+  .niyi-editor__inserter-section {
+    @apply border-b border-gray-100 last:border-b-0;
+  }
+
+  .niyi-editor__inserter-category-title {
+    font-size: 11px;
+    @apply px-4 py-2 font-bold uppercase tracking-wider text-gray-400 bg-gray-50/50;
+    @apply border-b border-gray-100;
+  }
+
+  .niyi-editor__inserter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    @apply p-2 gap-1;
+  }
+
+  .niyi-editor__inserter-item {
+    @apply flex flex-col items-center justify-center p-3 rounded transition-all;
+    @apply border border-transparent hover:border-gray-200 hover:bg-gray-50 hover:shadow-sm;
+
+    .niyi-editor__inserter-icon {
+      @apply mb-2 text-gray-500;
+      svg { @apply w-6 h-6; }
+    }
+
+    .niyi-editor__inserter-label {
+      font-size: 10px;
+      @apply leading-tight text-gray-600 text-center font-medium;
+      @apply truncate w-full;
+    }
+  }
+}

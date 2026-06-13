@@ -1,123 +1,81 @@
-import {
-  getBlockDefinition,
-  getInsertableBlockTypes,
-  type BlockCategory,
-} from '@niyi-builder/blocks';
-import type { BlockType } from '@niyi-builder/core';
-import { useMemo } from 'react';
-
-import { findBlockById, resolveInsertParentId } from '../document-ops.js';
+import React from 'react';
+import { getRegisteredBlocks, type BlockDefinition } from '@niyi-builder/blocks';
 import { useEditorStore } from '../store.js';
+import type { BlockType } from '@niyi-builder/core';
+import {
+  TextFields as TextIcon,
+  Title as HeadingIcon,
+  SmartButton as ButtonIcon,
+  Image as ImageIcon,
+  ViewQuilt as GridIcon,
+  CropFree as ContainerIcon,
+  ViewDay as SpacerIcon
+} from '@mui/icons-material';
 
-const CATEGORY_ORDER: BlockCategory[] = ['layout', 'content'];
-const CATEGORY_LABELS: Record<BlockCategory, string> = {
+/**
+ * Maps block types to their respective Material Icons.
+ */
+const ICON_MAP: Record<string, React.ReactNode> = {
+  'core/paragraph': <TextIcon fontSize="small" />,
+  'core/heading': <HeadingIcon fontSize="small" />,
+  'core/button': <ButtonIcon fontSize="small" />,
+  'core/image': <ImageIcon fontSize="small" />,
+  'core/group': <ContainerIcon fontSize="small" />,
+  'core/columns': <GridIcon fontSize="small" />,
+  'core/spacer': <SpacerIcon fontSize="small" />,
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
   layout: 'Layout',
-  content: 'Content',
+  content: 'Basic',
 };
 
 export function Inserter() {
-  const document = useEditorStore((state) => state.document);
-  const selectedBlockId = useEditorStore((state) => state.selectedBlockId);
+  const blocks = getRegisteredBlocks();
+  // Assuming addBlock is the store method to insert a block
+  const addBlock = useEditorStore((state) => (state as any).addBlock);
   const isInserterOpen = useEditorStore((state) => state.isInserterOpen);
-  const insertBlock = useEditorStore((state) => state.insertBlock);
-  const toggleInserter = useEditorStore((state) => state.toggleInserter);
 
-  const insertParentId = resolveInsertParentId(document.root, selectedBlockId);
-  const insertParent = findBlockById(document.root, insertParentId);
-  const insertParentLabel = insertParent
-    ? (getBlockDefinition(insertParent.type)?.label ?? insertParent.type)
-    : 'Page';
+  if (!isInserterOpen) return null;
 
-  const blocksByCategory = useMemo(() => {
-    const parentType = insertParent?.type ?? document.root.type;
-    const insertableTypes = getInsertableBlockTypes(parentType);
-
-    const grouped = new Map<BlockCategory, BlockType[]>();
-
-    for (const type of insertableTypes) {
-      const definition = getBlockDefinition(type);
-
-      if (!definition) {
-        continue;
-      }
-
-      const list = grouped.get(definition.category) ?? [];
-      list.push(type);
-      grouped.set(definition.category, list);
-    }
-
-    return grouped;
-  }, [document.root, insertParent?.type]);
-
-  if (!isInserterOpen) {
-    return null;
-  }
+  // Group blocks by category
+  const groupedBlocks = blocks.reduce((acc, block) => {
+    const category = block.category || 'other';
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(block);
+    return acc;
+  }, {} as Record<string, BlockDefinition[]>);
 
   return (
-    <div className="niyi-editor__inserter-backdrop" onClick={() => toggleInserter(false)}>
-      <aside
-        className="niyi-editor__inserter"
-        role="dialog"
-        aria-label="Add element"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <header className="niyi-editor__inserter-header">
-          <div>
-            <h2 className="niyi-editor__inserter-title">Add element</h2>
-            <p className="niyi-editor__inserter-target">
-              Inserting into <strong>{insertParentLabel}</strong>
-            </p>
+    <aside className="niyi-editor__inserter" aria-label="Elements Palette">
+      {Object.entries(groupedBlocks).map(([category, categoryBlocks]) => (
+        <div key={category} className="niyi-editor__inserter-section">
+          <h4 className="niyi-editor__inserter-category-title">
+            {CATEGORY_LABELS[category] || category}
+          </h4>
+          <div className="niyi-editor__inserter-grid">
+            {categoryBlocks.map((block) => (
+              <button
+                key={block.type}
+                type="button"
+                className="niyi-editor__inserter-item relative"
+                onClick={() => addBlock?.(block.type as BlockType)}
+                title={block.label}
+              >
+                {(block as any).isPro && (
+                  <span className="absolute top-1 right-1 bg-amber-500 text-white text-[8px] font-bold px-1 rounded-sm uppercase tracking-tighter shadow-sm">
+                    Pro
+                  </span>
+                )}
+                <div className="niyi-editor__inserter-icon">
+                  {ICON_MAP[block.type] || <TextIcon fontSize="small" />}
+                </div>
+                <span className="niyi-editor__inserter-label">{block.label}</span>
+              </button>
+            ))}
           </div>
-          <button
-            type="button"
-            className="niyi-editor__inserter-close"
-            aria-label="Close"
-            onClick={() => toggleInserter(false)}
-          >
-            ×
-          </button>
-        </header>
-
-        <div className="niyi-editor__inserter-body">
-          {CATEGORY_ORDER.map((category) => {
-            const types = blocksByCategory.get(category);
-
-            if (!types || types.length === 0) {
-              return null;
-            }
-
-            return (
-              <section key={category} className="niyi-editor__inserter-section">
-                <h3 className="niyi-editor__inserter-section-title">{CATEGORY_LABELS[category]}</h3>
-                <ul className="niyi-editor__inserter-list">
-                  {types.map((type) => {
-                    const definition = getBlockDefinition(type);
-
-                    if (!definition) {
-                      return null;
-                    }
-
-                    return (
-                      <li key={type}>
-                        <button
-                          type="button"
-                          className="niyi-editor__inserter-item"
-                          onClick={() => insertBlock(type)}
-                        >
-                          <span className="niyi-editor__inserter-item-label">
-                            {definition.label}
-                          </span>
-                          <span className="niyi-editor__inserter-item-type">{type}</span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            );
-          })}
         </div>
-      </aside>
-    </div>
+      ))}
+    </aside>
   );
 }

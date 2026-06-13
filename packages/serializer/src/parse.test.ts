@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { createEmptyDocument } from '@niyi-builder/core';
-import { ParseError } from './errors.js';
 import { parseFromGutenberg } from './parse.js';
 import { serializeToGutenberg } from './serialize.js';
 import { loadFixture } from './test-helpers.js';
@@ -84,11 +83,13 @@ describe('parseFromGutenberg', () => {
     expect(exported).not.toContain('<!-- wp:group');
   });
 
-  it('throws when markup has no supported blocks', () => {
+  it('returns empty root when markup has no supported blocks', () => {
     const markup = `<!-- wp:quote -->
 <blockquote class="wp-block-quote"><p>Hello</p></blockquote>
 <!-- /wp:quote -->`;
 
-    expect(() => parseFromGutenberg(markup)).toThrow(ParseError);
+    const doc = parseFromGutenberg(markup);
+    expect(doc.root.type).toBe('core/group');
+    expect(doc.root.children).toEqual([]);
   });
 });
