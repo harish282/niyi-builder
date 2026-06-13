@@ -2,15 +2,13 @@ import React from 'react';
 import { getRegisteredBlocks, type BlockDefinition } from '@niyi-builder/blocks';
 import { useEditorStore } from '../store.js';
 import type { BlockType } from '@niyi-builder/core';
-import {
-  TextFields as TextIcon,
-  Title as HeadingIcon,
-  SmartButton as ButtonIcon,
-  Image as ImageIcon,
-  ViewQuilt as GridIcon,
-  CropFree as ContainerIcon,
-  ViewDay as SpacerIcon
-} from '@mui/icons-material';
+import TextIcon from '@mui/icons-material/TextFields';
+import HeadingIcon from '@mui/icons-material/Title';
+import ButtonIcon from '@mui/icons-material/SmartButton';
+import ImageIcon from '@mui/icons-material/Image';
+import GridIcon from '@mui/icons-material/ViewQuilt';
+import ContainerIcon from '@mui/icons-material/CropFree';
+import SpacerIcon from '@mui/icons-material/ViewDay';
 
 /**
  * Maps block types to their respective Material Icons.
@@ -32,8 +30,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function Inserter() {
   const blocks = getRegisteredBlocks();
-  // Assuming addBlock is the store method to insert a block
-  const addBlock = useEditorStore((state) => (state as any).addBlock);
+  const insertBlock = useEditorStore((state) => state.insertBlock);
   const isInserterOpen = useEditorStore((state) => state.isInserterOpen);
 
   if (!isInserterOpen) return null;
@@ -59,7 +56,7 @@ export function Inserter() {
                 key={block.type}
                 type="button"
                 className="niyi-editor__inserter-item relative"
-                onClick={() => addBlock?.(block.type as BlockType)}
+                onClick={() => insertBlock(block.type as BlockType)}
                 title={block.label}
               >
                 {(block as any).isPro && (
