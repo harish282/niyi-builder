@@ -5,12 +5,12 @@ import { Toolbar } from './Toolbar.js';
 
 export function EditorShell() {
   return (
-    <div className="niyi-editor">
+    <div className="flex flex-col h-screen overflow-hidden bg-[#f0f0f1] text-[#1d2327] text-[13px] leading-relaxed">
       <Toolbar />
-      <div className="niyi-editor__main-area">
+      <div className="flex flex-row flex-1 overflow-hidden bg-gray-100">
+        <Inserter />
         <Canvas />
         <Inspector />
-        <Inserter />
       </div>
     </div>
   );

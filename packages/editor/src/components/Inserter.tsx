@@ -44,7 +44,11 @@ export function Inserter() {
   }, {} as Record<string, BlockDefinition[]>);
 
   return (
-    <aside className="niyi-editor__inserter" aria-label="Elements Palette">
+    <aside className="niyi-editor__inserter w-64 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col overflow-hidden" aria-label="Elements Palette">
+      <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+        <h3 className="text-xs font-bold text-gray-800 uppercase tracking-widest">Elements</h3>
+      </div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
       {Object.entries(groupedBlocks).map(([category, categoryBlocks]) => (
         <div key={category} className="niyi-editor__inserter-section">
           <h4 className="niyi-editor__inserter-category-title">
@@ -64,15 +68,16 @@ export function Inserter() {
                     Pro
                   </span>
                 )}
-                <div className="niyi-editor__inserter-icon">
+                <div className="text-gray-500 group-hover:text-blue-600 transition-colors">
                   {ICON_MAP[block.type] || <TextIcon fontSize="small" />}
                 </div>
-                <span className="niyi-editor__inserter-label">{block.label}</span>
+                <span className="mt-2 text-[11px] font-semibold text-gray-700">{block.label}</span>
               </button>
             ))}
           </div>
         </div>
       ))}
+      </div>
     </aside>
   );
 }

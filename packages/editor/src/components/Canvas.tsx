@@ -65,8 +65,11 @@ export function Canvas() {
   const activeNode =
     activeId !== null ? findBlockById(document.root, activeId) : null;
 
+  // Responsive widths for preview mode
+  const containerMaxWidth = device === 'tablet' ? '768px' : device === 'mobile' ? '375px' : 'none';
+
   return (
-    <main className="niyi-editor__canvas-wrap" aria-label="Builder canvas">
+    <main className="flex-1 overflow-y-auto p-8 bg-white" aria-label="Builder canvas">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -74,14 +77,22 @@ export function Canvas() {
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        <div className="niyi-editor__canvas" data-device={device}>
+        <div className="flex flex-1 justify-stretch min-h-0">
           <div
-            className="niyi-editor__canvas-inner editor-styles-wrapper"
+            className="flex-1 w-full min-h-full bg-transparent editor-styles-wrapper"
             onClick={() => selectBlock(null)}
           >
-            <div className="is-root-container wp-block-post-content block-editor-block-list__layout">
+            <div
+              className="wp-block-post-content block-editor-block-list__layout"
+              style={{
+                maxWidth: containerMaxWidth,
+                marginInline: 'auto',
+                minHeight: 'calc(100vh - 48px)',
+                padding: '2rem'
+              }}
+            >
               {blockCount === 0 ? (
-                <p className="niyi-editor__canvas-empty">
+                <p className="mb-4 font-semibold text-[#646970]">
                   Empty page — click <strong>Add element</strong> in the toolbar to insert your
                   first block.
                 </p>
@@ -94,8 +105,8 @@ export function Canvas() {
               )}
 
               {selectedBlockId ? (
-                <p className="niyi-editor__selection-hint" aria-live="polite">
-                  Selected block: <code>{selectedBlockId}</code>
+                <p className="mt-6 p-2 border border-dashed border-gray-300 rounded bg-gray-50 text-[12px] text-gray-600" aria-live="polite">
+                  Selected block: <code className="font-mono">{selectedBlockId}</code>
                 </p>
               ) : null}
             </div>
