@@ -65,7 +65,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set({
       document: insertChild(state.document, parentId, newBlock),
       selectedBlockId: newBlock.id,
-      isInserterOpen: false,
       isDirty: true,
       saveStatus: null,
       saveError: null,
