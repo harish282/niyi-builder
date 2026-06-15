@@ -150,7 +150,7 @@ sequenceDiagram
 | Dev-only admin menu                        | `includes/Admin/BuilderAdminPage.php`      |
 | HTML mount point                           | `resources/views/builder-app.php`          |
 | Block editor launch button                 | `assets/gutenberg-bridge.js`, `.css`       |
-| Full-screen admin CSS                      | `assets/admin.css`                         |
+| Editor styles (Source)                     | `packages/styles/editor.less`              |
 | React entry                                | `admin/src/main.tsx`                       |
 | Load post content into store               | `admin/src/bootstrap.ts`                   |
 | Canvas UI                                  | `packages/editor/src/components/*`         |

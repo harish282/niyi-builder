@@ -1,4 +1,4 @@
-import './styles.css';
+import '../../../styles/editor.less';
 
 export { EditorShell } from './components/EditorShell.js';
 export { Canvas } from './components/Canvas.js';

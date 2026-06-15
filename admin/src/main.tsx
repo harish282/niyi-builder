@@ -1,5 +1,5 @@
 // Import global styles (includes Tailwind and LESS)
-import '../../main.less';
+import '../../styles/main.less';
 
 import { ensureDefaultBlocksRegistered } from '@niyi-builder/blocks';
 import { StrictMode } from 'react';

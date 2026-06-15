@@ -208,7 +208,6 @@ verify_runtime_files() {
     "includes/Admin/BuilderPageRenderer.php"
     "includes/Admin/AdminAssetRegistrar.php"
     "resources/views/builder-app.php"
-    "assets/admin.css"
     "assets/gutenberg-bridge.css"
     "build/manifest.json"
     "readme.txt"
