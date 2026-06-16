@@ -1,5 +1,5 @@
 import { createBlockNode } from '@niyi-builder/blocks';
-import { createEmptyDocument, type BlockType, type BuilderDocument } from '@niyi-builder/core';
+import { createEmptyDocument, type BlockNode, type BlockType, type BuilderDocument } from '@niyi-builder/core';
 import { create } from 'zustand';
 
 import { savePostToWordPress } from './api.js';
@@ -23,6 +23,8 @@ export interface EditorState {
   isSaving: boolean;
   saveStatus: SaveStatus;
   saveError: string | null;
+  updateBlockAttributes: (blockId: string, attributes: Record<string, any>) => void;
+  setChildren: (blockId: string, children: BlockNode[]) => void;
   setDocument: (document: BuilderDocument, options?: SetDocumentOptions) => void;
   setDevice: (device: EditorDevice) => void;
   selectBlock: (blockId: string | null) => void;
@@ -51,6 +53,40 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       saveStatus: null,
       saveError: null,
     }),
+  updateBlockAttributes: (blockId, attributes) => {
+    set((state) => {
+      const updateNode = (node: BlockNode): BlockNode => {
+        if (node.id === blockId) {
+          return { ...node, attributes: { ...node.attributes, ...attributes } };
+        }
+        return {
+          ...node,
+          children: node.children.map(updateNode),
+        };
+      };
+      return {
+        document: { ...state.document, root: updateNode(state.document.root) },
+        isDirty: true,
+      };
+    });
+  },
+  setChildren: (blockId, children) => {
+    set((state) => {
+      const updateNode = (node: BlockNode): BlockNode => {
+        if (node.id === blockId) {
+          return { ...node, children };
+        }
+        return {
+          ...node,
+          children: node.children.map(updateNode),
+        };
+      };
+      return {
+        document: { ...state.document, root: updateNode(state.document.root) },
+        isDirty: true,
+      };
+    });
+  },
   setDevice: (device) => set({ device }),
   selectBlock: (blockId) => set({ selectedBlockId: blockId }),
   toggleInserter: (open) =>

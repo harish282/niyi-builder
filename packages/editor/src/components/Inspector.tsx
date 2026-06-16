@@ -1,5 +1,5 @@
 import React from 'react';
-import type { BlockNode } from '@niyi-builder/core';
+import type { BlockNode, BlockType } from '@niyi-builder/core';
 import { getBlockDefinition } from '@niyi-builder/blocks';
 import { useEditorStore } from '../store.js';
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
@@ -8,6 +8,9 @@ import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import WrapTextIcon from '@mui/icons-material/WrapText';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import TableChartIcon from '@mui/icons-material/TableChart';
+import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
+import VerticalAlignCenterIcon from '@mui/icons-material/VerticalAlignCenter';
+import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 
 /**
  * Custom hook to access attribute updates from the store.
@@ -81,6 +84,7 @@ export function Inspector() {
  */
 export const ContainerInspector: React.FC<{ node: BlockNode }> = ({ node }) => {
   const updateBlockAttributes = useUpdateAttributes();
+  const setChildren = useEditorStore((state: any) => state.setChildren);
   const attributes = node.attributes || {};
   const layoutType = attributes.layoutType as string;
 
@@ -135,11 +139,113 @@ export const ContainerInspector: React.FC<{ node: BlockNode }> = ({ node }) => {
     );
   }
 
-  // Step 2: Flex Wizard
+  const isUnconfigured = layoutType === 'flex' ? !attributes.direction : !attributes.columns;
+
+  const applyPreset = (config: any, childCount: number = 0) => {
+    updateBlockAttributes?.(node.id, { ...config, layoutType });
+
+    if (childCount > 0 && setChildren) {
+      const newChildren: BlockNode[] = Array.from({ length: childCount }).map((_, i) => ({
+        id: `${node.id}-child-${Date.now()}-${i}`,
+        type: 'core/group',
+        attributes: { layoutType: 'flex', direction: 'column' },
+        children: []
+      }));
+      setChildren(node.id, newChildren);
+    }
+  };
+
+  // Step 2: Column / Structure Selection
+  if (isUnconfigured) {
+    return (
+      <div className="p-4 space-y-6">
+        <button
+          type="button"
+          onClick={resetLayout}
+          className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-blue-600 font-bold uppercase tracking-wider"
+        >
+          <ArrowBackIcon sx={{ fontSize: 12 }} /> Back to Selection
+        </button>
+
+        <div className="text-center space-y-1">
+          <h4 className="text-sm font-bold text-gray-800 uppercase tracking-tight">Select Structure</h4>
+          <p className="text-[11px] text-gray-400 italic">Choose how many columns to start with.</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          {layoutType === 'flex' ? (
+            <>
+              <button
+                onClick={() => applyPreset({ direction: 'column' }, 1)}
+                className="flex flex-col items-center gap-2 p-4 border rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition-all group"
+              >
+                <div className="w-full h-8 bg-gray-100 rounded group-hover:bg-blue-100" />
+                <span className="text-[10px] font-bold text-gray-500">1 Column</span>
+              </button>
+              <button
+                onClick={() => applyPreset({ direction: 'row', columns: 2 }, 2)}
+                className="flex flex-col items-center gap-2 p-4 border rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition-all group"
+              >
+                <div className="w-full h-8 flex gap-1">
+                  <div className="flex-1 bg-gray-100 rounded group-hover:bg-blue-100" />
+                  <div className="flex-1 bg-gray-100 rounded group-hover:bg-blue-100" />
+                </div>
+                <span className="text-[10px] font-bold text-gray-500">2 Columns</span>
+              </button>
+              <button
+                onClick={() => applyPreset({ direction: 'row', columns: 3 }, 3)}
+                className="flex flex-col items-center gap-2 p-4 border rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition-all group"
+              >
+                <div className="w-full h-8 flex gap-1">
+                  <div className="flex-1 bg-gray-100 rounded group-hover:bg-blue-100" />
+                  <div className="flex-1 bg-gray-100 rounded group-hover:bg-blue-100" />
+                  <div className="flex-1 bg-gray-100 rounded group-hover:bg-blue-100" />
+                </div>
+                <span className="text-[10px] font-bold text-gray-500">3 Columns</span>
+              </button>
+              <button
+                onClick={() => applyPreset({ direction: 'row', columns: 4 }, 4)}
+                className="flex flex-col items-center gap-2 p-4 border rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition-all group"
+              >
+                <div className="w-full h-8 flex gap-1">
+                  <div className="flex-1 bg-gray-100 rounded group-hover:bg-blue-100" />
+                  <div className="flex-1 bg-gray-100 rounded group-hover:bg-blue-100" />
+                  <div className="flex-1 bg-gray-100 rounded group-hover:bg-blue-100" />
+                  <div className="flex-1 bg-gray-100 rounded group-hover:bg-blue-100" />
+                </div>
+                <span className="text-[10px] font-bold text-gray-500">4 Columns</span>
+              </button>
+            </>
+          ) : (
+            <>
+              {[2, 3, 4, 12].map(c => (
+                <button
+                  key={c}
+                  onClick={() => applyPreset({ columns: c })}
+                  className="flex flex-col items-center gap-2 p-4 border rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition-all group"
+                >
+                  <div className="w-full h-8 grid gap-0.5" style={{ gridTemplateColumns: `repeat(${Math.min(c, 6)}, 1fr)` }}>
+                    {Array.from({ length: Math.min(c, 6) }).map((_, i) => (
+                      <div key={i} className="bg-gray-100 rounded-sm group-hover:bg-blue-100" />
+                    ))}
+                  </div>
+                  <span className="text-[10px] font-bold text-gray-500">{c} Columns</span>
+                </button>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Step 3: Detailed Property Controls
   if (layoutType === 'flex') {
-    const direction = attributes.direction || 'horizontal';
-    const preset = attributes.preset || 1;
+    const direction = attributes.direction || 'row';
     const wrap = attributes.wrap ?? true;
+    const gapSize = attributes.gapSize || 'medium';
+    const alignItems = attributes.alignItems || 'stretch';
+    const justifyContent = attributes.justifyContent || 'start';
 
     return (
       <div className="p-4 space-y-8">
@@ -152,42 +258,77 @@ export const ContainerInspector: React.FC<{ node: BlockNode }> = ({ node }) => {
         </button>
 
         <div className="space-y-3">
-          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Direction</label>
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Orientation</label>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={() => setAttr('direction', 'horizontal')}
-              className={`p-3 border-2 rounded-lg flex flex-col items-center gap-2 transition-all ${direction === 'horizontal' ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-200'}`}
+              onClick={() => setAttr('direction', 'row')}
+              className={`p-3 border-2 rounded-lg flex flex-col items-center gap-2 transition-all ${direction === 'row' ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-200'}`}
             >
-              <ViewColumnIcon className={direction === 'horizontal' ? 'text-blue-600' : 'text-gray-300'} />
-              <span className={`text-[10px] font-bold ${direction === 'horizontal' ? 'text-blue-600' : 'text-gray-500'}`}>Horizontal</span>
+              <ViewColumnIcon className={direction === 'row' ? 'text-blue-600' : 'text-gray-300'} />
+              <span className={`text-[10px] font-bold ${direction === 'row' ? 'text-blue-600' : 'text-gray-500'}`}>Horizontal</span>
             </button>
             <button
               type="button"
-              onClick={() => setAttr('direction', 'vertical')}
-              className={`p-3 border-2 rounded-lg flex flex-col items-center gap-2 transition-all ${direction === 'vertical' ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-200'}`}
+              onClick={() => setAttr('direction', 'column')}
+              className={`p-3 border-2 rounded-lg flex flex-col items-center gap-2 transition-all ${direction === 'column' ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-200'}`}
             >
-              <ViewStreamIcon className={direction === 'vertical' ? 'text-blue-600' : 'text-gray-300'} />
-              <span className={`text-[10px] font-bold ${direction === 'vertical' ? 'text-blue-600' : 'text-gray-500'}`}>Vertical</span>
+              <ViewStreamIcon className={direction === 'column' ? 'text-blue-600' : 'text-gray-300'} />
+              <span className={`text-[10px] font-bold ${direction === 'column' ? 'text-blue-600' : 'text-gray-500'}`}>Vertical</span>
             </button>
           </div>
         </div>
 
         <div className="space-y-3">
-          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Column Presets</label>
-          <div className="grid grid-cols-4 gap-2">
-            {[1, 2, 3, 4].map((num) => (
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alignment</label>
+          <div className="flex bg-gray-50 p-1 rounded-lg">
+            {[
+              { id: 'start', icon: <VerticalAlignTopIcon fontSize="small" /> },
+              { id: 'center', icon: <VerticalAlignCenterIcon fontSize="small" /> },
+              { id: 'end', icon: <VerticalAlignBottomIcon fontSize="small" /> },
+              { id: 'stretch', icon: <WrapTextIcon fontSize="small" className="rotate-90" /> }
+            ].map(opt => (
               <button
-                key={num}
+                key={opt.id}
+                onClick={() => setAttr('alignItems', opt.id)}
+                className={`flex-1 flex justify-center py-1.5 rounded transition-all ${alignItems === opt.id ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}
+              >
+                {opt.icon}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Justification</label>
+          <div className="flex bg-gray-50 p-1 rounded-lg">
+            {[
+              { id: 'start', icon: <AlignHorizontalLeftIcon fontSize="small" /> },
+              { id: 'center', icon: <VerticalAlignCenterIcon fontSize="small" className="rotate-90" /> },
+              { id: 'between', icon: <AlignHorizontalLeftIcon fontSize="small" className="rotate-180" /> }
+            ].map(opt => (
+              <button
+                key={opt.id}
+                onClick={() => setAttr('justifyContent', opt.id)}
+                className={`flex-1 flex justify-center py-1.5 rounded transition-all ${justifyContent === opt.id ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}
+              >
+                {opt.icon}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Gap Spacing</label>
+          <div className="grid grid-cols-3 gap-1 bg-gray-50 p-1 rounded-lg">
+            {(['small', 'medium', 'large'] as const).map((size) => (
+              <button
+                key={size}
                 type="button"
-                onClick={() => setAttr('preset', num)}
-                className={`flex flex-col items-center gap-1.5 p-2 border-2 rounded-lg transition-all ${preset === num ? 'border-blue-600 bg-blue-50 shadow-sm' : 'border-gray-100 hover:border-gray-200'}`}>
-                <div className="flex gap-0.5 w-full h-4">
-                  {Array.from({ length: num }).map((_, i) => (
-                    <div key={i} className={`flex-1 rounded-sm ${preset === num ? 'bg-blue-600' : 'bg-gray-200'}`} />
-                  ))}
-                </div>
-                <span className={`text-[10px] font-bold ${preset === num ? 'text-blue-600' : 'text-gray-400'}`}>{num} Col</span>
+                onClick={() => setAttr('gapSize', size)}
+                className={`py-1.5 text-[9px] font-bold uppercase tracking-tight rounded transition-all ${gapSize === size ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+              >
+                {size}
               </button>
             ))}
           </div>
