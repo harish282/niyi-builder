@@ -29,6 +29,7 @@ The goal of Sprint 1 is to create the architecture, not the editor.
 
 ## DO NOT
 
+* Do not confuse with existing code in packages/, it is a old code and working but I need a different mordern structure
 * Build UI
 * Build Canvas
 * Build Drag & Drop
