@@ -25,6 +25,7 @@ No element editing functionality is required.
 
 ## DO NOT
 
+* Do not confuse with existing code in packages/, it is a old code and working but I need a different mordern structure
 * Render Elements
 * Implement Drag & Drop
 * Implement Document Management
