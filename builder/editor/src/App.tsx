@@ -4,16 +4,24 @@ import { ThemeProvider } from './theme/ThemeProvider.js';
 import { EditorProvider } from './store/EditorStore.js';
 import { ElementRegistry } from '@niyi-builder/core';
 import type { ElementDefinition } from '@niyi-builder/core';
-import { headingDefinition } from './elements/heading/index.js';
 
 const registry = new ElementRegistry();
 
-// Auto-register all element definitions
-// New elements: add their definition here and they'll be registered automatically
-const elementDefinitions: ElementDefinition[] = [headingDefinition];
+// Vite's import.meta.glob discovers element modules at build time
+const elementModules = import.meta.glob('./elements/*/index.ts', { eager: true });
 
-for (const def of elementDefinitions) {
-  registry.registerElement(def);
+for (const mod of Object.values(elementModules)) {
+  const exports = mod as Record<string, unknown>;
+  for (const value of Object.values(exports)) {
+    if (
+      value &&
+      typeof value === 'object' &&
+      'type' in value &&
+      typeof (value as Record<string, unknown>).type === 'string'
+    ) {
+      registry.registerElement(value as ElementDefinition);
+    }
+  }
 }
 
 declare global {

@@ -20,6 +20,7 @@ export default tseslint.config(
       'builder/core/src/types/*.d.ts',
       'builder/editor/src/types/*.d.ts',
       'builder/utils/src/**/*.ts',
+      'builder/editor/src/vite-env.d.ts',
     ],
   },
   eslint.configs.recommended,
