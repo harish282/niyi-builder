@@ -108,18 +108,18 @@ verify_built_assets() {
         echo "error: manifest references missing file: build/$rel_path" >&2
         missing=1
       fi
-    done < <(php -r "
-      $manifest = json_decode(file_get_contents($argv[1]), true);
-      if (!is_array(\$manifest)) exit(0);
-      \$files = [];
-      foreach (\$manifest as \$entry) {
-        if (isset(\$entry['file'])) \$files[] = \$entry['file'];
-        if (isset(\$entry['css']) && is_array(\$entry['css'])) {
-          foreach (\$entry['css'] as \$css) \$files[] = \$css;
-        }
-      }
-      echo implode(PHP_EOL, array_unique(\$files));
-    " "$manifest")
+done < <(php -r "
+       \$input_manifest = json_decode(file_get_contents(\$argv[1]), true);
+       if (!is_array(\$input_manifest)) exit(0);
+       \$files = [];
+       foreach (\$input_manifest as \$entry) {
+         if (isset(\$entry['file'])) \$files[] = \$entry['file'];
+         if (isset(\$entry['css']) && is_array(\$entry['css'])) {
+           foreach (\$entry['css'] as \$css) \$files[] = \$css;
+         }
+       }
+       echo implode(PHP_EOL, array_unique(\$files));
+     " "$manifest")
   fi
 
   if ! compgen -G "$ROOT/build/assets/*.css" > /dev/null && ! compgen -G "$ROOT/build/*.css" > /dev/null; then

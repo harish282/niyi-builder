@@ -2,11 +2,12 @@ import { createContext, useContext, type ReactNode } from 'react';
 import type { LeftPanelId, RightPanelId, ThemeMode } from '../types/index.js';
 import type { BuilderDocument, ElementNode } from '@niyi-builder/core';
 import { EventManager } from '@niyi-builder/core';
+import { generateId } from '@niyi-builder/utils';
 
 const eventManager = new EventManager();
 
 const createEmptyDocument = (): BuilderDocument => ({
-  id: crypto.randomUUID(),
+  id: generateId(),
   title: 'Untitled',
   elements: [],
 });

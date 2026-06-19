@@ -2,7 +2,7 @@
 export default {
   content: [
     './admin/src/**/*.{js,ts,jsx,tsx}',
-    './packages/*/src/**/*.{js,ts,jsx,tsx}',
+    './builder/*/src/**/*.{js,ts,jsx,tsx}',
     './resources/views/**/*.php',
   ],
   theme: {

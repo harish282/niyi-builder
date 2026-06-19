@@ -2,6 +2,7 @@ import type { ElementDefinition, ElementNode } from '@niyi-builder/core';
 import { HeadingCanvas } from './canvas.js';
 import { HeadingProperties } from './properties.js';
 import { headingDefaults } from './defaults.js';
+import { generateId } from '@niyi-builder/utils';
 
 export const headingDefinition: ElementDefinition = {
   type: 'heading',
@@ -15,7 +16,7 @@ export const headingDefinition: ElementDefinition = {
 
 export function createHeadingNode(overrides?: Partial<ElementNode>): ElementNode {
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     type: 'heading',
     attributes: { ...headingDefaults, ...overrides?.attributes },
     children: [],

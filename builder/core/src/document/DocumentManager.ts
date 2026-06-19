@@ -1,5 +1,6 @@
 import type { BuilderDocument, ElementNode } from '../types/index.js';
 import { EventManager } from '../events/EventManager.js';
+import { generateId } from '@niyi-builder/utils';
 
 const eventManager = new EventManager();
 
@@ -9,7 +10,7 @@ class DocumentManagerImpl implements BuilderDocument {
   elements: ElementNode[];
 
   constructor() {
-    this.id = crypto.randomUUID();
+    this.id = generateId();
     this.title = 'Untitled';
     this.elements = [];
   }

@@ -6,7 +6,7 @@
   "description": "WordPress visual page builder with native Gutenberg block output",
   "license": "GPL-2.0-or-later",
   "workspaces": [
-    "packages/*"
+    "builder/*"
   ],
   "scripts": {
     "build": "npm run build:packages && npm run build:admin",
