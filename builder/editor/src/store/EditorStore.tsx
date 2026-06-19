@@ -1,6 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import type { LeftPanelId, RightPanelId, ThemeMode } from '../types/index.js';
-import type { BuilderDocument, ElementNode } from '../../../../core/src/types/index.js';
+import type { BuilderDocument, ElementNode } from '@niyi-builder/core';
 
 const createEmptyDocument = (): BuilderDocument => ({
     id: crypto.randomUUID(),
