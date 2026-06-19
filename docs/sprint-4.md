@@ -8,14 +8,14 @@ This is the first Element that can contain other Elements.
 
 The Container becomes the foundation for:
 
-* Sections
-* Rows
-* Columns
-* Hero Areas
-* Cards
-* Forms
-* Galleries
-* Layouts
+- Sections
+- Rows
+- Columns
+- Hero Areas
+- Cards
+- Forms
+- Galleries
+- Layouts
 
 Everything in NiyiBuilder will eventually live inside Containers.
 
@@ -25,18 +25,18 @@ Everything in NiyiBuilder will eventually live inside Containers.
 
 ## DO
 
-* Build Container Element
-* Build Nested Elements
-* Build Layout System
-* Build Child Rendering
+- Build Container Element
+- Build Nested Elements
+- Build Layout System
+- Build Child Rendering
 
 ## DO NOT
 
-* Build Drag & Drop
-* Build Responsive Controls
-* Build Animations
-* Build Serialization
-* Build Wizards
+- Build Drag & Drop
+- Build Responsive Controls
+- Build Animations
+- Build Serialization
+- Build Wizards
 
 Focus only on Containers.
 
@@ -90,7 +90,7 @@ index.ts
 Create:
 
 ```ts id="aj1jjr"
-type: "container"
+type: 'container';
 ```
 
 Category:
@@ -102,7 +102,7 @@ Layout
 Allow children:
 
 ```ts id="q1dcbn"
-canHaveChildren: true
+canHaveChildren: true;
 ```
 
 ---
@@ -128,10 +128,10 @@ Create:
 Do NOT store:
 
 ```ts id="b0e67m"
-layoutType
-direction
-gap
-columns
+layoutType;
+direction;
+gap;
+columns;
 ```
 
 at the root.
@@ -167,7 +167,7 @@ This structure will scale later.
 Update:
 
 ```ts id="8xhxtm"
-ElementNode
+ElementNode;
 ```
 
 to support nesting.
@@ -187,11 +187,11 @@ Now start using it.
 Add methods:
 
 ```ts id="7vt2ae"
-addChildElement()
+addChildElement();
 
-removeChildElement()
+removeChildElement();
 
-moveElement()
+moveElement();
 ```
 
 Example:
@@ -240,15 +240,13 @@ The renderer must support unlimited nesting.
 Render:
 
 ```html id="g6dnc8"
-<div>
-    children...
-</div>
+<div>children...</div>
 ```
 
 Then render:
 
 ```ts id="2n5blq"
-node.children
+node.children;
 ```
 
 using CanvasRenderer.

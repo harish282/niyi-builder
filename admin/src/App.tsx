@@ -1,5 +1,10 @@
-import { EditorShell } from '@niyi-builder/editor';
+import { EditorLayout } from '@niyi-builder/editor';
+import { EditorProvider } from '@niyi-builder/editor';
 
 export function App() {
-  return <EditorShell />;
+  return (
+    <EditorProvider>
+      <EditorLayout />
+    </EditorProvider>
+  );
 }

@@ -9,14 +9,30 @@
     "composite": false,
     "declaration": false,
     "declarationMap": false,
-    "types": ["vite/client", "node"]
+    "types": ["vite/client", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "@niyi-builder/core": ["./builder/core/src/index.ts"],
+      "@niyi-builder/editor": ["./builder/editor/src/index.ts"]
+    }
   },
   "include": [
     "packages/*/src/**/*.ts",
     "packages/*/src/**/*.tsx",
     "admin/src/**/*.ts",
     "admin/src/**/*.tsx",
+    "builder/core/src/**/*.ts",
+    "builder/editor/src/**/*.ts",
+    "builder/editor/src/**/*.tsx",
     "vite.config.ts",
     "vitest.config.ts"
+  ],
+  "exclude": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/*.d.ts",
+    "builder/core/src/**/*.d.ts",
+    "builder/editor/src/**/*.d.ts",
+    "admin/src/**/*.d.ts"
   ]
 }

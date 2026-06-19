@@ -38,12 +38,12 @@ The visual builder stores pages as a **JSON block tree** that serializes to **Wo
 
 ### Layout
 
-| JSON type      | Gutenberg block | Children           | Attrs (v0 UX)                                    |
-| -------------- | --------------- | ------------------ | ------------------------------------------------ |
-| `core/group`   | `core/group`    | layout + content   | `layoutType`, `direction`, `columns`, `gapSize`  |
-| `core/columns` | `core/columns`  | `core/column` only | Row of columns       |
-| `core/column`  | `core/column`   | layout + content   | Single column        |
-| `core/spacer`  | `core/spacer`   | **none** (leaf)    | Height               |
+| JSON type      | Gutenberg block | Children           | Attrs (v0 UX)                                   |
+| -------------- | --------------- | ------------------ | ----------------------------------------------- |
+| `core/group`   | `core/group`    | layout + content   | `layoutType`, `direction`, `columns`, `gapSize` |
+| `core/columns` | `core/columns`  | `core/column` only | Row of columns                                  |
+| `core/column`  | `core/column`   | layout + content   | Single column                                   |
+| `core/spacer`  | `core/spacer`   | **none** (leaf)    | Height                                          |
 
 ### Content (all leaves in v0)
 

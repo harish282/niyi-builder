@@ -20,24 +20,24 @@ The goal of Sprint 1 is to create the architecture, not the editor.
 
 ## DO
 
-* Keep code simple
-* Use TypeScript
-* Use interfaces over classes where possible
-* Keep everything modular
-* Design for plugins/extensions
-* Keep packages independent
+- Keep code simple
+- Use TypeScript
+- Use interfaces over classes where possible
+- Keep everything modular
+- Design for plugins/extensions
+- Keep packages independent
 
 ## DO NOT
 
-* Do not confuse with existing code in packages/, it is a old code and working but I need a different mordern structure
-* Build UI
-* Build Canvas
-* Build Drag & Drop
-* Build Gutenberg integration
-* Build Forms
-* Build Animations
-* Build Responsive Controls
-* Add unnecessary dependencies
+- Do not confuse with existing code in packages/, it is a old code and working but I need a different mordern structure
+- Build UI
+- Build Canvas
+- Build Drag & Drop
+- Build Gutenberg integration
+- Build Forms
+- Build Animations
+- Build Responsive Controls
+- Add unnecessary dependencies
 
 Focus only on framework infrastructure.
 
@@ -82,13 +82,13 @@ ElementNode.ts
 
 ```ts
 export interface ElementNode {
-    id: string;
+  id: string;
 
-    type: string;
+  type: string;
 
-    attributes: Record<string, unknown>;
+  attributes: Record<string, unknown>;
 
-    children: ElementNode[];
+  children: ElementNode[];
 }
 ```
 
@@ -98,23 +98,23 @@ ElementDefinition.ts
 
 ```ts
 export interface ElementDefinition {
-    type: string;
+  type: string;
 
-    title: string;
+  title: string;
 
-    category: string;
+  category: string;
 
-    version: string;
+  version: string;
 
-    icon?: unknown;
+  icon?: unknown;
 
-    defaults: Record<string, unknown>;
+  defaults: Record<string, unknown>;
 
-    Canvas?: unknown;
+  Canvas?: unknown;
 
-    Properties?: unknown;
+  Properties?: unknown;
 
-    Wizard?: unknown;
+  Wizard?: unknown;
 }
 ```
 
@@ -132,30 +132,30 @@ ElementRegistry
 
 Responsibilities:
 
-* Register Elements
-* Unregister Elements
-* Find Element
-* List Elements
+- Register Elements
+- Unregister Elements
+- Find Element
+- List Elements
 
 Required methods:
 
 ```ts
-registerElement()
+registerElement();
 
-unregisterElement()
+unregisterElement();
 
-getElement()
+getElement();
 
-getAllElements()
+getAllElements();
 
-hasElement()
+hasElement();
 ```
 
 Requirements:
 
-* Prevent duplicate element types
-* Throw meaningful errors
-* Store definitions internally using Map
+- Prevent duplicate element types
+- Throw meaningful errors
+- Store definitions internally using Map
 
 ---
 
@@ -175,11 +175,11 @@ Validate ElementDefinition before registration.
 
 Required checks:
 
-* type exists
-* title exists
-* category exists
-* version exists
-* defaults exists
+- type exists
+- title exists
+- category exists
+- version exists
+- defaults exists
 
 Validation should return:
 
@@ -207,36 +207,30 @@ EventManager
 Required methods:
 
 ```ts
-on()
+on();
 
-off()
+off();
 
-emit()
+emit();
 
-once()
+once();
 ```
 
 Requirements:
 
-* Multiple listeners per event
-* Safe listener removal
-* Typed events where possible
-* No external libraries
+- Multiple listeners per event
+- Safe listener removal
+- Typed events where possible
+- No external libraries
 
 Example:
 
 ```ts
-eventManager.on(
-    "element.created",
-    callback
-);
+eventManager.on('element.created', callback);
 ```
 
 ```ts
-eventManager.emit(
-    "element.created",
-    payload
-);
+eventManager.emit('element.created', payload);
 ```
 
 ---
@@ -254,27 +248,24 @@ Logger
 Methods:
 
 ```ts
-info()
+info();
 
-warn()
+warn();
 
-error()
+error();
 
-debug()
+debug();
 ```
 
 Requirements:
 
-* Prefix messages
-* Support namespaces
+- Prefix messages
+- Support namespaces
 
 Example:
 
 ```ts
-logger.info(
-    "Registry",
-    "Heading registered"
-);
+logger.info('Registry', 'Heading registered');
 ```
 
 Output:
@@ -294,17 +285,17 @@ HeadingElement
 
 ```ts
 const HeadingElement = {
-    type: "heading",
+  type: 'heading',
 
-    title: "Heading",
+  title: 'Heading',
 
-    category: "Basic",
+  category: 'Basic',
 
-    version: "1.0.0",
+  version: '1.0.0',
 
-    defaults: {
-        text: "Heading"
-    }
+  defaults: {
+    text: 'Heading',
+  },
 };
 ```
 
@@ -317,35 +308,23 @@ Register it through the registry.
 At the end of Sprint 1 the following code must work:
 
 ```ts
-registry.registerElement(
-    HeadingElement
-);
+registry.registerElement(HeadingElement);
 ```
 
 ```ts
-registry.hasElement(
-    "heading"
-);
+registry.hasElement('heading');
 ```
 
 ```ts
-registry.getElement(
-    "heading"
-);
+registry.getElement('heading');
 ```
 
 ```ts
-eventManager.on(
-    "element.created",
-    callback
-);
+eventManager.on('element.created', callback);
 ```
 
 ```ts
-eventManager.emit(
-    "element.created",
-    {}
-);
+eventManager.emit('element.created', {});
 ```
 
 ---

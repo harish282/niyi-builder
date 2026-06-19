@@ -20,19 +20,20 @@ This is the first sprint where users can create content.
 
 ## DO
 
-* Build Document Manager
-* Build Canvas Renderer
-* Build Element Selection
-* Build first Element (Heading)
+- Build Document Manager
+- Build Canvas Renderer
+- Build Element Selection
+- Build first Element (Heading)
 
 ## DO NOT
-* Don't work on packages/, it is old code, we can check it only for reference
-* Build Drag & Drop
-* Build Containers
-* Build Wizards
-* Build Serialization
-* Build Responsive Controls
-* Build Animations
+
+- Don't work on packages/, it is old code, we can check it only for reference
+- Build Drag & Drop
+- Build Containers
+- Build Wizards
+- Build Serialization
+- Build Responsive Controls
+- Build Animations
 
 Focus on rendering and editing one Element.
 
@@ -101,11 +102,11 @@ Create:
 
 ```ts id="v8hz58"
 export interface BuilderDocument {
-    id: string;
+  id: string;
 
-    title: string;
+  title: string;
 
-    elements: ElementNode[];
+  elements: ElementNode[];
 }
 ```
 
@@ -115,24 +116,24 @@ export interface BuilderDocument {
 
 Responsibilities:
 
-* Create document
-* Add element
-* Remove element
-* Update element
-* Find element
+- Create document
+- Add element
+- Remove element
+- Update element
+- Find element
 
 Methods:
 
 ```ts id="xzz2zb"
-createDocument()
+createDocument();
 
-addElement()
+addElement();
 
-removeElement()
+removeElement();
 
-updateElement()
+updateElement();
 
-findElement()
+findElement();
 ```
 
 ---
@@ -144,19 +145,19 @@ Extend existing store.
 Add:
 
 ```ts id="10ujz8"
-document
+document;
 
-selectedElementId
+selectedElementId;
 ```
 
 Methods:
 
 ```ts id="cokng4"
-setDocument()
+setDocument();
 
-selectElement()
+selectElement();
 
-clearSelection()
+clearSelection();
 ```
 
 ---
@@ -174,9 +175,7 @@ Render all document elements.
 Pseudo:
 
 ```ts id="9n4eui"
-document.elements.map(
-    renderElement
-)
+document.elements.map(renderElement);
 ```
 
 ---
@@ -202,10 +201,7 @@ Use registry.
 Example:
 
 ```ts id="e1m11m"
-const definition =
-    registry.getElement(
-        node.type
-    );
+const definition = registry.getElement(node.type);
 ```
 
 Render:
@@ -227,14 +223,14 @@ Heading Element
 Definition:
 
 ```ts id="6gchzs"
-type: "heading"
+type: 'heading';
 ```
 
 Defaults:
 
 ```ts id="5yxujv"
 {
-    text: "Heading"
+  text: 'Heading';
 }
 ```
 
@@ -268,9 +264,7 @@ Heading
 Execute:
 
 ```ts id="mgw0w4"
-documentManager.addElement(
-    HeadingElement
-);
+documentManager.addElement(HeadingElement);
 ```
 
 Element appears on Canvas.
@@ -285,14 +279,14 @@ SelectionOverlay
 
 Requirements:
 
-* Click element
-* Select element
-* Highlight selection
+- Click element
+- Select element
+- Highlight selection
 
 Store:
 
 ```ts id="v8b9c6"
-selectedElementId
+selectedElementId;
 ```
 
 ---
@@ -312,7 +306,7 @@ Properties Panel
 Load:
 
 ```ts id="d0e1hq"
-definition.Properties
+definition.Properties;
 ```
 
 from registry.

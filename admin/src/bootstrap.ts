@@ -1,11 +1,3 @@
-import {
-  createEmptyDocument,
-  logger,
-} from '@niyi-builder/core';
-import { useEditorStore } from '@niyi-builder/editor';
-
-import { fetchPostContentRaw } from './load-content.js';
-
 export interface NiyiBuilderConfig {
   postId: number;
   postType: string;
@@ -30,23 +22,5 @@ export function getBootstrapConfig(): NiyiBuilderConfig | undefined {
 }
 
 export async function initializeEditorFromBootstrap(): Promise<void> {
-  const config = getBootstrapConfig();
-  
-  if (!config || config.isDevShell) {
-    const empty = createEmptyDocument();
-    useEditorStore.getState().setDocument(empty);
-    logger.info('Loaded empty builder document');
-    return;
-  }
-
-  try {
-    const content = (await fetchPostContentRaw(config)).trim();
-    const document = createEmptyDocument();
-    useEditorStore.getState().setDocument(document);
-    logger.info('Loaded builder document', { contentLength: content.length });
-  } catch (error) {
-    logger.error('Failed to load content.', error);
-    const empty = createEmptyDocument();
-    useEditorStore.getState().setDocument(empty);
-  }
+  // Logger is configured and document initialized via EditorProvider
 }

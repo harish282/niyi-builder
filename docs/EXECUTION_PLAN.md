@@ -147,18 +147,18 @@ _Durations are from the spec; calendar dates should be set when work starts._
 
 #### Sprint 0 — Serializer proof of concept
 
-| #    | Task                                   | Notes                                                 |
-| ---- | -------------------------------------- | ----------------------------------------------------- |
-| 0.1  | Monorepo & package scaffolding         | Done                                                  |
-| 0.2  | WordPress plugin scaffold              | Done                                                  |
-| 0.3  | React + TypeScript + Vite in `admin/`  | Done                                                  |
-| 0.4  | ESLint + Prettier + CI lint job (stub) | Done                                                  |
-| 0.5  | Layout JSON schema (v0)                | Done                                                  |
-| 0.6  | JSON → Gutenberg conversion            | Done                                                  |
-| 0.7  | Gutenberg → JSON conversion            | Done                                                  |
-| 0.8  | Round-trip tests                       | Done                                                  |
-| 0.9  | Nested container validation            | Done                                                  |
-| 0.10 | Nested block validation                | Done                                                  |
+| #    | Task                                   | Notes |
+| ---- | -------------------------------------- | ----- |
+| 0.1  | Monorepo & package scaffolding         | Done  |
+| 0.2  | WordPress plugin scaffold              | Done  |
+| 0.3  | React + TypeScript + Vite in `admin/`  | Done  |
+| 0.4  | ESLint + Prettier + CI lint job (stub) | Done  |
+| 0.5  | Layout JSON schema (v0)                | Done  |
+| 0.6  | JSON → Gutenberg conversion            | Done  |
+| 0.7  | Gutenberg → JSON conversion            | Done  |
+| 0.8  | Round-trip tests                       | Done  |
+| 0.9  | Nested container validation            | Done  |
+| 0.10 | Nested block validation                | Done  |
 
 **Deliverable:** Serializer package with passing round-trip tests; minimal admin entry to trigger test page (optional).
 
@@ -170,14 +170,14 @@ _Durations are from the spec; calendar dates should be set when work starts._
 
 #### Sprint 1 — Canvas foundation (2 weeks)
 
-| #   | Task                         | Notes                                     |
-| --- | ---------------------------- | ----------------------------------------- |
-| 1.1 | Editor shell UI              | Done (`EditorShell.tsx`)                  |
-| 1.2 | Component registry           | Register block types for canvas           |
-| 1.3 | Rendering engine             | JSON tree → React preview                 |
-| 1.4 | Selection system             | Click to select, highlight, breadcrumb    |
-| 1.5 | Add element flow             | Insert from palette (stub blocks OK)      |
-| 1.6 | Wire serializer to save/load | Done (Issue #18 - REST API wired)         |
+| #   | Task                         | Notes                                  |
+| --- | ---------------------------- | -------------------------------------- |
+| 1.1 | Editor shell UI              | Done (`EditorShell.tsx`)               |
+| 1.2 | Component registry           | Register block types for canvas        |
+| 1.3 | Rendering engine             | JSON tree → React preview              |
+| 1.4 | Selection system             | Click to select, highlight, breadcrumb |
+| 1.5 | Add element flow             | Insert from palette (stub blocks OK)   |
+| 1.6 | Wire serializer to save/load | Done (Issue #18 - REST API wired)      |
 
 **Deliverable:** User can add and select elements on canvas.
 

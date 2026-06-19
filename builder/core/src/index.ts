@@ -7,11 +7,12 @@ export { validateElementDefinition } from './validator/ElementValidator.js';
 export type { ValidationResult } from './validator/ElementValidator.js';
 export { DocumentManagerImpl } from './document/DocumentManager.js';
 export { logger } from './logger.js';
+export type { Logger } from './logger.js';
 
-export function createEmptyDocument(): BuilderDocument {
-    return {
-        id: crypto.randomUUID(),
-        title: 'Untitled',
-        elements: [],
-    };
+export function createEmptyDocument(): import('./types/index.js').BuilderDocument {
+  return {
+    id: crypto.randomUUID(),
+    title: 'Untitled',
+    elements: [],
+  };
 }

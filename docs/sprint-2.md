@@ -18,22 +18,22 @@ No element editing functionality is required.
 
 ## DO
 
-* Build reusable UI components
-* Create panel architecture
-* Create layout system
-* Prepare for future extensions
+- Build reusable UI components
+- Create panel architecture
+- Create layout system
+- Prepare for future extensions
 
 ## DO NOT
 
-* Do not confuse with existing code in packages/, it is a old code and working but I need a different mordern structure
-* Render Elements
-* Implement Drag & Drop
-* Implement Document Management
-* Implement Properties Editing
-* Implement Serialization
-* Implement Gutenberg Integration
-* Implement Forms
-* Implement Animations
+- Do not confuse with existing code in packages/, it is a old code and working but I need a different mordern structure
+- Render Elements
+- Implement Drag & Drop
+- Implement Document Management
+- Implement Properties Editing
+- Implement Serialization
+- Implement Gutenberg Integration
+- Implement Forms
+- Implement Animations
 
 Focus only on the Editor Shell.
 
@@ -87,11 +87,11 @@ Create the following layout:
 
 Responsibilities:
 
-* Save Button
-* Undo Button
-* Redo Button
-* Preview Button
-* Publish Button
+- Save Button
+- Undo Button
+- Redo Button
+- Preview Button
+- Publish Button
 
 For now buttons can be placeholders.
 
@@ -120,9 +120,9 @@ The central workspace.
 
 Responsibilities:
 
-* Display empty canvas
-* Display future content
-* Support future zooming
+- Display empty canvas
+- Display future content
+- Support future zooming
 
 For now render:
 
@@ -151,9 +151,9 @@ No editing functionality yet.
 
 Display:
 
-* Builder Version
-* Current Mode
-* Future Notifications Area
+- Builder Version
+- Current Mode
+- Future Notifications Area
 
 Example:
 
@@ -212,11 +212,11 @@ Create:
 
 ```ts
 export interface PanelDefinition {
-    id: string;
+  id: string;
 
-    title: string;
+  title: string;
 
-    component: React.ComponentType;
+  component: React.ComponentType;
 }
 ```
 
@@ -233,13 +233,13 @@ PanelRegistry
 Responsibilities:
 
 ```ts
-registerPanel()
+registerPanel();
 
-unregisterPanel()
+unregisterPanel();
 
-getPanel()
+getPanel();
 
-getAllPanels()
+getAllPanels();
 ```
 
 This should mirror the ElementRegistry architecture.
@@ -257,8 +257,8 @@ ThemeProvider
 Provide:
 
 ```ts
-light
-dark
+light;
+dark;
 ```
 
 No styling customization required.
@@ -276,13 +276,13 @@ EditorStore
 Store only:
 
 ```ts
-activeLeftPanel
+activeLeftPanel;
 
-activeRightPanel
+activeRightPanel;
 
-theme
+theme;
 
-isLoading
+isLoading;
 ```
 
 Do NOT store document data yet.
@@ -322,21 +322,15 @@ No Gutenberg integration.
 The following should work:
 
 ```ts
-setActiveLeftPanel(
-    "elements"
-);
+setActiveLeftPanel('elements');
 ```
 
 ```ts
-setActiveRightPanel(
-    "properties"
-);
+setActiveRightPanel('properties');
 ```
 
 ```ts
-panelRegistry.registerPanel(
-    CustomPanel
-);
+panelRegistry.registerPanel(CustomPanel);
 ```
 
 ```ts

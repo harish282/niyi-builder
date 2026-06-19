@@ -1,3 +1,3 @@
 export const headingDefaults = {
-    text: 'Heading',
+  text: 'Heading',
 };

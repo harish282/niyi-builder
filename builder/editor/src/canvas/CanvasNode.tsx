@@ -1,27 +1,25 @@
-import { useEditorStore } from '../../store/EditorStore.js';
 import type { FC } from 'react';
+import type { ElementNode } from '@niyi-builder/core';
 
 interface CanvasNodeProps {
-    node: {
-        id: string;
-        type: string;
-        attributes: Record<string, unknown>;
-        children: CanvasNodeProps['node'][];
-    };
+  node: ElementNode;
+  onSelect: () => void;
 }
 
-export const CanvasNode: FC<CanvasNodeProps> = ({ node }) => {
-    const { selectElement, selectedElementId } = useEditorStore();
-    const isSelected = selectedElementId === node.id;
+export const CanvasNode: FC<CanvasNodeProps> = ({ node, onSelect }) => {
+  type CanvasComponentProps = { node: ElementNode; onSelect: () => void };
 
-    const text = (node.attributes.text as string) || 'Heading';
+  const registry = window.__niyiRegistry;
+  const definition = registry?.getElement(node.type);
 
+  if (!definition?.Canvas) {
     return (
-        <div
-            className={`p-4 border rounded cursor-pointer mb-2 ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
-            onClick={() => selectElement(node.id)}
-        >
-            <h2 className="font-bold">{text}</h2>
-        </div>
+      <div className="p-4 border border-gray-300 rounded cursor-pointer mb-2" onClick={onSelect}>
+        {node.type}
+      </div>
     );
+  }
+
+  const CanvasComponent = definition.Canvas as FC<CanvasComponentProps>;
+  return <CanvasComponent node={node} onSelect={onSelect} />;
 };

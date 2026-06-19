@@ -1,16 +1,40 @@
 import type { ReactElement } from 'react';
 import { EditorLayout } from './layouts/EditorLayout.js';
 import { ThemeProvider } from './theme/ThemeProvider.js';
-import { EditorProvider, useEditorStore } from './store/EditorStore.js';
+import { EditorProvider } from './store/EditorStore.js';
+import { ElementRegistry } from '@niyi-builder/core';
+import type { ElementDefinition } from '@niyi-builder/core';
+import { headingDefinition } from './elements/heading/index.js';
 
-export function App(): ReactElement {
-    return (
-        <EditorProvider>
-            <ThemeProvider>
-                <EditorLayout />
-            </ThemeProvider>
-        </EditorProvider>
-    );
+const registry = new ElementRegistry();
+registry.registerElement(headingDefinition);
+
+declare global {
+  interface Window {
+    __niyiRegistry: {
+      registerElement: (def: ElementDefinition) => void;
+      getElement: (type: string) => ElementDefinition | undefined;
+      getAllElements: () => ElementDefinition[];
+    };
+  }
 }
 
-export { useEditorStore };
+export { registry };
+
+export function App(): ReactElement {
+  window.__niyiRegistry = {
+    registerElement: registry.registerElement.bind(registry),
+    getElement: registry.getElement.bind(registry),
+    getAllElements: registry.getAllElements.bind(registry),
+  };
+
+  return (
+    <EditorProvider>
+      <ThemeProvider>
+        <EditorLayout />
+      </ThemeProvider>
+    </EditorProvider>
+  );
+}
+
+export { useEditorStore } from './store/EditorStore.js';

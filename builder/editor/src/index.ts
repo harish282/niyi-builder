@@ -2,24 +2,24 @@
 import type { ThemeMode, LeftPanelId, RightPanelId } from './types/index.js';
 
 const editorState = {
-    activeLeftPanel: 'elements' as LeftPanelId,
-    activeRightPanel: 'properties' as RightPanelId,
-    theme: 'light' as ThemeMode
+  activeLeftPanel: 'elements' as LeftPanelId,
+  activeRightPanel: 'properties' as RightPanelId,
+  theme: 'light' as ThemeMode,
 };
 
 export function setActiveLeftPanel(panel: LeftPanelId): void {
-    editorState.activeLeftPanel = panel;
+  editorState.activeLeftPanel = panel;
 }
 
 export function setActiveRightPanel(panel: RightPanelId): void {
-    editorState.activeRightPanel = panel;
+  editorState.activeRightPanel = panel;
 }
 
 export function toggleTheme(): void {
-    editorState.theme = editorState.theme === 'light' ? 'dark' : 'light';
+  editorState.theme = editorState.theme === 'light' ? 'dark' : 'light';
 }
 
-export { App } from './App.js';
+export { App, registry } from './App.js';
 export { EditorLayout } from './layouts/EditorLayout.js';
 export { TopBar } from './toolbar/TopBar.js';
 export { Canvas } from './canvas/Canvas.js';

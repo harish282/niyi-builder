@@ -32,11 +32,7 @@ export default defineConfig(({ command }) => ({
     },
   },
   optimizeDeps: {
-    include: [
-      '@emotion/react',
-      '@emotion/styled',
-      '@mui/material/styles',
-    ],
+    include: ['@emotion/react', '@emotion/styled', '@mui/material/styles'],
   },
   server: {
     port: DEV_PORT,

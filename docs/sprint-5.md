@@ -8,10 +8,10 @@ The purpose of the Layout Wizard is to help users create structured layouts visu
 
 This sprint introduces:
 
-* Wizard Registry
-* Layout Wizard
-* Layout Presets
-* Auto-generated Container Structures
+- Wizard Registry
+- Layout Wizard
+- Layout Presets
+- Auto-generated Container Structures
 
 This is the first feature that makes NiyiBuilder feel user-friendly.
 
@@ -21,18 +21,18 @@ This is the first feature that makes NiyiBuilder feel user-friendly.
 
 ## DO
 
-* Build Wizard System
-* Build Layout Presets
-* Auto-generate Container Structures
-* Keep wizard architecture extensible
+- Build Wizard System
+- Build Layout Presets
+- Auto-generate Container Structures
+- Keep wizard architecture extensible
 
 ## DO NOT
 
-* Build Templates
-* Build Animations
-* Build Responsive Controls
-* Build Serialization
-* Build Drag & Drop
+- Build Templates
+- Build Animations
+- Build Responsive Controls
+- Build Serialization
+- Build Drag & Drop
 
 Focus only on creation workflows.
 
@@ -117,13 +117,13 @@ Create:
 
 ```ts
 export interface WizardDefinition {
-    id: string;
+  id: string;
 
-    title: string;
+  title: string;
 
-    elementType: string;
+  elementType: string;
 
-    component: React.ComponentType<any>;
+  component: React.ComponentType<any>;
 }
 ```
 
@@ -134,13 +134,13 @@ export interface WizardDefinition {
 Create:
 
 ```ts
-registerWizard()
+registerWizard();
 
-unregisterWizard()
+unregisterWizard();
 
-getWizard()
+getWizard();
 
-getWizardForElement()
+getWizardForElement();
 ```
 
 ---
@@ -156,9 +156,7 @@ Container
 System checks:
 
 ```ts
-WizardRegistry.getWizardForElement(
-    "container"
-)
+WizardRegistry.getWizardForElement('container');
 ```
 
 If wizard exists:
@@ -236,7 +234,7 @@ container/presets.ts
 Example:
 
 ```ts
-FlexTwoColumns
+FlexTwoColumns;
 ```
 
 Produces:
@@ -265,7 +263,7 @@ Produces:
 Example:
 
 ```ts
-GridThreeColumns
+GridThreeColumns;
 ```
 
 Produces:
@@ -310,9 +308,7 @@ Generate document structures from presets.
 Example:
 
 ```ts
-createLayout(
-    "flex-2-columns"
-)
+createLayout('flex-2-columns');
 ```
 
 Returns:
@@ -330,10 +326,10 @@ Container
 Every preset should provide:
 
 ```ts
-id
-title
-thumbnail
-create()
+id;
+title;
+thumbnail;
+create();
 ```
 
 Example:

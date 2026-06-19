@@ -10,7 +10,11 @@
 .niyi-builder-shell {
   @apply antialiased text-gray-900 bg-gray-50;
   @apply flex flex-col h-screen overflow-hidden;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    sans-serif;
 
   // Example of custom LESS nesting
   .niyi-canvas-container {
@@ -21,7 +25,6 @@
     }
   }
 }
-
 
 .niyi-editor {
   display: flex;
@@ -208,8 +211,9 @@
         max-width: none;
         min-height: calc(100vh - 48px);
         margin: 0;
-        padding: var(--wp--style--root--padding-top, 2rem) var(--wp--style--root--padding-right, 2rem)
-          var(--wp--style--root--padding-bottom, 2rem) var(--wp--style--root--padding-left, 2rem);
+        padding: var(--wp--style--root--padding-top, 2rem)
+          var(--wp--style--root--padding-right, 2rem) var(--wp--style--root--padding-bottom, 2rem)
+          var(--wp--style--root--padding-left, 2rem);
         padding-left: max(2rem, calc(var(--wp--style--root--padding-left, 2rem) + 1.25rem));
       }
     }
@@ -337,7 +341,9 @@
 
       &-icon {
         @apply mb-2 text-gray-500;
-        svg { @apply w-6 h-6; }
+        svg {
+          @apply w-6 h-6;
+        }
       }
 
       &-label {
