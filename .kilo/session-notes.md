@@ -17,6 +17,10 @@
 ## Progress Tracking
 - Session started: 2026-06-19
 
+### Sprint 3 Work Completed:
+- Added HeadingInspector with Text and Tag properties (packages/editor/src/components/Inspector.tsx)
+- TypeScript checks passing
+
 ## Key Files
 - Contains old code in packages/* with React components, we can only check for referene it but it would be no use when new architecture replace it
 - docs/EXECUTION_PLAN.md

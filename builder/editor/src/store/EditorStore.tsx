@@ -1,16 +1,29 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import type { LeftPanelId, RightPanelId, ThemeMode } from '../types/index.js';
+import type { BuilderDocument, ElementNode } from '../../../../core/src/types/index.js';
+
+const createEmptyDocument = (): BuilderDocument => ({
+    id: crypto.randomUUID(),
+    title: 'Untitled',
+    elements: [],
+});
 
 interface EditorState {
     activeLeftPanel: LeftPanelId;
     activeRightPanel: RightPanelId;
     theme: ThemeMode;
     isLoading: boolean;
+    document: BuilderDocument;
+    selectedElementId: string | null;
     
     setActiveLeftPanel: (panel: LeftPanelId) => void;
     setActiveRightPanel: (panel: RightPanelId) => void;
-    toggleTheme: () => void;
+    setTheme: (theme: ThemeMode) => void;
     setLoading: (loading: boolean) => void;
+    setDocument: (document: BuilderDocument) => void;
+    selectElement: (elementId: string | null) => void;
+    addElement: (element: ElementNode) => void;
+    updateElement: (elementId: string, updates: Partial<ElementNode>) => void;
 }
 
 const EditorContext = createContext<EditorState | null>(null);
@@ -21,6 +34,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
         activeRightPanel: 'properties',
         theme: 'light',
         isLoading: false,
+        document: createEmptyDocument(),
+        selectedElementId: null,
         
         setActiveLeftPanel(panel: LeftPanelId) {
             state.activeLeftPanel = panel;
@@ -30,15 +45,34 @@ export function EditorProvider({ children }: { children: ReactNode }) {
             state.activeRightPanel = panel;
         },
         
-        toggleTheme() {
-            state.theme = state.theme === 'light' ? 'dark' : 'light';
+        setTheme(theme: ThemeMode) {
+            state.theme = theme;
         },
         
         setLoading(loading: boolean) {
             state.isLoading = loading;
+        },
+        
+        setDocument(document: BuilderDocument) {
+            state.document = document;
+        },
+        
+        selectElement(elementId: string | null) {
+            state.selectedElementId = elementId;
+        },
+        
+        addElement(element: ElementNode) {
+            state.document.elements.push(element);
+        },
+        
+        updateElement(elementId: string, updates: Partial<ElementNode>) {
+            const element = state.document.elements.find(e => e.id === elementId);
+            if (element) {
+                Object.assign(element, updates);
+            }
         }
     };
-    
+
     return (
         <EditorContext.Provider value={state}>
             {children}

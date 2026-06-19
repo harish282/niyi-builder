@@ -26,7 +26,7 @@ This is the first sprint where users can create content.
 * Build first Element (Heading)
 
 ## DO NOT
-
+* Don't work on packages/, it is old code, we can check it only for reference
 * Build Drag & Drop
 * Build Containers
 * Build Wizards

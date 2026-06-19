@@ -10,7 +10,12 @@
     "declaration": false,
     "declarationMap": false,
     "sourceMap": true,
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@niyi-builder/core": ["./builder/core/src/index.ts"],
+      "@niyi-builder/editor": ["./builder/editor/src/index.ts"]
+    }
   },
   "include": ["admin/src", "vite.config.ts", "vitest.config.ts"]
 }

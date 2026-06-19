@@ -1,12 +1,8 @@
 {
   "files": [],
   "references": [
-    { "path": "./packages/core" },
-    { "path": "./packages/serializer" },
-    { "path": "./packages/editor" },
-    { "path": "./packages/blocks" },
-    { "path": "./packages/animations" },
-    { "path": "./packages/forms" },
-    { "path": "./packages/history" }
+    { "path": "./builder/core" },
+    { "path": "./builder/editor" },
+    { "path": "./builder/utils" }
   ]
 }

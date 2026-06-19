@@ -1,7 +1,6 @@
 // Import global styles (includes Tailwind and LESS)
 import '../../styles/main.less';
 
-import { ensureDefaultBlocksRegistered } from '@niyi-builder/blocks';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
@@ -10,7 +9,6 @@ import { setupLogger } from './setup-logger';
 
 async function boot(): Promise<void> {
   setupLogger();
-  ensureDefaultBlocksRegistered();
   await initializeEditorFromBootstrap();
 
   const rootElement = document.getElementById('niyi-builder-root');
