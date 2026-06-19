@@ -14,8 +14,7 @@
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
-    "react": "^19.1.0",
-    "@niyi-builder/utils": "workspace:*"
+    "react": "^19.1.0"
   },
   "files": [
     "dist"

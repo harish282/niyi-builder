@@ -15,8 +15,5 @@
   },
   "files": [
     "dist"
-  ],
-  "dependencies": {
-    "@niyi-builder/utils": "workspace:*"
-  }
+  ]
 }
