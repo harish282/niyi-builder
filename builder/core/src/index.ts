@@ -8,4 +8,5 @@ export type { ValidationResult } from './validator/ElementValidator.js';
 export { DocumentManagerImpl } from './document/DocumentManager.js';
 export { logger } from './logger.js';
 export type { Logger } from './logger.js';
-
+export { generateId } from './crypto.js';
+export { createEmptyDocument } from './document/DocumentManager.js';

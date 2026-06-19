@@ -1,6 +1,6 @@
 import type { BuilderDocument, ElementNode } from '../types/index.js';
 import { EventManager } from '../events/EventManager.js';
-import { generateId } from '@niyi-builder/utils';
+import { generateId } from '../crypto.js';
 
 const eventManager = new EventManager();
 
@@ -41,3 +41,11 @@ class DocumentManagerImpl implements BuilderDocument {
 }
 
 export { DocumentManagerImpl };
+
+export function createEmptyDocument(): BuilderDocument {
+  return {
+    id: generateId(),
+    title: 'Untitled',
+    elements: [],
+  };
+}

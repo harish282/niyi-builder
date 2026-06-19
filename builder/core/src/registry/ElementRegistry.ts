@@ -18,6 +18,12 @@ export class ElementRegistry {
     this.elements.set(definition.type, definition);
   }
 
+  registerElements(definitions: ElementDefinition[]): void {
+    for (const definition of definitions) {
+      this.registerElement(definition);
+    }
+  }
+
   unregisterElement(type: string): boolean {
     return this.elements.delete(type);
   }

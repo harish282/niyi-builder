@@ -2,7 +2,7 @@ import type { ElementDefinition, ElementNode } from '@niyi-builder/core';
 import { HeadingCanvas } from './canvas.js';
 import { HeadingProperties } from './properties.js';
 import { headingDefaults } from './defaults.js';
-import { generateId } from '@niyi-builder/utils';
+import { generateId } from '@niyi-builder/core';
 
 export const headingDefinition: ElementDefinition = {
   type: 'heading',

@@ -7,7 +7,14 @@ import type { ElementDefinition } from '@niyi-builder/core';
 import { headingDefinition } from './elements/heading/index.js';
 
 const registry = new ElementRegistry();
-registry.registerElement(headingDefinition);
+
+// Auto-register all element definitions
+// New elements: add their definition here and they'll be registered automatically
+const elementDefinitions: ElementDefinition[] = [headingDefinition];
+
+for (const def of elementDefinitions) {
+  registry.registerElement(def);
+}
 
 declare global {
   interface Window {
