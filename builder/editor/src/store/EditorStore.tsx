@@ -1,8 +1,7 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import type { LeftPanelId, RightPanelId, ThemeMode } from '../types/index.js';
 import type { BuilderDocument, ElementNode } from '@niyi-builder/core';
-import { EventManager } from '@niyi-builder/core';
-import { generateId } from '@niyi-builder/utils';
+import { EventManager, generateId } from '@niyi-builder/core';
 
 const eventManager = new EventManager();
 
