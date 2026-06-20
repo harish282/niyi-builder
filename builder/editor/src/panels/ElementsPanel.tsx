@@ -51,6 +51,8 @@ export function ElementsPanel(): ReactElement {
   const registry = window.__niyiRegistry;
   const elements = registry?.getAllElements() ?? [];
 
+  console.log("Elements Panel", [window.__niyiRegistry]);
+
   const grouped = elements.reduce<Map<string, ElementDefinition[]>>((acc, el) => {
     const group = el.category || 'general';
     if (!acc.has(group)) {

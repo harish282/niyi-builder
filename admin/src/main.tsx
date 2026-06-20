@@ -3,7 +3,7 @@ import '../../styles/main.less';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { App } from './App';
+import { AdminApp } from './App';
 import { initializeEditorFromBootstrap } from './bootstrap';
 import { setupLogger } from './setup-logger';
 
@@ -16,7 +16,7 @@ async function boot(): Promise<void> {
   if (rootElement) {
     createRoot(rootElement).render(
       <StrictMode>
-        <App />
+        <AdminApp />
       </StrictMode>,
     );
   }

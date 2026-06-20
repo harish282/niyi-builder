@@ -2,13 +2,16 @@ import type { ReactElement } from 'react';
 import { EditorLayout } from './layouts/EditorLayout.js';
 import { ThemeProvider } from './theme/ThemeProvider.js';
 import { EditorProvider } from './store/EditorStore.js';
-import { ElementRegistry } from '@niyi-builder/core';
+//import { ElementRegistry } from '@niyi-builder/core';
+import { ElementRegistry, logger } from '@niyi-builder/core';
 import type { ElementDefinition } from '@niyi-builder/core';
 
 const registry = new ElementRegistry();
 
 // Vite's import.meta.glob discovers element modules at build time
 const elementModules = import.meta.glob('../../elements/src/*/index.ts', { eager: true });
+logger.info("Element Registry", "Start register element");
+//logger.info("Element Registry", elementModules);
 
 for (const mod of Object.values(elementModules)) {
   const exports = mod as Record<string, unknown>;
@@ -19,6 +22,7 @@ for (const mod of Object.values(elementModules)) {
       'type' in value &&
       typeof (value as Record<string, unknown>).type === 'string'
     ) {
+      //logger.info("Element Registry", value);
       registry.registerElement(value as ElementDefinition);
     }
   }
