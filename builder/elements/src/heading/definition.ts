@@ -3,12 +3,14 @@ import { HeadingCanvas } from './canvas.js';
 import { HeadingProperties } from './properties.js';
 import { headingDefaults } from './defaults.js';
 import { generateId } from '@niyi-builder/core';
+import { HeadingIcon } from './icon.js';
 
 export const headingDefinition: ElementDefinition = {
   type: 'heading',
   title: 'Heading',
   category: 'content',
   version: '1.0.0',
+  icon: HeadingIcon(),
   defaults: headingDefaults,
   Canvas: HeadingCanvas,
   Properties: HeadingProperties,

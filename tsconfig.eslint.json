@@ -13,7 +13,8 @@
     "baseUrl": ".",
     "paths": {
       "@niyi-builder/core": ["./builder/core/src/index.ts"],
-      "@niyi-builder/editor": ["./builder/editor/src/index.ts"]
+      "@niyi-builder/editor": ["./builder/editor/src/index.ts"],
+      "@niyi-builder/elements": ["./builder/elements/src/index.ts"]
     }
   },
   "include": [
@@ -24,6 +25,7 @@
     "builder/core/src/**/*.ts",
     "builder/editor/src/**/*.ts",
     "builder/editor/src/**/*.tsx",
+    "builder/elements/src/**/*.ts",
     "vite.config.ts",
     "vitest.config.ts"
   ],

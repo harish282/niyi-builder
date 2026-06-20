@@ -8,7 +8,7 @@ import type { ElementDefinition } from '@niyi-builder/core';
 const registry = new ElementRegistry();
 
 // Vite's import.meta.glob discovers element modules at build time
-const elementModules = import.meta.glob('./elements/*/index.ts', { eager: true });
+const elementModules = import.meta.glob('../../elements/src/*/index.ts', { eager: true });
 
 for (const mod of Object.values(elementModules)) {
   const exports = mod as Record<string, unknown>;

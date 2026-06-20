@@ -3,6 +3,7 @@
   "references": [
     { "path": "./builder/core" },
     { "path": "./builder/editor" },
-    { "path": "./builder/utils" }
+    { "path": "./builder/utils" },
+    { "path": "./builder/elements" }
   ]
 }

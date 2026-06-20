@@ -29,6 +29,7 @@ export default defineConfig(({ command }) => ({
       '@niyi-builder/blocks': resolve(__dirname, 'builder/editor/src/index.ts'),
       '@niyi-builder/core': resolve(__dirname, 'builder/core/src/index.ts'),
       '@niyi-builder/editor': resolve(__dirname, 'builder/editor/src/index.ts'),
+      '@niyi-builder/elements': resolve(__dirname, 'builder/elements/src/index.ts'),
     },
   },
   optimizeDeps: {
