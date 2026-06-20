@@ -27,7 +27,6 @@ This is the first sprint where users can create content.
 
 ## DO NOT
 
-- Don't work on packages/, it is old code, we can check it only for reference
 - Build Drag & Drop
 - Build Containers
 - Build Wizards
@@ -61,7 +60,7 @@ Properties displayed
 
 Create:
 
-packages/core/src/document/
+builder/core/src/document/
 
 ```text id="jyvcfd"
 DocumentManager.ts
@@ -72,7 +71,7 @@ DocumentValidator.ts
 
 Create:
 
-packages/editor/src/canvas/
+builder/editor/src/canvas/
 
 ```text id="8mrppx"
 CanvasRenderer.tsx
@@ -84,7 +83,7 @@ SelectionOverlay.tsx
 
 Create:
 
-packages/elements/src/heading/
+builder/elements/src/heading/
 
 ```text id="eyr3u0"
 definition.ts
