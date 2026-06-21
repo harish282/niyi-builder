@@ -102,28 +102,35 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     eventManager.emit('element.selected', { elementId });
   }, []);
 
-  const addElement = useCallback((element: ElementNode) => {
-    setDocumentState((prev) => {
-      if (selectedElementId) {
-        const parent = findInTree(prev.elements, selectedElementId);
-        if (parent) {
-          const parentDef = window.__niyiRegistry?.getElement(parent.type);
-          if (parentDef?.canHaveChildren) {
-            eventManager.emit('element.addedToContainer', { parentId: selectedElementId, child: element });
-            return {
-              ...prev,
-              elements: addChildToTree(prev.elements, selectedElementId, element),
-            };
+  const addElement = useCallback(
+    (element: ElementNode) => {
+      setDocumentState((prev) => {
+        setSelectedElementId(element.id);
+        if (selectedElementId) {
+          const parent = findInTree(prev.elements, selectedElementId);
+          if (parent) {
+            const parentDef = window.__niyiRegistry?.getElement(parent.type);
+            if (parentDef?.canHaveChildren) {
+              eventManager.emit('element.addedToContainer', {
+                parentId: selectedElementId,
+                child: element,
+              });
+              return {
+                ...prev,
+                elements: addChildToTree(prev.elements, selectedElementId, element),
+              };
+            }
           }
         }
-      }
-      eventManager.emit('element.created', { element });
-      return {
-        ...prev,
-        elements: [...prev.elements, element],
-      };
-    });
-  }, [selectedElementId]);
+        eventManager.emit('element.created', { element });
+        return {
+          ...prev,
+          elements: [...prev.elements, element],
+        };
+      });
+    },
+    [selectedElementId],
+  );
 
   const addChildElement = useCallback((parentId: string, child: ElementNode) => {
     setDocumentState((prev) => ({
@@ -166,9 +173,12 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     setDocumentState(doc);
   }, []);
 
-  const findElement = useCallback((elementId: string) => {
-    return findInTree(document.elements, elementId);
-  }, [document]);
+  const findElement = useCallback(
+    (elementId: string) => {
+      return findInTree(document.elements, elementId);
+    },
+    [document],
+  );
 
   const state: EditorState = {
     activeLeftPanel,

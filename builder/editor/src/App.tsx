@@ -10,7 +10,7 @@ const registry = new ElementRegistry();
 
 // Vite's import.meta.glob discovers element modules at build time
 const elementModules = import.meta.glob('../../elements/src/*/index.ts', { eager: true });
-logger.info("Element Registry", "Start register element");
+logger.info('Element Registry', 'Start register element');
 //logger.info("Element Registry", elementModules);
 
 for (const mod of Object.values(elementModules)) {

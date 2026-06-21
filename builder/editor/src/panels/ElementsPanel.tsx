@@ -4,13 +4,7 @@ import { useEditorStore } from '../store/EditorStore.js';
 import { generateId, logger } from '@niyi-builder/core';
 
 const DEFAULT_ICON = (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="1.5" />
     <path d="M5 8H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
@@ -51,7 +45,7 @@ export function ElementsPanel(): ReactElement {
   const registry = window.__niyiRegistry;
   const elements = registry?.getAllElements() ?? [];
 
-  logger.info("Elements Panel", [window.__niyiRegistry]);
+  logger.info('Elements Panel', [window.__niyiRegistry]);
 
   const grouped = elements.reduce<Map<string, ElementDefinition[]>>((acc, el) => {
     const group = el.category || 'general';
@@ -79,9 +73,7 @@ export function ElementsPanel(): ReactElement {
           </div>
         </div>
       ))}
-      {elements.length === 0 && (
-        <div className="text-sm text-gray-400">No elements registered</div>
-      )}
+      {elements.length === 0 && <div className="text-sm text-gray-400">No elements registered</div>}
     </div>
   );
 }

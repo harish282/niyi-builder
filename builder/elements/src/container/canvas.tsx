@@ -6,17 +6,30 @@ interface ContainerCanvasProps {
   node: ElementNode;
   children?: ReactNode;
   onSelect: () => void;
+  isSelected?: boolean;
 }
 
-export const ContainerCanvas: FC<ContainerCanvasProps> = ({ node, children, onSelect }) => {
+export const ContainerCanvas: FC<ContainerCanvasProps> = ({
+  node,
+  children,
+  onSelect,
+  isSelected,
+}) => {
   const layout = (node.attributes.layout as Record<string, string>) || containerDefaults.layout;
 
   const containerStyle: CSSProperties = {
     display: 'flex',
     flexDirection: layout.direction === 'column' ? 'column' : 'row',
-    gap: layout.gap === 'none' ? '0px' : layout.gap === 'sm' ? '8px' : layout.gap === 'lg' ? '24px' : '16px',
+    gap:
+      layout.gap === 'none'
+        ? '0px'
+        : layout.gap === 'sm'
+          ? '8px'
+          : layout.gap === 'lg'
+            ? '24px'
+            : '16px',
     padding: '8px',
-    border: '1px dashed #ccc',
+    border: isSelected ? '2px solid #007cba' : '1px dashed #ccc',
     minHeight: '60px',
   };
 

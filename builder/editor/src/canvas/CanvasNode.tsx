@@ -5,6 +5,7 @@ interface CanvasNodeProps {
   node: ElementNode;
   onSelect: () => void;
   selectElement?: (id: string) => void;
+  isSelected?: boolean;
 }
 
 interface CanvasComponentProps {
@@ -12,9 +13,10 @@ interface CanvasComponentProps {
   children?: React.ReactNode;
   onSelect: () => void;
   selectElement?: (id: string) => void;
+  isSelected?: boolean;
 }
 
-export const CanvasNode: FC<CanvasNodeProps> = ({ node, onSelect, selectElement }) => {
+export const CanvasNode: FC<CanvasNodeProps> = ({ node, onSelect, selectElement, isSelected }) => {
   const registry = window.__niyiRegistry;
   const definition = registry?.getElement(node.type);
 
@@ -47,7 +49,12 @@ export const CanvasNode: FC<CanvasNodeProps> = ({ node, onSelect, selectElement 
   const CanvasComponent = definition.Canvas as FC<CanvasComponentProps>;
 
   return (
-    <CanvasComponent node={node} onSelect={onSelect} selectElement={selectElement}>
+    <CanvasComponent
+      node={node}
+      onSelect={onSelect}
+      selectElement={selectElement}
+      isSelected={isSelected}
+    >
       {node.children.length > 0 && (
         <div className="space-y-2">
           {node.children.map((child) => (
