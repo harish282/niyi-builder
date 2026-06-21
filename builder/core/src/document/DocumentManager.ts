@@ -31,6 +31,9 @@ class DocumentManagerImpl implements BuilderDocument {
     const element = this.findElement(elementId);
     if (element) {
       Object.assign(element, updates);
+      if (updates.attributes) {
+        element.attributes = { ...element.attributes, ...updates.attributes };
+      }
       eventManager.emit('element.updated', { elementId, updates });
     }
   }

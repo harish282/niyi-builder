@@ -55,9 +55,14 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   const updateElement = useCallback((elementId: string, updates: Partial<ElementNode>) => {
     setDocumentState((prev) => ({
       ...prev,
-      elements: prev.elements.map((e) =>
-        e.id === elementId ? { ...e, ...updates } : e
-      ),
+      elements: prev.elements.map((e) => {
+        if (e.id !== elementId) return e;
+        const merged: ElementNode = { ...e, ...updates };
+        if (updates.attributes) {
+          merged.attributes = { ...e.attributes, ...updates.attributes };
+        }
+        return merged;
+      }),
     }));
     eventManager.emit('element.updated', { elementId, updates });
   }, []);
