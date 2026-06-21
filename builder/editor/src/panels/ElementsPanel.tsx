@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import type { ElementDefinition } from '@niyi-builder/core';
 import { useEditorStore } from '../store/EditorStore.js';
-import { generateId } from '@niyi-builder/core';
+import { generateId, logger } from '@niyi-builder/core';
 
 const DEFAULT_ICON = (
   <svg
@@ -51,7 +51,7 @@ export function ElementsPanel(): ReactElement {
   const registry = window.__niyiRegistry;
   const elements = registry?.getAllElements() ?? [];
 
-  console.log("Elements Panel", [window.__niyiRegistry]);
+  logger.info("Elements Panel", [window.__niyiRegistry]);
 
   const grouped = elements.reduce<Map<string, ElementDefinition[]>>((acc, el) => {
     const group = el.category || 'general';
