@@ -17,7 +17,7 @@ const DEFAULT_ICON = (
 );
 
 function ElementEntry({ definition }: { definition: ElementDefinition }): ReactElement {
-  const { addElement, addChildElement, selectedElementId, findElement } = useEditorStore();
+  const { addElement } = useEditorStore();
 
   const handleAdd = () => {
     const node: ElementNode = {
@@ -26,15 +26,6 @@ function ElementEntry({ definition }: { definition: ElementDefinition }): ReactE
       attributes: definition.defaults,
       children: [],
     };
-
-    if (selectedElementId) {
-      const selected = findElement(selectedElementId);
-      const parentDef = window.__niyiRegistry?.getElement(selected?.type || '');
-      if (selected && parentDef?.canHaveChildren) {
-        addChildElement(selectedElementId, node);
-        return;
-      }
-    }
     addElement(node);
   };
 

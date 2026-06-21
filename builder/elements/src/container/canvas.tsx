@@ -1,13 +1,14 @@
-import type { FC, CSSProperties } from 'react';
+import type { FC, CSSProperties, ReactNode } from 'react';
 import type { ElementNode } from '@niyi-builder/core';
 import { containerDefaults } from './defaults.js';
 
 interface ContainerCanvasProps {
   node: ElementNode;
+  children?: ReactNode;
   onSelect: () => void;
 }
 
-export const ContainerCanvas: FC<ContainerCanvasProps> = ({ node, onSelect }) => {
+export const ContainerCanvas: FC<ContainerCanvasProps> = ({ node, children, onSelect }) => {
   const layout = (node.attributes.layout as Record<string, string>) || containerDefaults.layout;
 
   const containerStyle: CSSProperties = {
@@ -46,6 +47,8 @@ export const ContainerCanvas: FC<ContainerCanvasProps> = ({ node, onSelect }) =>
         e.stopPropagation();
         onSelect();
       }}
-    />
+    >
+      {children}
+    </div>
   );
 };

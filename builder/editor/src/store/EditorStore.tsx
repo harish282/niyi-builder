@@ -107,18 +107,22 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       if (selectedElementId) {
         const parent = findInTree(prev.elements, selectedElementId);
         if (parent) {
-          return {
-            ...prev,
-            elements: addChildToTree(prev.elements, selectedElementId, element),
-          };
+          const parentDef = window.__niyiRegistry?.getElement(parent.type);
+          if (parentDef?.canHaveChildren) {
+            eventManager.emit('element.addedToContainer', { parentId: selectedElementId, child: element });
+            return {
+              ...prev,
+              elements: addChildToTree(prev.elements, selectedElementId, element),
+            };
+          }
         }
       }
+      eventManager.emit('element.created', { element });
       return {
         ...prev,
         elements: [...prev.elements, element],
       };
     });
-    eventManager.emit('element.created', { element });
   }, [selectedElementId]);
 
   const addChildElement = useCallback((parentId: string, child: ElementNode) => {
