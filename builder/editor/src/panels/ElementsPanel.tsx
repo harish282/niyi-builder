@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import type { ElementDefinition } from '@niyi-builder/core';
+import type { ElementDefinition, ElementNode } from '@niyi-builder/core';
 import { useEditorStore } from '../store/EditorStore.js';
 import { generateId, logger } from '@niyi-builder/core';
 
@@ -17,15 +17,24 @@ const DEFAULT_ICON = (
 );
 
 function ElementEntry({ definition }: { definition: ElementDefinition }): ReactElement {
-  const { addElement } = useEditorStore();
+  const { addElement, addChildElement, selectedElementId, findElement } = useEditorStore();
 
   const handleAdd = () => {
-    const node = {
+    const node: ElementNode = {
       id: generateId(),
       type: definition.type,
-      attributes: definition.defaults as Record<string, unknown>,
+      attributes: definition.defaults,
       children: [],
     };
+
+    if (selectedElementId) {
+      const selected = findElement(selectedElementId);
+      const parentDef = window.__niyiRegistry?.getElement(selected?.type || '');
+      if (selected && parentDef?.canHaveChildren) {
+        addChildElement(selectedElementId, node);
+        return;
+      }
+    }
     addElement(node);
   };
 

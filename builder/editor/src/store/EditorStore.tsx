@@ -11,6 +11,60 @@ const createEmptyDocument = (): BuilderDocument => ({
   elements: [],
 });
 
+function findInTree(elements: ElementNode[], elementId: string): ElementNode | undefined {
+  for (const el of elements) {
+    if (el.id === elementId) return el;
+    const found = findInTree(el.children, elementId);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+function addChildToTree(
+  elements: ElementNode[],
+  parentId: string,
+  child: ElementNode,
+): ElementNode[] {
+  return elements.map((el) => {
+    if (el.id === parentId) {
+      return { ...el, children: [...el.children, child] };
+    }
+    if (el.children.length > 0) {
+      return { ...el, children: addChildToTree(el.children, parentId, child) };
+    }
+    return el;
+  });
+}
+
+function removeFromTree(elements: ElementNode[], elementId: string): ElementNode[] {
+  return elements
+    .filter((el) => el.id !== elementId)
+    .map((el) => ({
+      ...el,
+      children: removeFromTree(el.children, elementId),
+    }));
+}
+
+function updateInTree(
+  elements: ElementNode[],
+  elementId: string,
+  updates: Partial<ElementNode>,
+): ElementNode[] {
+  return elements.map((el) => {
+    if (el.id === elementId) {
+      const merged: ElementNode = { ...el, ...updates };
+      if (updates.attributes) {
+        merged.attributes = { ...el.attributes, ...updates.attributes };
+      }
+      return merged;
+    }
+    if (el.children.length > 0) {
+      return { ...el, children: updateInTree(el.children, elementId, updates) };
+    }
+    return el;
+  });
+}
+
 interface EditorState {
   activeLeftPanel: LeftPanelId;
   activeRightPanel: RightPanelId;
@@ -26,7 +80,11 @@ interface EditorState {
   setDocument: (document: BuilderDocument) => void;
   selectElement: (elementId: string | null) => void;
   addElement: (element: ElementNode) => void;
+  addChildElement: (parentId: string, child: ElementNode) => void;
+  removeElement: (elementId: string) => void;
   updateElement: (elementId: string, updates: Partial<ElementNode>) => void;
+  moveElement: (elementId: string, newParentId: string) => void;
+  findElement: (elementId: string) => ElementNode | undefined;
 }
 
 const EditorContext = createContext<EditorState | null>(null);
@@ -45,31 +103,68 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addElement = useCallback((element: ElementNode) => {
+    setDocumentState((prev) => {
+      if (selectedElementId) {
+        const parent = findInTree(prev.elements, selectedElementId);
+        if (parent) {
+          return {
+            ...prev,
+            elements: addChildToTree(prev.elements, selectedElementId, element),
+          };
+        }
+      }
+      return {
+        ...prev,
+        elements: [...prev.elements, element],
+      };
+    });
+    eventManager.emit('element.created', { element });
+  }, [selectedElementId]);
+
+  const addChildElement = useCallback((parentId: string, child: ElementNode) => {
     setDocumentState((prev) => ({
       ...prev,
-      elements: [...prev.elements, element],
+      elements: addChildToTree(prev.elements, parentId, child),
     }));
-    eventManager.emit('element.created', { element });
+    eventManager.emit('element.addedToContainer', { parentId, child });
+  }, []);
+
+  const removeElement = useCallback((elementId: string) => {
+    setDocumentState((prev) => ({
+      ...prev,
+      elements: removeFromTree(prev.elements, elementId),
+    }));
+    eventManager.emit('element.removed', { elementId });
   }, []);
 
   const updateElement = useCallback((elementId: string, updates: Partial<ElementNode>) => {
     setDocumentState((prev) => ({
       ...prev,
-      elements: prev.elements.map((e) => {
-        if (e.id !== elementId) return e;
-        const merged: ElementNode = { ...e, ...updates };
-        if (updates.attributes) {
-          merged.attributes = { ...e.attributes, ...updates.attributes };
-        }
-        return merged;
-      }),
+      elements: updateInTree(prev.elements, elementId, updates),
     }));
     eventManager.emit('element.updated', { elementId, updates });
+  }, []);
+
+  const moveElement = useCallback((elementId: string, newParentId: string) => {
+    setDocumentState((prev) => {
+      const element = findInTree(prev.elements, elementId);
+      if (!element) return prev;
+      const withoutElement = removeFromTree(prev.elements, elementId);
+      return {
+        ...prev,
+        elements: addChildToTree(withoutElement, newParentId, element),
+      };
+    });
+    eventManager.emit('element.moved', { elementId, newParentId });
   }, []);
 
   const setDocument = useCallback((doc: BuilderDocument) => {
     setDocumentState(doc);
   }, []);
+
+  const findElement = useCallback((elementId: string) => {
+    return findInTree(document.elements, elementId);
+  }, [document]);
 
   const state: EditorState = {
     activeLeftPanel,
@@ -85,7 +180,11 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     setDocument,
     selectElement,
     addElement,
+    addChildElement,
+    removeElement,
     updateElement,
+    moveElement,
+    findElement,
   };
 
   return <EditorContext.Provider value={state}>{children}</EditorContext.Provider>;

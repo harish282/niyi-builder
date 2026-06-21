@@ -1,5 +1,5 @@
 import { CanvasNode } from './CanvasNode.js';
-import { SelectionOverlay } from './SelectionOverlay.js';
+// import { SelectionOverlay } from './SelectionOverlay.js';
 import { useEditorStore } from '../store/EditorStore.js';
 import type { FC } from 'react';
 
@@ -14,10 +14,10 @@ export const CanvasRenderer: FC = () => {
         </div>
       ) : (
         document.elements.map((node) => (
-          <CanvasNode key={node.id} node={node} onSelect={() => selectElement(node.id)} />
+          <CanvasNode key={node.id} node={node} onSelect={() => selectElement(node.id)} selectElement={selectElement} />
         ))
       )}
-      <SelectionOverlay />
+      {/* <SelectionOverlay /> */}
     </div>
   );
 };

@@ -4,6 +4,7 @@ export interface ElementDefinition {
   category: string;
   version: string;
   icon?: unknown;
+  canHaveChildren?: boolean;
   defaults: Record<string, unknown>;
   Canvas?: unknown;
   Properties?: unknown;

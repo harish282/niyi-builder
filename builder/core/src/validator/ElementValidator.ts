@@ -28,6 +28,10 @@ export function validateElementDefinition(definition: ElementDefinition): Valida
     errors.push('defaults is required');
   }
 
+  if (definition.canHaveChildren !== undefined && typeof definition.canHaveChildren !== 'boolean') {
+    errors.push('canHaveChildren must be a boolean');
+  }
+
   return {
     valid: errors.length === 0,
     errors,
