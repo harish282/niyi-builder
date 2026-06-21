@@ -20,7 +20,13 @@ export const CanvasNode: FC<CanvasNodeProps> = ({ node, onSelect, selectElement 
 
   if (!definition?.Canvas) {
     return (
-      <div className="p-4 border border-gray-300 rounded cursor-pointer mb-2" onClick={onSelect}>
+      <div
+        className="p-4 border border-gray-300 rounded cursor-pointer mb-2"
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect();
+        }}
+      >
         {node.type}
         {node.children.length > 0 && (
           <div className="mt-2 space-y-2">

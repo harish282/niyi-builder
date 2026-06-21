@@ -6,8 +6,15 @@ import type { FC } from 'react';
 export const CanvasRenderer: FC = () => {
   const { document, selectElement } = useEditorStore();
 
+  const handleBackgroundClick = () => {
+    selectElement(null);
+  };
+
   return (
-    <div className="flex-1 overflow-auto p-4 min-h-screen">
+    <div
+      className="flex-1 overflow-auto p-4 min-h-screen"
+      onClick={handleBackgroundClick}
+    >
       {document.elements.length === 0 ? (
         <div className="text-gray-400 text-center py-8">
           Drop elements here or click "Add Heading" in the panel
