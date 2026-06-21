@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import type { LeftPanelId, RightPanelId, ThemeMode } from '../types/index.js';
 import type { BuilderDocument, ElementNode } from '@niyi-builder/core';
 import { EventManager, generateId } from '@niyi-builder/core';
@@ -32,51 +32,55 @@ interface EditorState {
 const EditorContext = createContext<EditorState | null>(null);
 
 export function EditorProvider({ children }: { children: ReactNode }) {
+  const [document, setDocumentState] = useState<BuilderDocument>(createEmptyDocument);
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+  const [activeLeftPanel, setActiveLeftPanel] = useState<LeftPanelId>('elements');
+  const [activeRightPanel, setActiveRightPanel] = useState<RightPanelId>('properties');
+  const [theme, setTheme] = useState<ThemeMode>('light');
+  const [isLoading, setLoading] = useState(false);
+
+  const selectElement = useCallback((elementId: string | null) => {
+    setSelectedElementId(elementId);
+    eventManager.emit('element.selected', { elementId });
+  }, []);
+
+  const addElement = useCallback((element: ElementNode) => {
+    setDocumentState((prev) => ({
+      ...prev,
+      elements: [...prev.elements, element],
+    }));
+    eventManager.emit('element.created', { element });
+  }, []);
+
+  const updateElement = useCallback((elementId: string, updates: Partial<ElementNode>) => {
+    setDocumentState((prev) => ({
+      ...prev,
+      elements: prev.elements.map((e) =>
+        e.id === elementId ? { ...e, ...updates } : e
+      ),
+    }));
+    eventManager.emit('element.updated', { elementId, updates });
+  }, []);
+
+  const setDocument = useCallback((doc: BuilderDocument) => {
+    setDocumentState(doc);
+  }, []);
+
   const state: EditorState = {
-    activeLeftPanel: 'elements',
-    activeRightPanel: 'properties',
-    theme: 'light',
-    isLoading: false,
-    document: createEmptyDocument(),
-    selectedElementId: null,
-
-    setActiveLeftPanel(panel: LeftPanelId) {
-      state.activeLeftPanel = panel;
-    },
-
-    setActiveRightPanel(panel: RightPanelId) {
-      state.activeRightPanel = panel;
-    },
-
-    setTheme(theme: ThemeMode) {
-      state.theme = theme;
-    },
-
-    setLoading(loading: boolean) {
-      state.isLoading = loading;
-    },
-
-    setDocument(document: BuilderDocument) {
-      state.document = document;
-    },
-
-    selectElement(elementId: string | null) {
-      state.selectedElementId = elementId;
-      eventManager.emit('element.selected', { elementId });
-    },
-
-    addElement(element: ElementNode) {
-      state.document.elements.push(element);
-      eventManager.emit('element.created', { element });
-    },
-
-    updateElement(elementId: string, updates: Partial<ElementNode>) {
-      const element = state.document.elements.find((e) => e.id === elementId);
-      if (element) {
-        Object.assign(element, updates);
-        eventManager.emit('element.updated', { elementId, updates });
-      }
-    },
+    activeLeftPanel,
+    activeRightPanel,
+    theme,
+    isLoading,
+    document,
+    selectedElementId,
+    setActiveLeftPanel,
+    setActiveRightPanel,
+    setTheme,
+    setLoading,
+    setDocument,
+    selectElement,
+    addElement,
+    updateElement,
   };
 
   return <EditorContext.Provider value={state}>{children}</EditorContext.Provider>;
