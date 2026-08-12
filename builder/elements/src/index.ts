@@ -15,4 +15,20 @@ export {
   buttonDefaults,
   ButtonIcon,
 } from './button/index.js';
+export {
+  paragraphDefinition,
+  createParagraphNode,
+  ParagraphCanvas,
+  ParagraphProperties,
+  paragraphDefaults,
+  ParagraphIcon,
+} from './paragraph/index.js';
+export {
+  imageDefinition,
+  createImageNode,
+  ImageCanvas,
+  ImageProperties,
+  imageDefaults,
+  ImageIcon,
+} from './image/index.js';
 export type { ElementDefinition, ElementNode } from '@niyi-builder/core';

@@ -1,7 +1,14 @@
+import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@niyi-builder/core': resolve(__dirname, 'builder/core/src/index.ts'),
+      '@niyi-builder/serializer': resolve(__dirname, 'builder/serializer/src/index.ts'),
+    },
+  },
   test: {
-    include: ['packages/**/*.test.ts'],
+    include: ['builder/**/*.test.ts'],
   },
 });

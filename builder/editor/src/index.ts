@@ -31,6 +31,20 @@ export { SettingsPanel } from './panels/SettingsPanel.js';
 export { ThemeProvider, useTheme } from './theme/ThemeProvider.js';
 export { useEditorStore, EditorProvider } from './store/EditorStore.js';
 export { PanelRegistry } from './panels/PanelRegistry.js';
+export {
+  blockNodeToElement,
+  coreDocumentToEditorDocument,
+  editorDocumentToCoreDocument,
+  elementToBlockNode,
+  getEditorRuntimeConfig,
+  loadPostContent,
+  parseEditorDocument,
+  savePostContent,
+  serializeEditorDocument,
+  switchToGutenbergEditor,
+  type EditorDocumentMeta,
+  type EditorRuntimeConfig,
+} from './serialization/index.js';
 export type { PanelDefinition } from './types/index.js';
 export type { ThemeMode } from './types/index.js';
 export type { LeftPanelId } from './types/index.js';

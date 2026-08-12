@@ -3,6 +3,7 @@
   "references": [
     { "path": "./builder/core" },
     { "path": "./builder/editor" },
+    { "path": "./builder/serializer" },
     { "path": "./builder/utils" },
     { "path": "./builder/elements" }
   ]

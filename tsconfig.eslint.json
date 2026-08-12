@@ -14,7 +14,8 @@
     "paths": {
       "@niyi-builder/core": ["./builder/core/src/index.ts"],
       "@niyi-builder/editor": ["./builder/editor/src/index.ts"],
-      "@niyi-builder/elements": ["./builder/elements/src/index.ts"]
+      "@niyi-builder/elements": ["./builder/elements/src/index.ts"],
+      "@niyi-builder/serializer": ["./builder/serializer/src/index.ts"]
     }
   },
   "include": [
@@ -26,6 +27,7 @@
     "builder/editor/src/**/*.ts",
     "builder/editor/src/**/*.tsx",
     "builder/elements/src/**/*.ts",
+    "builder/serializer/src/**/*.ts",
     "vite.config.ts",
     "vitest.config.ts"
   ],

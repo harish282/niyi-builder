@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import { EditorLayout } from './layouts/EditorLayout.js';
 import { ThemeProvider } from './theme/ThemeProvider.js';
 import { EditorProvider } from './store/EditorStore.js';
+import { ContentBootstrap } from './serialization/ContentBootstrap.js';
 //import { ElementRegistry } from '@niyi-builder/core';
 import { ElementRegistry, logger } from '@niyi-builder/core';
 import type { ElementDefinition } from '@niyi-builder/core';
@@ -50,6 +51,7 @@ export function App(): ReactElement {
   return (
     <EditorProvider>
       <ThemeProvider>
+        <ContentBootstrap />
         <EditorLayout />
       </ThemeProvider>
     </EditorProvider>

@@ -1,21 +1,6 @@
-export interface NiyiBuilderConfig {
-  postId: number;
-  postType: string;
-  postTitle: string;
-  restUrl: string;
-  restPostUrl: string;
-  nonce: string;
-  content: string;
-  exitUrl: string;
-  isDevShell: boolean;
-  loggingEnabled: boolean;
-}
+import type { EditorRuntimeConfig } from '@niyi-builder/editor';
 
-declare global {
-  interface Window {
-    niyiBuilderConfig?: NiyiBuilderConfig;
-  }
-}
+export type NiyiBuilderConfig = EditorRuntimeConfig;
 
 export function getBootstrapConfig(): NiyiBuilderConfig | undefined {
   return window.niyiBuilderConfig;
