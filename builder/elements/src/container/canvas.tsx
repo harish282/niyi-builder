@@ -54,7 +54,7 @@ export const ContainerCanvas: FC<ContainerCanvasProps> = ({
 
   return (
     <div
-      className="niyi-container cursor-pointer"
+      className="wp-block-group niyi-container cursor-pointer"
       style={containerStyle}
       onClick={(e) => {
         e.stopPropagation();

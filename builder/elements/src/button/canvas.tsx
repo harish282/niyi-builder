@@ -7,26 +7,32 @@ interface ButtonCanvasProps {
   onSelect: () => void;
 }
 
-const variantClasses: Record<string, string> = {
-  primary: 'bg-blue-600 text-white hover:bg-blue-700',
-  secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-};
-
+/**
+ * Renders the same markup as Gutenberg's core/button block so theme + block
+ * library styles apply exactly like the native editor canvas.
+ */
 export const ButtonCanvas: FC<ButtonCanvasProps> = ({ node, onSelect }) => {
   const text = (node.attributes.text as string) || buttonDefaults.text;
   const variant = (node.attributes.variant as string) || buttonDefaults.variant;
-  const className = variantClasses[variant] || variantClasses.primary;
 
   return (
-    <button
-      type="button"
-      className={`niyi-button px-4 py-2 rounded text-sm font-medium cursor-pointer ${className}`}
+    <div
+      className={`wp-block-button cursor-pointer ${variant === 'secondary' ? 'is-style-outline' : ''}`}
       onClick={(e) => {
         e.stopPropagation();
         onSelect();
       }}
     >
-      {text}
-    </button>
+      <a
+        className="wp-block-button__link wp-element-button"
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        {text}
+      </a>
+    </div>
   );
 };

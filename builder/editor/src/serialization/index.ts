@@ -12,5 +12,7 @@ export {
   savePostContent,
   serializeEditorDocument,
   switchToGutenbergEditor,
+  type CanvasStyleLink,
+  type CanvasStyles,
   type EditorRuntimeConfig,
 } from './persistence.js';

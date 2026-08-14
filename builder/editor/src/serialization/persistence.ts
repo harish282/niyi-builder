@@ -6,6 +6,16 @@ import { coreDocumentToEditorDocument, editorDocumentToCoreDocument } from './ad
  * Runtime post context exposed by PHP via wp_localize_script
  * (see AdminAssetRegistrar::localizeBootstrapConfig).
  */
+export interface CanvasStyleLink {
+  id: string;
+  href: string;
+}
+
+export interface CanvasStyles {
+  links: CanvasStyleLink[];
+  html: string;
+}
+
 export interface EditorRuntimeConfig {
   postId: number;
   postTitle: string;
@@ -14,6 +24,7 @@ export interface EditorRuntimeConfig {
   content: string;
   exitUrl: string;
   isDevShell: boolean;
+  canvasStyles?: CanvasStyles;
 }
 
 declare global {
@@ -111,8 +122,7 @@ export async function switchToGutenbergEditor(
   document: BuilderDocument,
 ): Promise<void> {
   const html = serializeEditorDocument(document);
-  const canSave =
-    !config.isDevShell && config.postId > 0 && config.restPostUrl.trim() !== '';
+  const canSave = !config.isDevShell && config.postId > 0 && config.restPostUrl.trim() !== '';
   const shouldSave = canSave && html.trim().length > 0;
 
   if (shouldSave) {

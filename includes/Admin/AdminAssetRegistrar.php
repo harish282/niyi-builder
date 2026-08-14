@@ -45,7 +45,22 @@ final class AdminAssetRegistrar
             NIYI_BUILDER_VERSION
         );
 
-        (new BuilderThemeStyles())->enqueue();
+        // Theme styles are injected into the canvas iframe (like Gutenberg) for
+        // post editing; only the dev shell (no canvas) falls back to the editor
+        // style enqueues for the surrounding admin page.
+        if ($post === null) {
+            $themeStyles = new BuilderThemeStyles();
+            $version = get_bloginfo('version');
+
+            foreach ($themeStyles->getEditorStyleUrls() as $index => $url) {
+                wp_enqueue_style(
+                    'niyi-builder-editor-style-' . (string) $index,
+                    $url,
+                    ['niyi-builder-admin-shell'],
+                    $version
+                );
+            }
+        }
 
         $this->enqueueProductionAssets($post);
     }
@@ -74,7 +89,7 @@ final class AdminAssetRegistrar
         $scriptUrl = $buildUrl . ltrim($entry['file'], '/');
 
         $this->enqueueModuleScript(self::SCRIPT_HANDLE, $scriptUrl, []);
-        $this->localizeBootstrapConfig($post);
+        $this->localizeBootstrapConfig($post, $manifest);
 
         if (! empty($entry['css']) && is_array($entry['css'])) {
             foreach ($entry['css'] as $index => $stylesheet) {
@@ -92,7 +107,10 @@ final class AdminAssetRegistrar
         }
     }
 
-    private function localizeBootstrapConfig(?WP_Post $post): void
+    /**
+     * @param array<string, mixed>|null $manifest
+     */
+    private function localizeBootstrapConfig(?WP_Post $post, ?array $manifest): void
     {
         $restPostUrl = '';
 
@@ -112,9 +130,75 @@ final class AdminAssetRegistrar
             'exitUrl' => $post instanceof WP_Post ? PostEditorIntegration::getBlockEditorUrl($post->ID) : '',
             'isDevShell' => ! ($post instanceof WP_Post),
             'loggingEnabled' => (bool) Config::instance()->get('app.logging.enabled', false),
+            'canvasStyles' => $this->getCanvasStyles($manifest),
         ];
 
         wp_localize_script(self::SCRIPT_HANDLE, 'niyiBuilderConfig', $config);
+    }
+
+    /**
+     * Canvas styles for the iframe: the built admin bundle first (Tailwind +
+     * editor canvas styles), then the editor style markup captured the same way
+     * Gutenberg builds its canvas, then theme editor-style stylesheet links.
+     *
+     * @param array<string, mixed>|null $manifest
+     * @return array{
+     *   links: list<array{id: string, href: string}>,
+     *   html: string
+     * }
+     */
+    private function getCanvasStyles(?array $manifest): array
+    {
+        $themeStyles = new BuilderThemeStyles();
+
+        $links = $this->getManifestStylesheetLinks($manifest);
+
+        foreach ($themeStyles->getEditorStyleUrls() as $index => $url) {
+            $links[] = [
+                'id' => 'niyi-builder-editor-style-' . (string) $index,
+                'href' => $url,
+            ];
+        }
+
+        return [
+            'links' => $links,
+            'html' => $themeStyles->getCanvasStyleHtml(),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed>|null $manifest
+     * @return list<array{id: string, href: string}>
+     */
+    private function getManifestStylesheetLinks(?array $manifest): array
+    {
+        if ($manifest === null) {
+            return [];
+        }
+
+        $links = [];
+        $buildUrl = PluginAssets::url('build/');
+
+        foreach (self::MANIFEST_ENTRIES as $key) {
+            $entry = $manifest[$key] ?? null;
+
+            if (! is_array($entry) || empty($entry['css']) || ! is_array($entry['css'])) {
+                continue;
+            }
+
+            foreach ($entry['css'] as $index => $stylesheet) {
+                if (! is_string($stylesheet) || $stylesheet === '') {
+                    continue;
+                }
+
+                $links[] = [
+                    'id' => 'niyi-builder-admin-bundle-' . (string) $index,
+                    'href' => $buildUrl . ltrim($stylesheet, '/'),
+                ];
+            }
+        }
+
+        return $links;
     }
 
     /**

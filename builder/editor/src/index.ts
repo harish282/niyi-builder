@@ -23,6 +23,7 @@ export { App, registry } from './App.js';
 export { EditorLayout } from './layouts/EditorLayout.js';
 export { TopBar } from './toolbar/TopBar.js';
 export { Canvas } from './canvas/Canvas.js';
+export { CanvasFrame } from './canvas/CanvasFrame.js';
 export { StatusBar } from './status-bar/StatusBar.js';
 export { ElementsPanel } from './panels/ElementsPanel.js';
 export { PropertiesPanel } from './panels/PropertiesPanel.js';
@@ -42,6 +43,8 @@ export {
   savePostContent,
   serializeEditorDocument,
   switchToGutenbergEditor,
+  type CanvasStyleLink,
+  type CanvasStyles,
   type EditorDocumentMeta,
   type EditorRuntimeConfig,
 } from './serialization/index.js';

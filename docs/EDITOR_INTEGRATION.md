@@ -170,9 +170,20 @@ sequenceDiagram
   "nonce": "...",
   "content": "<!-- wp:group -->...",
   "exitUrl": "post.php?post=5&action=edit",
-  "isDevShell": false
+  "isDevShell": false,
+  "canvasStyles": {
+    "links": [
+      {
+        "id": "niyi-builder-admin-bundle-0",
+        "href": "https://site.test/.../build/assets/admin-xxx.css"
+      }
+    ],
+    "html": "<link rel='stylesheet' id='wp-block-library-css' href='...'/>...<style id='global-styles-inline-css'>:root{--wp--preset--color--base:#ffffff;...}</style>"
+  }
 }
 ```
+
+`canvasStyles.html` is the exact stylesheet markup the native Gutenberg canvas loads — it is built by `BuilderThemeStyles::getCanvasStyleHtml()`, which mirrors core `_wp_get_iframed_editor_assets()` (block library + editor content styles, `enqueue_block_assets` + `enqueue_block_editor_assets`, per-block editor styles, global styles, font faces) plus Astra-style theme editor assets and Google Fonts. `CanvasFrame.tsx` injects it into the canvas iframe head along with the admin bundle CSS (so Tailwind/editor canvas styles are available inside the frame too). Theme CSS stays out of the admin UI.
 
 `admin/src/bootstrap.ts` runs **before** React mount:
 
