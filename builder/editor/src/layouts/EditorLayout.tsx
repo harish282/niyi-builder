@@ -16,10 +16,10 @@ export function EditorLayout(): ReactElement {
       <div className="flex flex-row flex-1 overflow-hidden">
         {pendingWizard ? (
           <ElementWizard />
-        ) : selectedElementId ? (
-          <PropertiesPanel />
         ) : showElements ? (
           <ElementsPanel />
+        ) : selectedElementId ? (
+          <PropertiesPanel />
         ) : null}
         <Canvas />
       </div>

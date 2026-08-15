@@ -65,6 +65,59 @@ function updateInTree(
   });
 }
 
+function findInList(
+  children: ElementNode[],
+  parentId: string | null,
+  elementId: string,
+): { parentId: string | null; index: number } | undefined {
+  for (let i = 0; i < children.length; i++) {
+    if (children[i].id === elementId) {
+      return { parentId, index: i };
+    }
+    const found = findInList(children[i].children, children[i].id, elementId);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+function containsElement(elements: ElementNode[], elementId: string): boolean {
+  return elements.some((el) => el.id === elementId || containsElement(el.children, elementId));
+}
+
+function isDescendantOf(elements: ElementNode[], ancestorId: string, elementId: string): boolean {
+  for (const el of elements) {
+    if (el.id === ancestorId) {
+      return containsElement(el.children, elementId);
+    }
+    if (isDescendantOf(el.children, ancestorId, elementId)) return true;
+  }
+  return false;
+}
+
+function insertChildAt(
+  elements: ElementNode[],
+  parentId: string | null,
+  child: ElementNode,
+  index: number,
+): ElementNode[] {
+  if (parentId === null) {
+    const next = [...elements];
+    next.splice(index, 0, child);
+    return next;
+  }
+  return elements.map((el) => {
+    if (el.id === parentId) {
+      const next = [...el.children];
+      next.splice(index, 0, child);
+      return { ...el, children: next };
+    }
+    if (el.children.length > 0) {
+      return { ...el, children: insertChildAt(el.children, parentId, child, index) };
+    }
+    return el;
+  });
+}
+
 interface EditorState {
   activeLeftPanel: LeftPanelId;
   activeRightPanel: RightPanelId;
@@ -89,6 +142,7 @@ interface EditorState {
   removeElement: (elementId: string) => void;
   updateElement: (elementId: string, updates: Partial<ElementNode>) => void;
   moveElement: (elementId: string, newParentId: string) => void;
+  moveElementTo: (elementId: string, overId: string) => void;
   findElement: (elementId: string) => ElementNode | undefined;
 }
 
@@ -120,6 +174,9 @@ export function EditorProvider({ children }: { children: ReactNode }) {
 
   const selectElement = useCallback((elementId: string | null) => {
     setSelectedElementId(elementId);
+    if (elementId !== null) {
+      setShowElements(false);
+    }
     eventManager.emit('element.selected', { elementId });
   }, []);
 
@@ -190,6 +247,42 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     eventManager.emit('element.moved', { elementId, newParentId });
   }, []);
 
+  const moveElementTo = useCallback((elementId: string, overId: string) => {
+    setDocumentState((prev) => {
+      if (elementId === overId) return prev;
+      const active = findInTree(prev.elements, elementId);
+      if (!active) return prev;
+      const target = findInTree(prev.elements, overId);
+      if (!target) return prev;
+      if (isDescendantOf(prev.elements, elementId, overId)) return prev;
+
+      const targetDef = window.__niyiRegistry?.getElement(target.type);
+      const canNest = Boolean(targetDef?.canHaveChildren);
+
+      const activePos = findInList(prev.elements, null, elementId);
+      const targetPos = findInList(prev.elements, null, overId);
+      if (!activePos || !targetPos) return prev;
+
+      let newParentId: string | null;
+      let insertIndex: number;
+
+      if (canNest) {
+        newParentId = overId;
+        insertIndex = target.children.length;
+      } else {
+        newParentId = targetPos.parentId;
+        insertIndex = targetPos.index;
+        if (activePos.parentId === newParentId && activePos.index < insertIndex) {
+          insertIndex -= 1;
+        }
+      }
+
+      const withoutElement = removeFromTree(prev.elements, elementId);
+      return { ...prev, elements: insertChildAt(withoutElement, newParentId, active, insertIndex) };
+    });
+    eventManager.emit('element.moved', { elementId, overId });
+  }, []);
+
   const setDocument = useCallback((doc: BuilderDocument) => {
     setDocumentState(doc);
   }, []);
@@ -224,6 +317,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     removeElement,
     updateElement,
     moveElement,
+    moveElementTo,
     findElement,
   };
 
