@@ -72,6 +72,8 @@ interface EditorState {
   isLoading: boolean;
   document: BuilderDocument;
   selectedElementId: string | null;
+  pendingWizard: string | null;
+  showElements: boolean;
 
   setActiveLeftPanel: (panel: LeftPanelId) => void;
   setActiveRightPanel: (panel: RightPanelId) => void;
@@ -79,6 +81,9 @@ interface EditorState {
   setLoading: (loading: boolean) => void;
   setDocument: (document: BuilderDocument) => void;
   selectElement: (elementId: string | null) => void;
+  openWizard: (elementType: string) => void;
+  closeWizard: () => void;
+  toggleElements: () => void;
   addElement: (element: ElementNode) => void;
   addChildElement: (parentId: string, child: ElementNode) => void;
   removeElement: (elementId: string) => void;
@@ -96,6 +101,22 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   const [activeRightPanel, setActiveRightPanel] = useState<RightPanelId>('properties');
   const [theme, setTheme] = useState<ThemeMode>('light');
   const [isLoading, setLoading] = useState(false);
+  const [pendingWizard, setPendingWizard] = useState<string | null>(null);
+  const [showElements, setShowElements] = useState(true);
+
+  const openWizard = useCallback((elementType: string) => {
+    setPendingWizard(elementType);
+    setShowElements(false);
+  }, []);
+
+  const closeWizard = useCallback(() => {
+    setPendingWizard(null);
+    setShowElements(true);
+  }, []);
+
+  const toggleElements = useCallback(() => {
+    setShowElements((prev) => !prev);
+  }, []);
 
   const selectElement = useCallback((elementId: string | null) => {
     setSelectedElementId(elementId);
@@ -187,12 +208,17 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     isLoading,
     document,
     selectedElementId,
+    pendingWizard,
+    showElements,
     setActiveLeftPanel,
     setActiveRightPanel,
     setTheme,
     setLoading,
     setDocument,
     selectElement,
+    openWizard,
+    closeWizard,
+    toggleElements,
     addElement,
     addChildElement,
     removeElement,

@@ -21,7 +21,9 @@ for (const mod of Object.values(elementModules)) {
       value &&
       typeof value === 'object' &&
       'type' in value &&
-      typeof (value as Record<string, unknown>).type === 'string'
+      typeof (value as Record<string, unknown>).type === 'string' &&
+      'title' in value &&
+      'defaults' in value
     ) {
       //logger.info("Element Registry", value);
       registry.registerElement(value as ElementDefinition);

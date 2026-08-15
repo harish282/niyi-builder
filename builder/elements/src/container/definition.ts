@@ -4,13 +4,19 @@ import { ContainerProperties } from './properties.js';
 import { containerDefaults } from './defaults.js';
 import { generateId } from '@niyi-builder/core';
 import { ContainerIcon } from './icon.js';
+import { ContainerWizard } from './wizard.js';
+import { createContainerChildren } from './options.js';
 
 export interface ContainerLayout {
   type: 'flex' | 'grid';
-  direction: 'row' | 'column';
-  justify: 'start' | 'center' | 'end' | 'between';
-  align: 'start' | 'center' | 'end';
-  gap: 'none' | 'sm' | 'md' | 'lg';
+  direction?: 'row' | 'column';
+  justify?: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly';
+  align?: 'start' | 'center' | 'end' | 'stretch';
+  gap?: 'none' | 'sm' | 'md' | 'lg';
+  columns?: number;
+  rows?: 'auto' | number;
+  justifyItems?: 'start' | 'center' | 'end' | 'stretch';
+  alignItems?: 'start' | 'center' | 'end' | 'stretch';
 }
 
 export const containerDefinition: ElementDefinition = {
@@ -23,6 +29,8 @@ export const containerDefinition: ElementDefinition = {
   defaults: containerDefaults,
   Canvas: ContainerCanvas,
   Properties: ContainerProperties,
+  Wizard: ContainerWizard,
+  createChildren: createContainerChildren,
 };
 
 export function createContainerNode(overrides?: Partial<ElementNode>): ElementNode {

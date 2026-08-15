@@ -11,9 +11,13 @@ const DEFAULT_ICON = (
 );
 
 function ElementEntry({ definition }: { definition: ElementDefinition }): ReactElement {
-  const { addElement } = useEditorStore();
+  const { addElement, openWizard } = useEditorStore();
 
   const handleAdd = () => {
+    if (definition.Wizard) {
+      openWizard(definition.type);
+      return;
+    }
     const node: ElementNode = {
       id: generateId(),
       type: definition.type,

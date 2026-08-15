@@ -55,18 +55,15 @@ export const CanvasNode: FC<CanvasNodeProps> = ({ node, onSelect, selectElement,
       selectElement={selectElement}
       isSelected={isSelected}
     >
-      {node.children.length > 0 && (
-        <div className="space-y-2">
-          {node.children.map((child) => (
-            <CanvasNode
-              key={child.id}
-              node={child}
-              onSelect={() => selectElement?.(child.id)}
-              selectElement={selectElement}
-            />
-          ))}
-        </div>
-      )}
+      {node.children.length > 0 &&
+        node.children.map((child) => (
+          <CanvasNode
+            key={child.id}
+            node={child}
+            onSelect={() => selectElement?.(child.id)}
+            selectElement={selectElement}
+          />
+        ))}
     </CanvasComponent>
   );
 };

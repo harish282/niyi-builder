@@ -26,6 +26,7 @@ export { Canvas } from './canvas/Canvas.js';
 export { CanvasFrame } from './canvas/CanvasFrame.js';
 export { StatusBar } from './status-bar/StatusBar.js';
 export { ElementsPanel } from './panels/ElementsPanel.js';
+export { ElementWizard } from './panels/ElementWizard.js';
 export { PropertiesPanel } from './panels/PropertiesPanel.js';
 export { NavigatorPanel } from './panels/NavigatorPanel.js';
 export { SettingsPanel } from './panels/SettingsPanel.js';
@@ -49,6 +50,7 @@ export {
   type EditorRuntimeConfig,
 } from './serialization/index.js';
 export type { PanelDefinition } from './types/index.js';
+export type { ElementWizardProps } from './types/index.js';
 export type { ThemeMode } from './types/index.js';
 export type { LeftPanelId } from './types/index.js';
 export type { RightPanelId } from './types/index.js';

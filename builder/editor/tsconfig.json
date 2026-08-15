@@ -8,9 +8,15 @@
     "types": ["vite/client"],
     "paths": {
       "@niyi-builder/core": ["../core/src/index.ts"],
-      "@niyi-builder/serializer": ["../serializer/src/index.ts"]
+      "@niyi-builder/serializer": ["../serializer/src/index.ts"],
+      "@niyi-builder/elements": ["../elements/src/index.ts"]
     }
   },
   "include": ["src"],
-  "references": [{ "path": "../core" }, { "path": "../serializer" }, { "path": "../utils" }]
+  "references": [
+    { "path": "../core" },
+    { "path": "../serializer" },
+    { "path": "../utils" },
+    { "path": "../elements" }
+  ]
 }

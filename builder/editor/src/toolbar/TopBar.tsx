@@ -3,7 +3,7 @@ import { useEditorStore } from '../store/EditorStore.js';
 import { getEditorRuntimeConfig, switchToGutenbergEditor } from '../serialization/index.js';
 
 export function TopBar(): ReactElement {
-  const { document } = useEditorStore();
+  const { document, showElements, toggleElements } = useEditorStore();
   const [isSwitching, setIsSwitching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,6 +28,18 @@ export function TopBar(): ReactElement {
   return (
     <header className="flex items-center justify-between flex-shrink-0 min-h-[48px] px-4 py-2 bg-white border-b border-[#c3c4c7]">
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={toggleElements}
+          title={showElements ? 'Hide elements panel' : 'Show elements panel'}
+          className={`px-3 py-1.5 border rounded text-[13px] hover:bg-gray-100 ${
+            showElements
+              ? 'border-[#c3c4c7] bg-[#f6f7f7] text-[#50575e]'
+              : 'border-[#2271b1] bg-[#2271b1] text-white'
+          }`}
+        >
+          +
+        </button>
         <button
           type="button"
           className="px-3 py-1.5 border border-[#c3c4c7] rounded bg-[#f6f7f7] text-[#50575e] text-[13px] hover:bg-gray-100"

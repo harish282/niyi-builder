@@ -1,3 +1,5 @@
+import type { ElementNode } from './ElementNode.js';
+
 export interface ElementDefinition {
   type: string;
   title: string;
@@ -9,4 +11,5 @@ export interface ElementDefinition {
   Canvas?: unknown;
   Properties?: unknown;
   Wizard?: unknown;
+  createChildren?: (attributes: Record<string, unknown>) => ElementNode[];
 }
