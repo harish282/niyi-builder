@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import type { ElementDefinition, ElementNode } from '@niyi-builder/core';
 import { useEditorStore } from '../store/EditorStore.js';
-import { generateId, logger } from '@niyi-builder/core';
+import { compareCategories, formatCategoryLabel, generateId, logger } from '@niyi-builder/core';
 
 const DEFAULT_ICON = (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -60,7 +60,7 @@ export function ElementsPanel(): ReactElement {
     return acc;
   }, new Map());
 
-  const groups = Array.from(grouped.entries()).sort(([a], [b]) => a.localeCompare(b));
+  const groups = Array.from(grouped.entries()).sort(([a], [b]) => compareCategories(a, b));
 
   return (
     <div className="w-64 flex-shrink-0 border-r border-[#c3c4c7] bg-white p-4">
@@ -68,7 +68,7 @@ export function ElementsPanel(): ReactElement {
       {groups.map(([group, items]) => (
         <div key={group} className="mb-4 last:mb-0">
           <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
-            {group}
+            {formatCategoryLabel(group)}
           </h4>
           <div className="space-y-2">
             {items.map((def) => (

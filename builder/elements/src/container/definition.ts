@@ -22,7 +22,7 @@ export interface ContainerLayout {
 export const containerDefinition: ElementDefinition = {
   type: 'container',
   title: 'Container',
-  category: 'Layout',
+  category: 'layout',
   version: '1.0.0',
   icon: ContainerIcon(),
   canHaveChildren: true,

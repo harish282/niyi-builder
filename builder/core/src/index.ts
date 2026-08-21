@@ -1,5 +1,11 @@
 export type { ElementNode } from './types/ElementNode.js';
 export type { ElementDefinition } from './types/ElementDefinition.js';
+export {
+  ELEMENT_CATEGORY_ORDER,
+  categoryRank,
+  compareCategories,
+  formatCategoryLabel,
+} from './types/categories.js';
 export type { BuilderDocument } from './types/index.js';
 export { EventManager } from './events/EventManager.js';
 export { ElementRegistry } from './registry/ElementRegistry.js';
