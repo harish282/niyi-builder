@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import type { ElementNode } from '@niyi-builder/core';
 import { extractBaseAttributes, attributesToInlineStyles, attributesToClassName } from '@niyi-builder/core';
 import { paragraphDefaults } from './defaults.js';
-import { InlineTiptapEditor } from '../shared/InlineTiptapEditor.js';
+import { InlineEditor } from '../shared/InlineEditor.js';
 
 interface ParagraphCanvasProps {
   node: ElementNode;
@@ -32,7 +32,7 @@ export const ParagraphCanvas: FC<ParagraphCanvasProps> = ({ node, onSelect, isSe
         id={base.htmlId || undefined}
         onClick={handleClick}
       >
-        <InlineTiptapEditor
+        <InlineEditor
           content={content}
           onUpdate={(html) => onUpdate({ content: html })}
           isSelected={isSelected}

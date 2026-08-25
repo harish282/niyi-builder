@@ -1,7 +1,7 @@
 import type { FC, HTMLAttributes } from 'react';
 import type { ElementNode } from '@niyi-builder/core';
 import { extractBaseAttributes, attributesToInlineStyles, attributesToClassName } from '@niyi-builder/core';
-import { InlineTiptapEditor } from '../shared/InlineTiptapEditor.js';
+import { InlineEditor } from '../shared/InlineEditor.js';
 
 interface HeadingCanvasProps {
   node: ElementNode;
@@ -52,7 +52,7 @@ export const HeadingCanvas: FC<HeadingCanvasProps> = ({ node, onSelect, isSelect
         id={base.htmlId || undefined}
         onClick={handleClick}
       >
-        <InlineTiptapEditor
+        <InlineEditor
           content={text}
           onUpdate={(html) => onUpdate({ text: html })}
           isSelected={isSelected}
