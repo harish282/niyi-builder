@@ -1,5 +1,7 @@
 export type { ElementNode } from './types/ElementNode.js';
 export type { ElementDefinition } from './types/ElementDefinition.js';
+export type { BaseElementAttributes } from './types/BaseElementAttributes.js';
+export { BASE_ATTRIBUTE_KEYS } from './types/BaseElementAttributes.js';
 export {
   ELEMENT_CATEGORY_ORDER,
   categoryRank,
@@ -16,3 +18,4 @@ export { logger } from './logger.js';
 export type { Logger } from './logger.js';
 export { generateId } from './crypto.js';
 export { createEmptyDocument } from './document/DocumentManager.js';
+export { attributesToInlineStyles, attributesToClassName, extractBaseAttributes } from './styles/attributesToInlineStyles.js';

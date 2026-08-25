@@ -31,6 +31,24 @@ body {
   padding: 2rem;
   box-sizing: border-box;
 }
+
+/* Tiptap editor styles */
+.tiptap {
+  outline: none;
+}
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.tiptap p {
+  margin: 0;
+}
+.tiptap h1, .tiptap h2, .tiptap h3, .tiptap h4, .tiptap h5, .tiptap h6 {
+  margin: 0;
+}
 `;
 
 interface CanvasFrameProps {

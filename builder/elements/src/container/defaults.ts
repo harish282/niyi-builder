@@ -26,4 +26,10 @@ export const gridDefaults = {
   alignItems: 'stretch',
 } as const;
 
-export const containerDefaults = { layout: flexDefaults };
+export const containerDefaults = {
+  // Element-specific
+  layout: flexDefaults,
+
+  // Base attributes
+  padding: '8px',
+};

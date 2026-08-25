@@ -1,10 +1,13 @@
 import type { FC, HTMLAttributes } from 'react';
 import type { ElementNode } from '@niyi-builder/core';
-import { headingDefaults } from './defaults.js';
+import { extractBaseAttributes, attributesToInlineStyles, attributesToClassName } from '@niyi-builder/core';
+import { InlineTiptapEditor } from '../shared/InlineTiptapEditor.js';
 
 interface HeadingCanvasProps {
   node: ElementNode;
   onSelect: () => void;
+  isSelected?: boolean;
+  onUpdate?: (attributes: Record<string, unknown>) => void;
 }
 
 type HeadingTagProps = HTMLAttributes<HTMLHeadingElement>;
@@ -25,19 +28,46 @@ const headingTags: Record<number, FC<HeadingTagProps>> = {
   6: H6,
 };
 
-export const HeadingCanvas: FC<HeadingCanvasProps> = ({ node, onSelect }) => {
-  const text = (node.attributes.text as string) || headingDefaults.text;
+export const HeadingCanvas: FC<HeadingCanvasProps> = ({ node, onSelect, isSelected, onUpdate }) => {
+  const text = (node.attributes.text as string) || 'Heading';
   const level = (node.attributes.level as number) || 2;
 
   const Tag = headingTags[level] || H2;
+  const base = extractBaseAttributes(node.attributes);
+  const style = attributesToInlineStyles(base);
+  const className = attributesToClassName(base);
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isSelected) {
+      onSelect();
+    }
+  };
+
+  if (isSelected && onUpdate) {
+    return (
+      <Tag
+        className={`wp-block-heading ${className}`}
+        style={style}
+        id={base.htmlId || undefined}
+        onClick={handleClick}
+      >
+        <InlineTiptapEditor
+          content={text}
+          onUpdate={(html) => onUpdate({ text: html })}
+          isSelected={isSelected}
+          placeholder="Heading..."
+        />
+      </Tag>
+    );
+  }
 
   return (
     <Tag
-      className="wp-block-heading cursor-pointer hover:outline hover:outline-1 hover:outline-blue-500"
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect();
-      }}
+      className={`wp-block-heading cursor-pointer hover:outline hover:outline-1 hover:outline-blue-500 ${className}`}
+      style={style}
+      id={base.htmlId || undefined}
+      onClick={handleClick}
     >
       {text}
     </Tag>

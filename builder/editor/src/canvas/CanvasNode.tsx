@@ -26,6 +26,7 @@ interface CanvasComponentProps {
   onSelect: () => void;
   selectElement?: (id: string) => void;
   isSelected?: boolean;
+  onUpdate?: (attributes: Record<string, unknown>) => void;
 }
 
 function ChildrenSlot({ node, path, selectElement }: SortableNodeProps): ReactNode {
@@ -73,10 +74,14 @@ export const SortableNode: FC<SortableNodeProps> = ({ node, path, onSelect, sele
 };
 
 export const CanvasNode: FC<CanvasNodeProps> = ({ node, path, onSelect, selectElement }) => {
-  const { selectedElementId } = useEditorStore();
+  const { selectedElementId, updateElement } = useEditorStore();
   const isSelected = selectedElementId === node.id;
   const registry = window.__niyiRegistry;
   const definition = registry?.getElement(node.type);
+
+  const handleUpdate = (attributes: Record<string, unknown>) => {
+    updateElement(node.id, { attributes });
+  };
 
   const childrenSlot = (
     <ChildrenSlot node={node} path={path} onSelect={onSelect} selectElement={selectElement} />
@@ -105,6 +110,7 @@ export const CanvasNode: FC<CanvasNodeProps> = ({ node, path, onSelect, selectEl
       onSelect={onSelect}
       selectElement={selectElement}
       isSelected={isSelected}
+      onUpdate={handleUpdate}
     >
       {childrenSlot}
     </CanvasComponent>

@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import type { ElementNode } from '@niyi-builder/core';
+import { extractBaseAttributes, attributesToInlineStyles, attributesToClassName } from '@niyi-builder/core';
 import { buttonDefaults } from './defaults.js';
 
 interface ButtonCanvasProps {
@@ -7,25 +8,26 @@ interface ButtonCanvasProps {
   onSelect: () => void;
 }
 
-/**
- * Renders the same markup as Gutenberg's core/button block so theme + block
- * library styles apply exactly like the native editor canvas.
- */
 export const ButtonCanvas: FC<ButtonCanvasProps> = ({ node, onSelect }) => {
   const text = (node.attributes.text as string) || buttonDefaults.text;
   const variant = (node.attributes.variant as string) || buttonDefaults.variant;
+  const base = extractBaseAttributes(node.attributes);
+  const style = attributesToInlineStyles(base);
+  const className = attributesToClassName(base);
 
   return (
     <div
       className={`wp-block-button cursor-pointer ${variant === 'secondary' ? 'is-style-outline' : ''}`}
+      id={base.htmlId || undefined}
       onClick={(e) => {
         e.stopPropagation();
         onSelect();
       }}
     >
       <a
-        className="wp-block-button__link wp-element-button"
+        className={`wp-block-button__link wp-element-button ${className}`}
         href="#"
+        style={style}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();

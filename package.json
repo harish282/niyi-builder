@@ -33,6 +33,11 @@
     "@mui/material": "^6.4.3",
     "@mui/styled-engine": "^6.4.3",
     "@niyi-builder/core": "0.0.0",
+    "@tiptap/extension-placeholder": "^3.30.3",
+    "@tiptap/extension-text-align": "^3.30.3",
+    "@tiptap/extension-underline": "^3.30.3",
+    "@tiptap/react": "^3.30.3",
+    "@tiptap/starter-kit": "^3.30.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

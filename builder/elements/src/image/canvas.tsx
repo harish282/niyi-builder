@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import type { ElementNode } from '@niyi-builder/core';
+import { extractBaseAttributes, attributesToInlineStyles, attributesToClassName } from '@niyi-builder/core';
 import { imageDefaults } from './defaults.js';
 
 interface ImageCanvasProps {
@@ -7,17 +8,18 @@ interface ImageCanvasProps {
   onSelect: () => void;
 }
 
-/**
- * Renders the same markup as Gutenberg's core/image block (<figure> wrapper)
- * so theme + block library styles apply exactly like the native editor canvas.
- */
 export const ImageCanvas: FC<ImageCanvasProps> = ({ node, onSelect }) => {
   const url = (node.attributes.url as string) || imageDefaults.url;
   const alt = (node.attributes.alt as string) || imageDefaults.alt;
+  const base = extractBaseAttributes(node.attributes);
+  const style = attributesToInlineStyles(base);
+  const className = attributesToClassName(base);
 
   return (
     <figure
-      className="wp-block-image cursor-pointer"
+      className={`wp-block-image cursor-pointer ${className}`}
+      id={base.htmlId || undefined}
+      style={style}
       onClick={(e) => {
         e.stopPropagation();
         onSelect();
