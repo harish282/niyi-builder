@@ -25,7 +25,7 @@ body {
 }
 .is-root-container {
   width: 100%;
-  max-width: none;
+  max-width: var(--wp--style--global--content-size, 840px);
   min-height: 100vh;
   margin: 0 auto;
   padding: 2rem;
