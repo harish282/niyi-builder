@@ -34,7 +34,10 @@ export const HeadingCanvas: FC<HeadingCanvasProps> = ({ node, onSelect }) => {
   return (
     <Tag
       className="wp-block-heading cursor-pointer hover:outline hover:outline-1 hover:outline-blue-500"
-      onClick={onSelect}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect();
+      }}
     >
       {text}
     </Tag>
