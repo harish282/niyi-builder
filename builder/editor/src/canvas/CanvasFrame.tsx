@@ -1,21 +1,13 @@
-import { useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useRef, type ReactElement, type ReactNode } from 'react';
 import { getEditorRuntimeConfig, type CanvasStyles } from '../serialization/persistence.js';
 
 /**
- * Minimal base styles for the canvas document (mirrors Gutenberg's
- * editor-styles-wrapper so theme/block styles are applied on a clean body).
+ * Minimal base styles for the canvas (mirrors Gutenberg's editor-styles-wrapper
+ * so theme/block styles are applied on a clean surface). Rendered as a scoped
+ * `<style>` tag so admin styles don't leak in.
  */
-const FRAME_RESET_STYLES = `
-html {
-  -webkit-text-size-adjust: 100%;
-}
-html,
-body {
-  margin: 0;
-  padding: 0;
-}
-body {
+const CANVAS_RESET_STYLES = `
+.niyi-canvas-editor {
   background: var(--wp--preset--color--base, #ffffff);
   color: var(--wp--preset--color--contrast, #1d2327);
   font-size: 16px;
@@ -23,7 +15,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
 }
-.is-root-container {
+.niyi-canvas-editor .is-root-container {
   width: 100%;
   max-width: var(--wp--style--global--content-size, 840px);
   min-height: 100vh;
@@ -37,90 +29,73 @@ interface CanvasFrameProps {
   children: ReactNode;
 }
 
-function injectFrameHead(document_: Document, canvasStyles?: CanvasStyles): void {
-  const head = document_.head;
+/**
+ * Injects theme stylesheet links + global-styles HTML into the main document
+ * `<head>` (once) so the canvas preview matches the front-end. Cleanup removes
+ * the injected elements on unmount.
+ */
+function useCanvasStyles(canvasStyles?: CanvasStyles): void {
+  const cleanupRef = useRef<(() => void) | null>(null);
 
-  head.innerHTML = '';
+  useEffect(() => {
+    if (!canvasStyles) return;
 
-  const meta = document_.createElement('meta');
-  meta.setAttribute('charset', 'utf-8');
-  head.appendChild(meta);
+    const head = document.head;
+    const added: Element[] = [];
 
-  const viewport = document_.createElement('meta');
-  viewport.setAttribute('name', 'viewport');
-  viewport.setAttribute('content', 'width=device-width, initial-scale=1');
-  head.appendChild(viewport);
+    for (const link of canvasStyles.links ?? []) {
+      const existing = head.querySelector(`#${CSS.escape(link.id)}`);
+      if (existing) continue;
 
-  for (const link of canvasStyles?.links ?? []) {
-    const element = document_.createElement('link');
-    element.rel = 'stylesheet';
-    element.id = link.id;
-    element.href = link.href;
-    head.appendChild(element);
-  }
+      const el = document.createElement('link');
+      el.rel = 'stylesheet';
+      el.id = link.id;
+      el.href = link.href;
+      head.appendChild(el);
+      added.push(el);
+    }
 
-  if (canvasStyles?.html) {
-    const wrapper = document_.createElement('template');
-    wrapper.innerHTML = canvasStyles.html;
-    head.appendChild(wrapper.content);
-  }
+    if (canvasStyles.html) {
+      const marker = document.createElement('meta');
+      marker.id = 'niyi-canvas-global-styles';
+      marker.setAttribute('data-niyi', '');
+      const template = document.createElement('template');
+      template.innerHTML = canvasStyles.html;
+      const frag = template.content.cloneNode(true);
+      marker.appendChild(frag);
+      head.appendChild(marker);
+      added.push(marker);
+    }
 
-  const reset = document_.createElement('style');
-  reset.id = 'niyi-canvas-reset';
-  reset.textContent = FRAME_RESET_STYLES;
-  head.appendChild(reset);
+    cleanupRef.current = () => {
+      for (const el of added) el.remove();
+    };
+
+    return () => {
+      cleanupRef.current?.();
+      cleanupRef.current = null;
+    };
+  }, [canvasStyles]);
 }
 
 /**
- * Renders the document tree inside a same-origin iframe (like the native
- * Gutenberg canvas) and injects block-library + theme + global styles into it,
- * so the preview matches the front-end instead of the admin UI.
+ * Renders the document tree inside a styled `<div>` (not an iframe) so that
+ * native DOM events — including those used by dnd-kit — bubble through the
+ * same document. Theme + block styles are injected into `<head>` and a scoped
+ * reset isolates the canvas from WordPress admin styles.
  */
 export function CanvasFrame({ children }: CanvasFrameProps): ReactElement {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [frameDocument, setFrameDocument] = useState<Document | null>(null);
-
   const config = getEditorRuntimeConfig();
   const canvasStyles = config?.canvasStyles;
 
-  useEffect(() => {
-    const frame = iframeRef.current;
-
-    if (!frame) {
-      return;
-    }
-
-    const document_ = frame.contentDocument;
-
-    if (!document_) {
-      return;
-    }
-
-    document_.open();
-    document_.write(
-      '<!DOCTYPE html><html><head></head><body class="editor-styles-wrapper"></body></html>',
-    );
-    document_.close();
-
-    setFrameDocument(document_);
-  }, []);
-
-  useEffect(() => {
-    if (frameDocument) {
-      injectFrameHead(frameDocument, canvasStyles);
-    }
-  }, [frameDocument, canvasStyles]);
+  useCanvasStyles(canvasStyles);
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-white">
-      <iframe
-        ref={iframeRef}
-        title="Niyi Builder canvas"
-        sandbox="allow-same-origin"
-        className="w-full h-full min-h-[400px] border-0 block"
-      />
-      {frameDocument !== null &&
-        createPortal(<div className="is-root-container">{children}</div>, frameDocument.body)}
+      <style dangerouslySetInnerHTML={{ __html: CANVAS_RESET_STYLES }} />
+      <div className="niyi-canvas-editor editor-styles-wrapper">
+        <div className="is-root-container">{children}</div>
+      </div>
     </div>
   );
 }
