@@ -26,6 +26,7 @@ interface CanvasComponentProps {
   onSelect: () => void;
   selectElement?: (id: string) => void;
   isSelected?: boolean;
+  onUpdate?: (attributes: Record<string, unknown>) => void;
 }
 
 function ChildrenSlot({ node, path, selectElement }: SortableNodeProps): ReactNode {
@@ -58,33 +59,14 @@ export const SortableNode: FC<SortableNodeProps> = ({ node, path, onSelect, sele
 
   const style: CSSProperties = {
     position: 'relative',
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     transition,
     opacity: isDragging ? 0.6 : 1,
-  };
-
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    listeners?.onPointerDown?.(e);
-  };
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    listeners?.onTouchStart?.(e);
-  };
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    listeners?.onKeyDown?.(e);
+    touchAction: 'none',
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      onPointerDown={handlePointerDown}
-      onTouchStart={handleTouchStart}
-      onKeyDown={handleKeyDown}
-    >
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <CanvasNode node={node} path={path} onSelect={onSelect} selectElement={selectElement} />
       {isSelected && <ElementNavigator path={path} onSelect={(id) => storeSelectElement(id)} />}
     </div>
@@ -92,10 +74,14 @@ export const SortableNode: FC<SortableNodeProps> = ({ node, path, onSelect, sele
 };
 
 export const CanvasNode: FC<CanvasNodeProps> = ({ node, path, onSelect, selectElement }) => {
-  const { selectedElementId } = useEditorStore();
+  const { selectedElementId, updateElement } = useEditorStore();
   const isSelected = selectedElementId === node.id;
   const registry = window.__niyiRegistry;
   const definition = registry?.getElement(node.type);
+
+  const handleUpdate = (attributes: Record<string, unknown>) => {
+    updateElement(node.id, { attributes });
+  };
 
   const childrenSlot = (
     <ChildrenSlot node={node} path={path} onSelect={onSelect} selectElement={selectElement} />
@@ -124,6 +110,7 @@ export const CanvasNode: FC<CanvasNodeProps> = ({ node, path, onSelect, selectEl
       onSelect={onSelect}
       selectElement={selectElement}
       isSelected={isSelected}
+      onUpdate={handleUpdate}
     >
       {childrenSlot}
     </CanvasComponent>

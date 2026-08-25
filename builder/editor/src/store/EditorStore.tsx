@@ -272,9 +272,6 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       } else {
         newParentId = targetPos.parentId;
         insertIndex = targetPos.index;
-        if (activePos.parentId === newParentId && activePos.index < insertIndex) {
-          insertIndex -= 1;
-        }
       }
 
       const withoutElement = removeFromTree(prev.elements, elementId);

@@ -4,10 +4,10 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  pointerWithin,
+  closestCenter,
   type DragEndEvent,
 } from '@dnd-kit/core';
-import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CanvasFrame } from './CanvasFrame.js';
 import { SortableNode } from './CanvasNode.js';
 import { useEditorStore } from '../store/EditorStore.js';
@@ -29,7 +29,7 @@ export const CanvasRenderer: FC = () => {
 
   return (
     <CanvasFrame>
-      <DndContext sensors={sensors} collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div className="min-h-screen" onClick={handleBackgroundClick}>
           {document.elements.length === 0 ? (
             <div className="text-gray-400 text-center py-8">
@@ -38,7 +38,7 @@ export const CanvasRenderer: FC = () => {
           ) : (
             <SortableContext
               items={document.elements.map((n) => n.id)}
-              strategy={rectSortingStrategy}
+              strategy={verticalListSortingStrategy}
             >
               <div className="flex flex-col gap-4">
                 {document.elements.map((node) => (

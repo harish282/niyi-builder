@@ -23,6 +23,13 @@ const CANVAS_RESET_STYLES = `
   padding: 2rem;
   box-sizing: border-box;
 }
+
+/* Placeholder styles for inline editors */
+[contenteditable]:empty::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  pointer-events: none;
+}
 `;
 
 interface CanvasFrameProps {

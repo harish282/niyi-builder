@@ -1,5 +1,6 @@
 import type { FC, CSSProperties, ReactNode } from 'react';
 import type { ElementNode } from '@niyi-builder/core';
+import { extractBaseAttributes, attributesToInlineStyles, attributesToClassName } from '@niyi-builder/core';
 import { GAP_SIZES, containerDefaults } from './defaults.js';
 import type { ContainerLayout } from './definition.js';
 
@@ -22,8 +23,12 @@ export const ContainerCanvas: FC<ContainerCanvasProps> = ({
   const gap = GAP_SIZES[layout.gap || 'md'];
   const selector = `[data-niyi-c="${node.id}"]`;
 
+  const base = extractBaseAttributes(node.attributes);
+  const baseStyle = attributesToInlineStyles(base);
+  const className = attributesToClassName(base);
+
   const containerStyle: CSSProperties = {
-    padding: '8px',
+    ...baseStyle,
     border: isSelected ? '2px solid #007cba' : '1px dashed #ccc',
     minHeight: '60px',
   };
@@ -94,8 +99,9 @@ export const ContainerCanvas: FC<ContainerCanvasProps> = ({
 
   return (
     <div
-      className="wp-block-group niyi-container cursor-pointer"
+      className={`wp-block-group niyi-container cursor-pointer ${className}`}
       data-niyi-c={node.id}
+      id={base.htmlId || undefined}
       style={containerStyle}
       onClick={(e) => {
         e.stopPropagation();
