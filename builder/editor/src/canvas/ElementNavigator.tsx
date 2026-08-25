@@ -9,7 +9,7 @@ interface ElementNavigatorProps {
 export function ElementNavigator({ path, onSelect }: ElementNavigatorProps): ReactElement {
   return (
     <div
-      className="absolute bottom-0 left-0 right-0 z-10 flex items-center gap-1.5 bg-[#1d2327] text-white text-[11px] leading-none px-2 py-1 rounded-t"
+      className="relative z-10 flex items-center gap-1.5 bg-[#1d2327] text-white text-[11px] leading-none px-2 py-1 rounded-b -mt-px"
       onClick={(e) => e.stopPropagation()}
     >
       <span className="opacity-50 select-none cursor-grab" title="Drag to move">
