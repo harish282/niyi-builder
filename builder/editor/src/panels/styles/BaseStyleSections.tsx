@@ -1,17 +1,27 @@
-import type { BaseElementAttributes } from '@niyi-builder/core';
+import type { ChangeEvent, ReactNode } from 'react';
+import type { BaseElementAttributes, Breakpoint, ResponsiveValue } from '@niyi-builder/core';
+import {
+  hasBreakpointValue,
+  readResponsiveValue,
+  resolveResponsiveValue,
+  setResponsiveValue,
+} from '@niyi-builder/core';
 
-interface StyleSectionProps {
+export interface StyleSectionProps {
   attributes: BaseElementAttributes;
-  onUpdate: (attrs: Partial<BaseElementAttributes>) => void;
+  device: Breakpoint;
+  onUpdate: (attrs: Record<string, unknown>) => void;
 }
 
 interface FieldProps {
   label: string;
   value?: string;
   onChange: (value: string) => void;
-  type?: 'text' | 'select' | 'color';
+  type?: 'text' | 'select' | 'color' | 'textarea';
   options?: { value: string; label: string }[];
   placeholder?: string;
+  rows?: number;
+  overridden?: boolean;
 }
 
 const FONT_FAMILIES = [
@@ -56,6 +66,13 @@ const FONT_WEIGHTS = [
   { value: '900', label: 'Black (900)' },
 ];
 
+const FONT_STYLES = [
+  { value: '', label: 'Default' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'italic', label: 'Italic' },
+  { value: 'oblique', label: 'Oblique' },
+];
+
 const TEXT_ALIGN_OPTIONS = [
   { value: '', label: 'Default' },
   { value: 'left', label: 'Left' },
@@ -80,14 +97,113 @@ const TEXT_TRANSFORM_OPTIONS = [
   { value: 'lowercase', label: 'Lowercase' },
 ];
 
-function Field({ label, value, onChange, type = 'select', options, placeholder }: FieldProps) {
+const BACKGROUND_SIZE_OPTIONS = [
+  { value: '', label: 'Default' },
+  { value: 'auto', label: 'Auto' },
+  { value: 'cover', label: 'Cover' },
+  { value: 'contain', label: 'Contain' },
+  { value: '100% 100%', label: 'Stretch' },
+];
+
+const BACKGROUND_POSITION_OPTIONS = [
+  { value: '', label: 'Default' },
+  { value: 'center center', label: 'Center' },
+  { value: 'top center', label: 'Top' },
+  { value: 'bottom center', label: 'Bottom' },
+  { value: 'center left', label: 'Left' },
+  { value: 'center right', label: 'Right' },
+];
+
+const BACKGROUND_REPEAT_OPTIONS = [
+  { value: '', label: 'Default' },
+  { value: 'no-repeat', label: 'No Repeat' },
+  { value: 'repeat', label: 'Repeat' },
+  { value: 'repeat-x', label: 'Repeat X' },
+  { value: 'repeat-y', label: 'Repeat Y' },
+];
+
+const BACKGROUND_ATTACHMENT_OPTIONS = [
+  { value: '', label: 'Default' },
+  { value: 'scroll', label: 'Scroll' },
+  { value: 'fixed', label: 'Fixed' },
+];
+
+const BORDER_STYLE_OPTIONS = [
+  { value: '', label: 'None' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'dashed', label: 'Dashed' },
+  { value: 'dotted', label: 'Dotted' },
+  { value: 'double', label: 'Double' },
+  { value: 'groove', label: 'Groove' },
+  { value: 'ridge', label: 'Ridge' },
+];
+
+const OVERFLOW_OPTIONS = [
+  { value: '', label: 'Default' },
+  { value: 'visible', label: 'Visible' },
+  { value: 'hidden', label: 'Hidden' },
+  { value: 'scroll', label: 'Scroll' },
+  { value: 'auto', label: 'Auto' },
+];
+
+const POSITION_OPTIONS = [
+  { value: '', label: 'Default' },
+  { value: 'static', label: 'Static' },
+  { value: 'relative', label: 'Relative' },
+  { value: 'absolute', label: 'Absolute' },
+  { value: 'fixed', label: 'Fixed' },
+  { value: 'sticky', label: 'Sticky' },
+];
+
+const TIMING_OPTIONS = [
+  { value: '', label: 'Default' },
+  { value: 'linear', label: 'Linear' },
+  { value: 'ease', label: 'Ease' },
+  { value: 'ease-in', label: 'Ease In' },
+  { value: 'ease-out', label: 'Ease Out' },
+  { value: 'ease-in-out', label: 'Ease In Out' },
+];
+
+const ANIMATION_OPTIONS = [
+  { value: '', label: 'None' },
+  { value: 'niyi-fade-in', label: 'Fade In' },
+  { value: 'niyi-fade-up', label: 'Fade Up' },
+  { value: 'niyi-fade-down', label: 'Fade Down' },
+  { value: 'niyi-fade-left', label: 'Fade Left' },
+  { value: 'niyi-fade-right', label: 'Fade Right' },
+  { value: 'niyi-zoom-in', label: 'Zoom In' },
+  { value: 'niyi-zoom-out', label: 'Zoom Out' },
+];
+
+function Field({
+  label,
+  value,
+  onChange,
+  type = 'text',
+  options,
+  placeholder,
+  rows = 3,
+  overridden,
+}: FieldProps) {
+  const labelNode = (
+    <label className="text-[11px] text-gray-500 w-16 shrink-0 flex items-center gap-1">
+      <span>{label}</span>
+      {overridden ? (
+        <span
+          className="inline-block w-1.5 h-1.5 rounded-full bg-[#2271b1]"
+          title="Overridden for this breakpoint"
+        />
+      ) : null}
+    </label>
+  );
+
   if (type === 'select' && options) {
     return (
       <div className="flex items-center gap-2">
-        <label className="text-[11px] text-gray-500 w-16 shrink-0">{label}</label>
+        {labelNode}
         <select
           value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLSelectElement>) => onChange(e.target.value)}
           className="flex-1 border border-[#c3c4c7] rounded px-2 py-1 text-[12px] bg-white"
         >
           {options.map((opt) => (
@@ -101,13 +217,15 @@ function Field({ label, value, onChange, type = 'select', options, placeholder }
   }
 
   if (type === 'color') {
+    const colorValue = value && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value) ? value : '#000000';
+
     return (
       <div className="flex items-center gap-2">
-        <label className="text-[11px] text-gray-500 w-16 shrink-0">{label}</label>
+        {labelNode}
         <div className="flex items-center gap-1 flex-1">
           <input
             type="color"
-            value={value || '#000000'}
+            value={colorValue}
             onChange={(e) => onChange(e.target.value)}
             className="w-6 h-6 border border-[#c3c4c7] rounded cursor-pointer p-0"
           />
@@ -123,9 +241,24 @@ function Field({ label, value, onChange, type = 'select', options, placeholder }
     );
   }
 
+  if (type === 'textarea') {
+    return (
+      <div className="flex items-start gap-2">
+        {labelNode}
+        <textarea
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          rows={rows}
+          className="flex-1 border border-[#c3c4c7] rounded px-2 py-1 text-[12px] font-mono resize-y"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center gap-2">
-      <label className="text-[11px] text-gray-500 w-16 shrink-0">{label}</label>
+      {labelNode}
       <input
         type="text"
         value={value || ''}
@@ -137,6 +270,47 @@ function Field({ label, value, onChange, type = 'select', options, placeholder }
   );
 }
 
+interface ResponsiveFieldProps extends Omit<FieldProps, 'value' | 'onChange' | 'overridden'> {
+  attribute: keyof BaseElementAttributes;
+  attributes: BaseElementAttributes;
+  device: Breakpoint;
+  onUpdate: (attrs: Record<string, unknown>) => void;
+}
+
+/**
+ * Reads the value for the active breakpoint (no cascade for the input value),
+ * shows the inherited value as a placeholder, and writes a responsive value.
+ */
+function ResponsiveField({
+  attribute,
+  attributes,
+  device,
+  onUpdate,
+  ...fieldProps
+}: ResponsiveFieldProps) {
+  const raw = attributes[attribute] as ResponsiveValue<string> | undefined;
+  const direct = readResponsiveValue<string>(raw, device) ?? '';
+  const resolved = resolveResponsiveValue<string>(raw, device);
+  const overridden = device !== 'desktop' && hasBreakpointValue(raw, device);
+  const placeholder =
+    fieldProps.placeholder ?? (resolved && resolved !== direct ? `Inherited: ${resolved}` : 'auto');
+
+  const handleChange = (value: string) => {
+    const next = setResponsiveValue<string>(raw, device, value === '' ? undefined : value);
+    onUpdate({ [attribute]: next });
+  };
+
+  return (
+    <Field
+      {...fieldProps}
+      value={direct}
+      onChange={handleChange}
+      placeholder={placeholder}
+      overridden={overridden}
+    />
+  );
+}
+
 export function CollapsibleSection({
   title,
   defaultOpen = false,
@@ -144,7 +318,7 @@ export function CollapsibleSection({
 }: {
   title: string;
   defaultOpen?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <details open={defaultOpen} className="border-b border-[#e0e0e0]">
@@ -156,162 +330,885 @@ export function CollapsibleSection({
   );
 }
 
-export function TypographySection({ attributes, onUpdate }: StyleSectionProps) {
+export function TypographySection({ attributes, device, onUpdate }: StyleSectionProps) {
   return (
     <CollapsibleSection title="Typography" defaultOpen>
-      <Field
+      <ResponsiveField
         label="Font"
-        value={attributes.fontFamily}
-        onChange={(v) => onUpdate({ fontFamily: v || undefined })}
+        attribute="fontFamily"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
         options={FONT_FAMILIES}
+        type="select"
       />
-      <Field
+      <ResponsiveField
         label="Size"
-        value={attributes.fontSize}
-        onChange={(v) => onUpdate({ fontSize: v || undefined })}
+        attribute="fontSize"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
         options={FONT_SIZES}
+        type="select"
       />
-      <Field
+      <ResponsiveField
         label="Weight"
-        value={attributes.fontWeight}
-        onChange={(v) => onUpdate({ fontWeight: v || undefined })}
+        attribute="fontWeight"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
         options={FONT_WEIGHTS}
+        type="select"
       />
-      <Field
+      <ResponsiveField
+        label="Style"
+        attribute="fontStyle"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={FONT_STYLES}
+        type="select"
+      />
+      <ResponsiveField
         label="Align"
-        value={attributes.textAlign}
-        onChange={(v) => onUpdate({ textAlign: v as BaseElementAttributes['textAlign'] || undefined })}
+        attribute="textAlign"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
         options={TEXT_ALIGN_OPTIONS}
+        type="select"
       />
-      <Field
+      <ResponsiveField
         label="Line H."
-        value={attributes.lineHeight}
-        onChange={(v) => onUpdate({ lineHeight: v || undefined })}
+        attribute="lineHeight"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
         placeholder="e.g. 1.5"
       />
-      <Field
+      <ResponsiveField
         label="Spacing"
-        value={attributes.letterSpacing}
-        onChange={(v) => onUpdate({ letterSpacing: v || undefined })}
+        attribute="letterSpacing"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
         placeholder="e.g. 0.5px"
       />
-      <Field
-        label="Decor."
-        value={attributes.textDecoration}
-        onChange={(v) => onUpdate({ textDecoration: v as BaseElementAttributes['textDecoration'] || undefined })}
-        options={TEXT_DECORATION_OPTIONS}
+      <ResponsiveField
+        label="Word Sp."
+        attribute="wordSpacing"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="e.g. 2px"
       />
-      <Field
+      <ResponsiveField
+        label="Indent"
+        attribute="textIndent"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="e.g. 2em"
+      />
+      <ResponsiveField
+        label="Decor."
+        attribute="textDecoration"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={TEXT_DECORATION_OPTIONS}
+        type="select"
+      />
+      <ResponsiveField
         label="Transform"
-        value={attributes.textTransform}
-        onChange={(v) => onUpdate({ textTransform: v as BaseElementAttributes['textTransform'] || undefined })}
+        attribute="textTransform"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
         options={TEXT_TRANSFORM_OPTIONS}
+        type="select"
+      />
+      <ResponsiveField
+        label="Shadow"
+        attribute="textShadow"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="0 1px 2px rgba(0,0,0,.2)"
       />
     </CollapsibleSection>
   );
 }
 
-export function ColorsSection({ attributes, onUpdate }: StyleSectionProps) {
+export function ColorsSection({ attributes, device, onUpdate }: StyleSectionProps) {
   return (
-    <CollapsibleSection title="Colors">
-      <Field
+    <CollapsibleSection title="Content Colors">
+      <ResponsiveField
         label="Text"
-        value={attributes.textColor}
-        onChange={(v) => onUpdate({ textColor: v || undefined })}
+        attribute="textColor"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
         type="color"
         placeholder="#000000"
       />
-      <Field
-        label="Background"
-        value={attributes.bgColor}
-        onChange={(v) => onUpdate({ bgColor: v || undefined })}
+      <ResponsiveField
+        label="Link"
+        attribute="linkColor"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
         type="color"
-        placeholder="transparent"
+        placeholder="#2271b1"
+      />
+      <ResponsiveField
+        label="Link Hover"
+        attribute="linkHoverColor"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        type="color"
+        placeholder="#135e96"
       />
     </CollapsibleSection>
   );
 }
 
-export function SpacingSection({ attributes, onUpdate }: StyleSectionProps) {
+export function BackgroundSection({ attributes, device, onUpdate }: StyleSectionProps) {
+  return (
+    <CollapsibleSection title="Background">
+      <ResponsiveField
+        label="Color"
+        attribute="bgColor"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        type="color"
+        placeholder="transparent"
+      />
+      <ResponsiveField
+        label="Gradient"
+        attribute="backgroundGradient"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="linear-gradient(…)"
+      />
+      <ResponsiveField
+        label="Image URL"
+        attribute="backgroundImage"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="https://…"
+      />
+      <ResponsiveField
+        label="Size"
+        attribute="backgroundSize"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={BACKGROUND_SIZE_OPTIONS}
+        type="select"
+      />
+      <ResponsiveField
+        label="Position"
+        attribute="backgroundPosition"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={BACKGROUND_POSITION_OPTIONS}
+        type="select"
+      />
+      <ResponsiveField
+        label="Repeat"
+        attribute="backgroundRepeat"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={BACKGROUND_REPEAT_OPTIONS}
+        type="select"
+      />
+      <ResponsiveField
+        label="Attachment"
+        attribute="backgroundAttachment"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={BACKGROUND_ATTACHMENT_OPTIONS}
+        type="select"
+      />
+      <ResponsiveField
+        label="Overlay"
+        attribute="backgroundOverlayColor"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        type="color"
+        placeholder="#000000"
+      />
+      <ResponsiveField
+        label="Overlay Op."
+        attribute="backgroundOverlayOpacity"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="0.5"
+      />
+    </CollapsibleSection>
+  );
+}
+
+export function SpacingSection({ attributes, device, onUpdate }: StyleSectionProps) {
   return (
     <CollapsibleSection title="Spacing">
       <div className="space-y-1">
         <div className="text-[10px] text-gray-400 uppercase tracking-wide">Margin</div>
         <div className="grid grid-cols-2 gap-1">
-          <Field label="Top" value={attributes.marginTop} onChange={(v) => onUpdate({ marginTop: v || undefined })} placeholder="0" />
-          <Field label="Right" value={attributes.marginRight} onChange={(v) => onUpdate({ marginRight: v || undefined })} placeholder="0" />
-          <Field label="Bottom" value={attributes.marginBottom} onChange={(v) => onUpdate({ marginBottom: v || undefined })} placeholder="0" />
-          <Field label="Left" value={attributes.marginLeft} onChange={(v) => onUpdate({ marginLeft: v || undefined })} placeholder="0" />
+          <ResponsiveField
+            label="Top"
+            attribute="marginTop"
+            attributes={attributes}
+            device={device}
+            onUpdate={onUpdate}
+            placeholder="0"
+          />
+          <ResponsiveField
+            label="Right"
+            attribute="marginRight"
+            attributes={attributes}
+            device={device}
+            onUpdate={onUpdate}
+            placeholder="0"
+          />
+          <ResponsiveField
+            label="Bottom"
+            attribute="marginBottom"
+            attributes={attributes}
+            device={device}
+            onUpdate={onUpdate}
+            placeholder="0"
+          />
+          <ResponsiveField
+            label="Left"
+            attribute="marginLeft"
+            attributes={attributes}
+            device={device}
+            onUpdate={onUpdate}
+            placeholder="0"
+          />
         </div>
       </div>
       <div className="space-y-1">
         <div className="text-[10px] text-gray-400 uppercase tracking-wide">Padding</div>
         <div className="grid grid-cols-2 gap-1">
-          <Field label="Top" value={attributes.paddingTop} onChange={(v) => onUpdate({ paddingTop: v || undefined })} placeholder="0" />
-          <Field label="Right" value={attributes.paddingRight} onChange={(v) => onUpdate({ paddingRight: v || undefined })} placeholder="0" />
-          <Field label="Bottom" value={attributes.paddingBottom} onChange={(v) => onUpdate({ paddingBottom: v || undefined })} placeholder="0" />
-          <Field label="Left" value={attributes.paddingLeft} onChange={(v) => onUpdate({ paddingLeft: v || undefined })} placeholder="0" />
+          <ResponsiveField
+            label="Top"
+            attribute="paddingTop"
+            attributes={attributes}
+            device={device}
+            onUpdate={onUpdate}
+            placeholder="0"
+          />
+          <ResponsiveField
+            label="Right"
+            attribute="paddingRight"
+            attributes={attributes}
+            device={device}
+            onUpdate={onUpdate}
+            placeholder="0"
+          />
+          <ResponsiveField
+            label="Bottom"
+            attribute="paddingBottom"
+            attributes={attributes}
+            device={device}
+            onUpdate={onUpdate}
+            placeholder="0"
+          />
+          <ResponsiveField
+            label="Left"
+            attribute="paddingLeft"
+            attributes={attributes}
+            device={device}
+            onUpdate={onUpdate}
+            placeholder="0"
+          />
         </div>
       </div>
     </CollapsibleSection>
   );
 }
 
-export function DimensionsSection({ attributes, onUpdate }: StyleSectionProps) {
+export function DimensionsSection({ attributes, device, onUpdate }: StyleSectionProps) {
   return (
     <CollapsibleSection title="Dimensions">
-      <Field label="Width" value={attributes.width} onChange={(v) => onUpdate({ width: v || undefined })} placeholder="auto" />
-      <Field label="Height" value={attributes.height} onChange={(v) => onUpdate({ height: v || undefined })} placeholder="auto" />
-      <Field label="Min W" value={attributes.minWidth} onChange={(v) => onUpdate({ minWidth: v || undefined })} placeholder="auto" />
-      <Field label="Min H" value={attributes.minHeight} onChange={(v) => onUpdate({ minHeight: v || undefined })} placeholder="auto" />
-      <Field label="Max W" value={attributes.maxWidth} onChange={(v) => onUpdate({ maxWidth: v || undefined })} placeholder="auto" />
-      <Field label="Max H" value={attributes.maxHeight} onChange={(v) => onUpdate({ maxHeight: v || undefined })} placeholder="auto" />
+      <ResponsiveField
+        label="Width"
+        attribute="width"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="auto"
+      />
+      <ResponsiveField
+        label="Height"
+        attribute="height"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="auto"
+      />
+      <ResponsiveField
+        label="Min W"
+        attribute="minWidth"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="auto"
+      />
+      <ResponsiveField
+        label="Min H"
+        attribute="minHeight"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="auto"
+      />
+      <ResponsiveField
+        label="Max W"
+        attribute="maxWidth"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="auto"
+      />
+      <ResponsiveField
+        label="Max H"
+        attribute="maxHeight"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="auto"
+      />
+      <ResponsiveField
+        label="Overflow"
+        attribute="overflow"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={OVERFLOW_OPTIONS}
+        type="select"
+      />
     </CollapsibleSection>
   );
 }
 
-export function BorderSection({ attributes, onUpdate }: StyleSectionProps) {
+export function BorderSection({ attributes, device, onUpdate }: StyleSectionProps) {
   return (
     <CollapsibleSection title="Border">
-      <Field
+      <ResponsiveField
         label="Style"
-        value={attributes.borderStyle}
-        onChange={(v) => onUpdate({ borderStyle: v as BaseElementAttributes['borderStyle'] || undefined })}
-        options={[
-          { value: '', label: 'None' },
-          { value: 'solid', label: 'Solid' },
-          { value: 'dashed', label: 'Dashed' },
-          { value: 'dotted', label: 'Dotted' },
-          { value: 'double', label: 'Double' },
-        ]}
+        attribute="borderStyle"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={BORDER_STYLE_OPTIONS}
+        type="select"
       />
-      <Field label="Width" value={attributes.borderWidth} onChange={(v) => onUpdate({ borderWidth: v || undefined })} placeholder="1px" />
-      <Field
+      <ResponsiveField
+        label="Width"
+        attribute="borderWidth"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="1px"
+      />
+      <ResponsiveField
         label="Color"
-        value={attributes.borderColor}
-        onChange={(v) => onUpdate({ borderColor: v || undefined })}
+        attribute="borderColor"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
         type="color"
         placeholder="#000000"
       />
-      <Field label="Radius" value={attributes.borderRadius} onChange={(v) => onUpdate({ borderRadius: v || undefined })} placeholder="0" />
+      <ResponsiveField
+        label="Radius"
+        attribute="borderRadius"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="0"
+      />
+      <div className="text-[10px] text-gray-400 uppercase tracking-wide pt-1">Corner Radius</div>
+      <div className="grid grid-cols-2 gap-1">
+        <ResponsiveField
+          label="TL"
+          attribute="borderTopLeftRadius"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0"
+        />
+        <ResponsiveField
+          label="TR"
+          attribute="borderTopRightRadius"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0"
+        />
+        <ResponsiveField
+          label="BR"
+          attribute="borderBottomRightRadius"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0"
+        />
+        <ResponsiveField
+          label="BL"
+          attribute="borderBottomLeftRadius"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0"
+        />
+      </div>
     </CollapsibleSection>
   );
 }
 
-export function EffectsSection({ attributes, onUpdate }: StyleSectionProps) {
+export function EffectsSection({ attributes, device, onUpdate }: StyleSectionProps) {
   return (
     <CollapsibleSection title="Effects">
-      <Field label="Opacity" value={attributes.opacity} onChange={(v) => onUpdate({ opacity: v || undefined })} placeholder="1" />
-      <Field label="Shadow" value={attributes.boxShadow} onChange={(v) => onUpdate({ boxShadow: v || undefined })} placeholder="0 2px 4px rgba(0,0,0,0.1)" />
+      <ResponsiveField
+        label="Opacity"
+        attribute="opacity"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="1"
+      />
+      <ResponsiveField
+        label="Shadow"
+        attribute="boxShadow"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="0 2px 4px rgba(0,0,0,0.1)"
+      />
+      <ResponsiveField
+        label="Blend"
+        attribute="mixBlendMode"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="normal"
+      />
+      <div className="text-[10px] text-gray-400 uppercase tracking-wide pt-1">Filters</div>
+      <div className="grid grid-cols-2 gap-1">
+        <ResponsiveField
+          label="Blur"
+          attribute="filterBlur"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0"
+        />
+        <ResponsiveField
+          label="Bright"
+          attribute="filterBrightness"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="100%"
+        />
+        <ResponsiveField
+          label="Contrast"
+          attribute="filterContrast"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="100%"
+        />
+        <ResponsiveField
+          label="Saturate"
+          attribute="filterSaturate"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="100%"
+        />
+        <ResponsiveField
+          label="Hue"
+          attribute="filterHueRotate"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0deg"
+        />
+        <ResponsiveField
+          label="Invert"
+          attribute="filterInvert"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0%"
+        />
+        <ResponsiveField
+          label="Sepia"
+          attribute="filterSepia"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0%"
+        />
+      </div>
     </CollapsibleSection>
   );
 }
 
-export function AdvancedSection({ attributes, onUpdate }: StyleSectionProps) {
+export function TransformSection({ attributes, device, onUpdate }: StyleSectionProps) {
+  return (
+    <CollapsibleSection title="Transform">
+      <div className="grid grid-cols-2 gap-1">
+        <ResponsiveField
+          label="Move X"
+          attribute="transformTranslateX"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0px"
+        />
+        <ResponsiveField
+          label="Move Y"
+          attribute="transformTranslateY"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0px"
+        />
+        <ResponsiveField
+          label="Scale"
+          attribute="transformScale"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="1"
+        />
+        <ResponsiveField
+          label="Rotate"
+          attribute="transformRotate"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0deg"
+        />
+        <ResponsiveField
+          label="Skew X"
+          attribute="transformSkewX"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0deg"
+        />
+        <ResponsiveField
+          label="Skew Y"
+          attribute="transformSkewY"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0deg"
+        />
+      </div>
+      <ResponsiveField
+        label="Origin"
+        attribute="transformOrigin"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="center center"
+      />
+    </CollapsibleSection>
+  );
+}
+
+export function TransitionSection({ attributes, device, onUpdate }: StyleSectionProps) {
+  return (
+    <CollapsibleSection title="Transition">
+      <ResponsiveField
+        label="Property"
+        attribute="transitionProperty"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="all"
+      />
+      <ResponsiveField
+        label="Duration"
+        attribute="transitionDuration"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="0.3s"
+      />
+      <ResponsiveField
+        label="Delay"
+        attribute="transitionDelay"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="0s"
+      />
+      <ResponsiveField
+        label="Timing"
+        attribute="transitionTimingFunction"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={TIMING_OPTIONS}
+        type="select"
+      />
+    </CollapsibleSection>
+  );
+}
+
+export function PositionSection({ attributes, device, onUpdate }: StyleSectionProps) {
+  return (
+    <CollapsibleSection title="Position">
+      <ResponsiveField
+        label="Position"
+        attribute="position"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={POSITION_OPTIONS}
+        type="select"
+      />
+      <div className="grid grid-cols-2 gap-1">
+        <ResponsiveField
+          label="Top"
+          attribute="positionTop"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="auto"
+        />
+        <ResponsiveField
+          label="Right"
+          attribute="positionRight"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="auto"
+        />
+        <ResponsiveField
+          label="Bottom"
+          attribute="positionBottom"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="auto"
+        />
+        <ResponsiveField
+          label="Left"
+          attribute="positionLeft"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="auto"
+        />
+      </div>
+      <ResponsiveField
+        label="Z-Index"
+        attribute="zIndex"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="auto"
+      />
+    </CollapsibleSection>
+  );
+}
+
+export function AnimationSection({ attributes, device, onUpdate }: StyleSectionProps) {
+  return (
+    <CollapsibleSection title="Animation">
+      <ResponsiveField
+        label="Effect"
+        attribute="animationName"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={ANIMATION_OPTIONS}
+        type="select"
+      />
+      <div className="grid grid-cols-2 gap-1">
+        <ResponsiveField
+          label="Duration"
+          attribute="animationDuration"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0.6s"
+        />
+        <ResponsiveField
+          label="Delay"
+          attribute="animationDelay"
+          attributes={attributes}
+          device={device}
+          onUpdate={onUpdate}
+          placeholder="0s"
+        />
+      </div>
+      <ResponsiveField
+        label="Timing"
+        attribute="animationTimingFunction"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        options={TIMING_OPTIONS}
+        type="select"
+      />
+      <ResponsiveField
+        label="Repeat"
+        attribute="animationIterationCount"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="1"
+      />
+    </CollapsibleSection>
+  );
+}
+
+export function LinkSection({ attributes, device, onUpdate }: StyleSectionProps) {
+  return (
+    <CollapsibleSection title="Link">
+      <Field
+        label="URL"
+        value={attributes.linkUrl}
+        onChange={(v) => onUpdate({ linkUrl: v || undefined })}
+        placeholder="https://…"
+      />
+      <div className="flex items-center gap-2">
+        <label className="text-[11px] text-gray-500 w-16 shrink-0">Target</label>
+        <select
+          value={attributes.linkTarget || '_self'}
+          onChange={(e) => onUpdate({ linkTarget: e.target.value })}
+          className="flex-1 border border-[#c3c4c7] rounded px-2 py-1 text-[12px] bg-white"
+        >
+          <option value="_self">Same tab</option>
+          <option value="_blank">New tab</option>
+        </select>
+      </div>
+      <Field
+        label="Rel"
+        value={attributes.linkRel}
+        onChange={(v) => onUpdate({ linkRel: v || undefined })}
+        placeholder="noopener"
+      />
+      <Field
+        label="Aria"
+        value={attributes.linkAriaLabel}
+        onChange={(v) => onUpdate({ linkAriaLabel: v || undefined })}
+        placeholder="Describe link"
+      />
+      <div className="text-[10px] text-gray-400">
+        Applies to the element wrapper when it supports a link.
+      </div>
+      <span className="hidden">{device}</span>
+    </CollapsibleSection>
+  );
+}
+
+export function VisibilitySection({ attributes, device, onUpdate }: StyleSectionProps) {
+  return (
+    <CollapsibleSection title="Visibility">
+      <label className="flex items-center gap-2 text-[12px] text-gray-600">
+        <input
+          type="checkbox"
+          checked={Boolean(attributes.hideOnDesktop)}
+          onChange={(e) => onUpdate({ hideOnDesktop: e.target.checked || undefined })}
+        />
+        Hide on desktop
+      </label>
+      <label className="flex items-center gap-2 text-[12px] text-gray-600">
+        <input
+          type="checkbox"
+          checked={Boolean(attributes.hideOnTablet)}
+          onChange={(e) => onUpdate({ hideOnTablet: e.target.checked || undefined })}
+        />
+        Hide on tablet
+      </label>
+      <label className="flex items-center gap-2 text-[12px] text-gray-600">
+        <input
+          type="checkbox"
+          checked={Boolean(attributes.hideOnMobile)}
+          onChange={(e) => onUpdate({ hideOnMobile: e.target.checked || undefined })}
+        />
+        Hide on mobile
+      </label>
+      <label className="flex items-center gap-2 text-[12px] text-gray-600">
+        <input
+          type="checkbox"
+          checked={Boolean(attributes.sticky)}
+          onChange={(e) => onUpdate({ sticky: e.target.checked || undefined })}
+        />
+        Sticky on scroll
+      </label>
+      <ResponsiveField
+        label="Sticky Off."
+        attribute="stickyOffset"
+        attributes={attributes}
+        device={device}
+        onUpdate={onUpdate}
+        placeholder="0px"
+      />
+    </CollapsibleSection>
+  );
+}
+
+export function AdvancedSection({ attributes, device, onUpdate }: StyleSectionProps) {
+  const serializedAttributes = Object.entries(attributes.htmlAttributes ?? {})
+    .map(([key, value]) => `${key}="${value}"`)
+    .join('\n');
+
+  const handleAttributesChange = (value: string) => {
+    const parsed: Record<string, string> = {};
+    for (const line of value.split('\n')) {
+      const match = /^\s*([a-z_:][a-z0-9_:.-]*)\s*=\s*"?([^"]*)"?\s*$/i.exec(line);
+      if (match) {
+        parsed[match[1]] = match[2];
+      }
+    }
+    onUpdate({ htmlAttributes: Object.keys(parsed).length > 0 ? parsed : undefined });
+  };
+
   return (
     <CollapsibleSection title="Advanced">
-      <Field label="CSS Class" value={attributes.cssClass} onChange={(v) => onUpdate({ cssClass: v || undefined })} placeholder="my-class" />
-      <Field label="HTML ID" value={attributes.htmlId} onChange={(v) => onUpdate({ htmlId: v || undefined })} placeholder="my-id" />
+      <Field
+        label="CSS Class"
+        value={attributes.cssClass}
+        onChange={(v) => onUpdate({ cssClass: v || undefined })}
+        placeholder="my-class"
+      />
+      <Field
+        label="HTML ID"
+        value={attributes.htmlId}
+        onChange={(v) => onUpdate({ htmlId: v || undefined })}
+        placeholder="my-id"
+      />
+      <Field
+        label="Attributes"
+        type="textarea"
+        value={serializedAttributes}
+        onChange={handleAttributesChange}
+        placeholder={'data-foo="bar"'}
+        rows={3}
+      />
       <div>
         <label className="text-[11px] text-gray-500 block mb-1">Custom CSS</label>
         <textarea
@@ -322,6 +1219,7 @@ export function AdvancedSection({ attributes, onUpdate }: StyleSectionProps) {
           className="w-full border border-[#c3c4c7] rounded px-2 py-1 text-[12px] font-mono resize-y"
         />
       </div>
+      <span className="hidden">{device}</span>
     </CollapsibleSection>
   );
 }

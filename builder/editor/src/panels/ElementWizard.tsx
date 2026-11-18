@@ -34,9 +34,7 @@ export function ElementWizard(): ReactElement | null {
   };
 
   const handleComplete = (attributes: Record<string, unknown>) => {
-    const children = definition.createChildren
-      ? definition.createChildren(attributes)
-      : [];
+    const children = definition.createChildren ? definition.createChildren(attributes) : [];
     addElement({
       id: generateId(),
       type: pendingWizard,

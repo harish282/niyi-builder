@@ -1,9 +1,26 @@
 import { useState, type ReactElement } from 'react';
+import { BREAKPOINTS, type Breakpoint } from '@niyi-builder/core';
 import { useEditorStore } from '../store/EditorStore.js';
 import { getEditorRuntimeConfig, switchToGutenbergEditor } from '../serialization/index.js';
 
+const DEVICE_LABELS: Record<Breakpoint, string> = {
+  desktop: 'Desktop',
+  tablet: 'Tablet',
+  mobile: 'Mobile',
+};
+
 export function TopBar(): ReactElement {
-  const { document, showElements, toggleElements } = useEditorStore();
+  const {
+    document,
+    showElements,
+    toggleElements,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
+    activeBreakpoint,
+    setActiveBreakpoint,
+  } = useEditorStore();
   const [isSwitching, setIsSwitching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,16 +59,38 @@ export function TopBar(): ReactElement {
         </button>
         <button
           type="button"
-          className="px-3 py-1.5 border border-[#c3c4c7] rounded bg-[#f6f7f7] text-[#50575e] text-[13px] hover:bg-gray-100"
+          onClick={undo}
+          disabled={!canUndo}
+          title="Undo"
+          className="px-3 py-1.5 border border-[#c3c4c7] rounded bg-[#f6f7f7] text-[#50575e] text-[13px] hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Undo
         </button>
         <button
           type="button"
-          className="px-3 py-1.5 border border-[#c3c4c7] rounded bg-[#f6f7f7] text-[#50575e] text-[13px] hover:bg-gray-100"
+          onClick={redo}
+          disabled={!canRedo}
+          title="Redo"
+          className="px-3 py-1.5 border border-[#c3c4c7] rounded bg-[#f6f7f7] text-[#50575e] text-[13px] hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Redo
         </button>
+      </div>
+      <div className="flex items-center gap-1 rounded border border-[#c3c4c7] bg-[#f6f7f7] p-0.5">
+        {BREAKPOINTS.map((breakpoint) => (
+          <button
+            key={breakpoint}
+            type="button"
+            onClick={() => setActiveBreakpoint(breakpoint)}
+            className={`px-3 py-1 rounded text-[12px] ${
+              activeBreakpoint === breakpoint
+                ? 'bg-white text-[#2271b1] font-semibold shadow-sm'
+                : 'text-[#50575e] hover:bg-white/60'
+            }`}
+          >
+            {DEVICE_LABELS[breakpoint]}
+          </button>
+        ))}
       </div>
       <div className="flex items-center gap-2">
         {error && (

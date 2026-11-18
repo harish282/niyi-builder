@@ -1,50 +1,45 @@
 import type { ReactElement, FC } from 'react';
-import type { ElementNode, BaseElementAttributes } from '@niyi-builder/core';
+import type { ElementNode } from '@niyi-builder/core';
+import { BREAKPOINTS, extractBaseAttributes } from '@niyi-builder/core';
 import { useEditorStore } from '../store/EditorStore.js';
 import {
   CollapsibleSection,
   TypographySection,
   ColorsSection,
+  BackgroundSection,
   SpacingSection,
   DimensionsSection,
   BorderSection,
   EffectsSection,
+  TransformSection,
+  TransitionSection,
+  PositionSection,
+  AnimationSection,
+  LinkSection,
+  VisibilitySection,
   AdvancedSection,
 } from './styles/index.js';
 
 type PropertiesProps = { node: ElementNode; onUpdate: (attrs: Record<string, unknown>) => void };
 
-const BASE_KEYS: (keyof BaseElementAttributes)[] = [
-  'textColor', 'bgColor',
-  'fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing',
-  'textAlign', 'textDecoration', 'textTransform',
-  'marginTop', 'marginRight', 'marginBottom', 'marginLeft',
-  'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
-  'width', 'height', 'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
-  'borderWidth', 'borderStyle', 'borderColor', 'borderRadius',
-  'opacity', 'boxShadow',
-  'cssClass', 'customCss', 'htmlId',
-];
-
-function extractBaseAttributes(attributes: Record<string, unknown>): BaseElementAttributes {
-  const base: Record<string, unknown> = {};
-  for (const key of BASE_KEYS) {
-    if (attributes[key] !== undefined) {
-      base[key] = attributes[key];
-    }
-  }
-  return base as BaseElementAttributes;
-}
+const DEVICE_LABELS: Record<(typeof BREAKPOINTS)[number], string> = {
+  desktop: 'Desktop',
+  tablet: 'Tablet',
+  mobile: 'Mobile',
+};
 
 export function PropertiesPanel(): ReactElement {
-  const { selectedElementId, updateElement, findElement } = useEditorStore();
+  const { selectedElementId, updateElement, findElement, activeBreakpoint, setActiveBreakpoint } =
+    useEditorStore();
 
   const selectedElement = selectedElementId ? findElement(selectedElementId) : null;
 
   if (!selectedElement) {
     return (
       <div className="w-64 flex-shrink-0 border-r border-[#c3c4c7] bg-white overflow-y-auto">
-        <h3 className="text-[14px] font-semibold px-4 py-3 border-b border-[#e0e0e0]">Properties</h3>
+        <h3 className="text-[14px] font-semibold px-4 py-3 border-b border-[#e0e0e0]">
+          Properties
+        </h3>
         <div className="p-4 text-gray-400 text-sm">Select an element to edit its properties</div>
       </div>
     );
@@ -57,18 +52,40 @@ export function PropertiesPanel(): ReactElement {
     updateElement(selectedElementId!, { attributes });
   };
 
-  const updateBaseAttributes = (baseAttrs: Partial<BaseElementAttributes>) => {
-    updateAttributes({ ...selectedElement.attributes, ...baseAttrs });
+  const updateBaseAttributes = (baseAttrs: Record<string, unknown>) => {
+    updateAttributes(baseAttrs);
   };
 
   const baseAttributes = extractBaseAttributes(selectedElement.attributes);
   const PropsComp = definition?.Properties as FC<PropertiesProps> | undefined;
+  const sectionProps = {
+    attributes: baseAttributes,
+    device: activeBreakpoint,
+    onUpdate: updateBaseAttributes,
+  };
 
   return (
     <div className="w-64 flex-shrink-0 border-r border-[#c3c4c7] bg-white overflow-y-auto">
       <h3 className="text-[14px] font-semibold px-4 py-3 border-b border-[#e0e0e0]">
-        {selectedElement.type}
+        {definition?.title ?? selectedElement.type}
       </h3>
+
+      <div className="flex items-center gap-1 px-4 py-2 border-b border-[#e0e0e0] bg-[#f6f7f7]">
+        {BREAKPOINTS.map((breakpoint) => (
+          <button
+            key={breakpoint}
+            type="button"
+            onClick={() => setActiveBreakpoint(breakpoint)}
+            className={`flex-1 px-2 py-1 rounded text-[11px] border ${
+              activeBreakpoint === breakpoint
+                ? 'border-[#2271b1] bg-white text-[#2271b1] font-semibold'
+                : 'border-transparent text-gray-500 hover:bg-white'
+            }`}
+          >
+            {DEVICE_LABELS[breakpoint]}
+          </button>
+        ))}
+      </div>
 
       {/* Element-specific controls */}
       {PropsComp && (
@@ -80,13 +97,20 @@ export function PropertiesPanel(): ReactElement {
       )}
 
       {/* Base style sections */}
-      <TypographySection attributes={baseAttributes} onUpdate={updateBaseAttributes} />
-      <ColorsSection attributes={baseAttributes} onUpdate={updateBaseAttributes} />
-      <SpacingSection attributes={baseAttributes} onUpdate={updateBaseAttributes} />
-      <DimensionsSection attributes={baseAttributes} onUpdate={updateBaseAttributes} />
-      <BorderSection attributes={baseAttributes} onUpdate={updateBaseAttributes} />
-      <EffectsSection attributes={baseAttributes} onUpdate={updateBaseAttributes} />
-      <AdvancedSection attributes={baseAttributes} onUpdate={updateBaseAttributes} />
+      <TypographySection {...sectionProps} />
+      <ColorsSection {...sectionProps} />
+      <BackgroundSection {...sectionProps} />
+      <SpacingSection {...sectionProps} />
+      <DimensionsSection {...sectionProps} />
+      <BorderSection {...sectionProps} />
+      <EffectsSection {...sectionProps} />
+      <TransformSection {...sectionProps} />
+      <TransitionSection {...sectionProps} />
+      <PositionSection {...sectionProps} />
+      <AnimationSection {...sectionProps} />
+      <LinkSection {...sectionProps} />
+      <VisibilitySection {...sectionProps} />
+      <AdvancedSection {...sectionProps} />
     </div>
   );
 }

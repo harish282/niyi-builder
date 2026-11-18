@@ -58,18 +58,40 @@ describe('serialization adapter', () => {
         children: [],
       }).type,
     ).toBe('image');
+    expect(
+      blockNodeToElement({ id: 'f', type: 'core/spacer', attributes: {}, children: [] }).type,
+    ).toBe('spacer');
+    expect(
+      blockNodeToElement({ id: 'g', type: 'core/html', attributes: {}, children: [] }).type,
+    ).toBe('icon');
+    expect(
+      blockNodeToElement({ id: 'h', type: 'core/embed', attributes: {}, children: [] }).type,
+    ).toBe('video');
+  });
+
+  it('maps icon/video/spacer elements to their core block types', () => {
+    expect(
+      elementToBlockNode({ id: 's', type: 'spacer', attributes: { height: '40px' }, children: [] })
+        .type,
+    ).toBe('core/spacer');
+    expect(elementToBlockNode({ id: 'i', type: 'icon', attributes: {}, children: [] }).type).toBe(
+      'core/html',
+    );
+    expect(elementToBlockNode({ id: 'v', type: 'video', attributes: {}, children: [] }).type).toBe(
+      'core/embed',
+    );
   });
 
   it('keeps unknown core block types as pass-through elements', () => {
     const element = blockNodeToElement({
-      id: 'h1',
-      type: 'core/html',
-      attributes: { html: '<div>x</div>' },
+      id: 'cols',
+      type: 'core/columns',
+      attributes: { columns: 2 },
       children: [],
     });
 
-    expect(element.type).toBe('core/html');
-    expect(element.attributes.html).toBe('<div>x</div>');
+    expect(element.type).toBe('core/columns');
+    expect(element.attributes.columns).toBe(2);
   });
 
   it('wraps elements in a structural core/group root', () => {
@@ -225,6 +247,33 @@ describe('editor document <-> Gutenberg markup round-trip', () => {
       alt: 'Pic',
       attachmentId: 7,
     });
+  });
+
+  it('round-trips spacer, icon and video elements through Gutenberg markup', () => {
+    const doc = makeDocument([
+      { id: 's1', type: 'spacer', attributes: { height: '48px' }, children: [] },
+      {
+        id: 'ic1',
+        type: 'icon',
+        attributes: { name: 'check', svg: '<svg viewBox="0 0 24 24"><path d="M1 1"/></svg>' },
+        children: [],
+      },
+      {
+        id: 'v1',
+        type: 'video',
+        attributes: { url: 'https://www.youtube.com/watch?v=abc123', provider: 'youtube' },
+        children: [],
+      },
+    ]);
+
+    const html = serializeEditorDocument(doc);
+    const restored = parseEditorDocument(html);
+
+    expect(restored.elements.map((element) => element.type)).toEqual(['spacer', 'icon', 'video']);
+    expect(restored.elements[0].attributes.height).toEqual({ desktop: '48px' });
+    expect(restored.elements[1].attributes.svg).toContain('<svg');
+    expect(restored.elements[2].attributes.url).toContain('youtube.com');
+    expect(restored.elements[2].attributes.provider).toBe('youtube');
   });
 
   it('produces empty markup for an empty document', () => {

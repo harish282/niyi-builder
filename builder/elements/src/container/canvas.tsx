@@ -1,6 +1,10 @@
 import type { FC, CSSProperties, ReactNode } from 'react';
-import type { ElementNode } from '@niyi-builder/core';
-import { extractBaseAttributes, attributesToInlineStyles, attributesToClassName } from '@niyi-builder/core';
+import type { Breakpoint, ElementNode } from '@niyi-builder/core';
+import {
+  extractBaseAttributes,
+  attributesToInlineStyles,
+  attributesToClassName,
+} from '@niyi-builder/core';
 import { GAP_SIZES, containerDefaults } from './defaults.js';
 import type { ContainerLayout } from './definition.js';
 
@@ -9,6 +13,7 @@ interface ContainerCanvasProps {
   children?: ReactNode;
   onSelect: () => void;
   isSelected?: boolean;
+  device?: Breakpoint;
 }
 
 const FLEX_ROW_ROW_HEIGHT = 64;
@@ -18,13 +23,14 @@ export const ContainerCanvas: FC<ContainerCanvasProps> = ({
   children,
   onSelect,
   isSelected,
+  device,
 }) => {
   const layout = (node.attributes.layout as ContainerLayout) || containerDefaults.layout;
   const gap = GAP_SIZES[layout.gap || 'md'];
   const selector = `[data-niyi-c="${node.id}"]`;
 
   const base = extractBaseAttributes(node.attributes);
-  const baseStyle = attributesToInlineStyles(base);
+  const baseStyle = attributesToInlineStyles(base, { device });
   const className = attributesToClassName(base);
 
   const containerStyle: CSSProperties = {

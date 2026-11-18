@@ -1,18 +1,23 @@
 import type { FC } from 'react';
-import type { ElementNode } from '@niyi-builder/core';
-import { extractBaseAttributes, attributesToInlineStyles, attributesToClassName } from '@niyi-builder/core';
+import type { Breakpoint, ElementNode } from '@niyi-builder/core';
+import {
+  extractBaseAttributes,
+  attributesToInlineStyles,
+  attributesToClassName,
+} from '@niyi-builder/core';
 import { buttonDefaults } from './defaults.js';
 
 interface ButtonCanvasProps {
   node: ElementNode;
   onSelect: () => void;
+  device?: Breakpoint;
 }
 
-export const ButtonCanvas: FC<ButtonCanvasProps> = ({ node, onSelect }) => {
+export const ButtonCanvas: FC<ButtonCanvasProps> = ({ node, onSelect, device }) => {
   const text = (node.attributes.text as string) || buttonDefaults.text;
   const variant = (node.attributes.variant as string) || buttonDefaults.variant;
   const base = extractBaseAttributes(node.attributes);
-  const style = attributesToInlineStyles(base);
+  const style = attributesToInlineStyles(base, { device });
   const className = attributesToClassName(base);
 
   return (

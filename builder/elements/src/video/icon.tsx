@@ -1,0 +1,16 @@
+import type { ReactElement } from 'react';
+
+export const VideoIcon = (): ReactElement => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect
+      x="1.75"
+      y="3.75"
+      width="12.5"
+      height="8.5"
+      rx="1.5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+    <path d="M6.75 6l3 2-3 2V6z" fill="currentColor" />
+  </svg>
+);

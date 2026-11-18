@@ -1,6 +1,10 @@
 import type { FC, HTMLAttributes } from 'react';
-import type { ElementNode } from '@niyi-builder/core';
-import { extractBaseAttributes, attributesToInlineStyles, attributesToClassName } from '@niyi-builder/core';
+import type { Breakpoint, ElementNode } from '@niyi-builder/core';
+import {
+  extractBaseAttributes,
+  attributesToInlineStyles,
+  attributesToClassName,
+} from '@niyi-builder/core';
 import { InlineEditor } from '../shared/InlineEditor.js';
 
 interface HeadingCanvasProps {
@@ -8,6 +12,7 @@ interface HeadingCanvasProps {
   onSelect: () => void;
   isSelected?: boolean;
   onUpdate?: (attributes: Record<string, unknown>) => void;
+  device?: Breakpoint;
 }
 
 type HeadingTagProps = HTMLAttributes<HTMLHeadingElement>;
@@ -28,13 +33,19 @@ const headingTags: Record<number, FC<HeadingTagProps>> = {
   6: H6,
 };
 
-export const HeadingCanvas: FC<HeadingCanvasProps> = ({ node, onSelect, isSelected, onUpdate }) => {
+export const HeadingCanvas: FC<HeadingCanvasProps> = ({
+  node,
+  onSelect,
+  isSelected,
+  onUpdate,
+  device,
+}) => {
   const text = (node.attributes.text as string) || 'Heading';
   const level = (node.attributes.level as number) || 2;
 
   const Tag = headingTags[level] || H2;
   const base = extractBaseAttributes(node.attributes);
-  const style = attributesToInlineStyles(base);
+  const style = attributesToInlineStyles(base, { device });
   const className = attributesToClassName(base);
 
   const handleClick = (e: React.MouseEvent) => {

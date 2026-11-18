@@ -23,6 +23,9 @@ const EDITOR_TYPE_TO_BLOCK_TYPE: Record<string, BlockType> = {
   heading: 'core/heading',
   paragraph: 'core/paragraph',
   image: 'core/image',
+  spacer: 'core/spacer',
+  icon: 'core/html',
+  video: 'core/embed',
 };
 
 const BLOCK_TYPE_TO_EDITOR_TYPE: Record<string, string> = {
@@ -31,6 +34,9 @@ const BLOCK_TYPE_TO_EDITOR_TYPE: Record<string, string> = {
   'core/heading': 'heading',
   'core/paragraph': 'paragraph',
   'core/image': 'image',
+  'core/spacer': 'spacer',
+  'core/html': 'icon',
+  'core/embed': 'video',
 };
 
 const ROOT_ID = 'root';

@@ -1,18 +1,23 @@
 import type { FC } from 'react';
-import type { ElementNode } from '@niyi-builder/core';
-import { extractBaseAttributes, attributesToInlineStyles, attributesToClassName } from '@niyi-builder/core';
+import type { Breakpoint, ElementNode } from '@niyi-builder/core';
+import {
+  extractBaseAttributes,
+  attributesToInlineStyles,
+  attributesToClassName,
+} from '@niyi-builder/core';
 import { imageDefaults } from './defaults.js';
 
 interface ImageCanvasProps {
   node: ElementNode;
   onSelect: () => void;
+  device?: Breakpoint;
 }
 
-export const ImageCanvas: FC<ImageCanvasProps> = ({ node, onSelect }) => {
+export const ImageCanvas: FC<ImageCanvasProps> = ({ node, onSelect, device }) => {
   const url = (node.attributes.url as string) || imageDefaults.url;
   const alt = (node.attributes.alt as string) || imageDefaults.alt;
   const base = extractBaseAttributes(node.attributes);
-  const style = attributesToInlineStyles(base);
+  const style = attributesToInlineStyles(base, { device });
   const className = attributesToClassName(base);
 
   return (

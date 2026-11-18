@@ -3,6 +3,17 @@ export type { ElementDefinition } from './types/ElementDefinition.js';
 export type { BaseElementAttributes } from './types/BaseElementAttributes.js';
 export { BASE_ATTRIBUTE_KEYS } from './types/BaseElementAttributes.js';
 export {
+  BREAKPOINTS,
+  isBreakpoint,
+  isResponsiveObject,
+  readResponsiveValue,
+  resolveResponsiveValue,
+  setResponsiveValue,
+  clearResponsiveValue,
+  hasBreakpointValue,
+} from './types/responsive.js';
+export type { Breakpoint, ResponsiveValue } from './types/responsive.js';
+export {
   ELEMENT_CATEGORY_ORDER,
   categoryRank,
   compareCategories,
@@ -18,4 +29,12 @@ export { logger } from './logger.js';
 export type { Logger } from './logger.js';
 export { generateId } from './crypto.js';
 export { createEmptyDocument } from './document/DocumentManager.js';
-export { attributesToInlineStyles, attributesToClassName, extractBaseAttributes } from './styles/attributesToInlineStyles.js';
+export {
+  attributesToInlineStyles,
+  attributesToClassName,
+  extractBaseAttributes,
+  isHiddenAtBreakpoint,
+  attributesToHtmlAttributes,
+  attributesToLinkProps,
+} from './styles/attributesToInlineStyles.js';
+export type { StyleResolutionOptions } from './styles/attributesToInlineStyles.js';

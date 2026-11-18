@@ -98,9 +98,7 @@ describe('container wizard add flow', () => {
     fireEvent.click(screen.getByRole('button', { name: /open wizard/i }));
     completeWizard();
 
-    const iframe = document.querySelector('iframe');
-    const frameDoc = iframe?.contentDocument;
-    const containers = frameDoc?.querySelectorAll('.niyi-container');
-    expect(containers?.length).toBe(3);
+    const containers = document.querySelectorAll('.niyi-container');
+    expect(containers.length).toBe(3);
   });
 });

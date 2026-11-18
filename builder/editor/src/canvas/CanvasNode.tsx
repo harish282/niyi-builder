@@ -1,5 +1,6 @@
 import type { FC, CSSProperties, ReactNode } from 'react';
-import type { ElementNode } from '@niyi-builder/core';
+import type { Breakpoint, ElementNode } from '@niyi-builder/core';
+import { extractBaseAttributes, isHiddenAtBreakpoint } from '@niyi-builder/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -27,6 +28,7 @@ interface CanvasComponentProps {
   selectElement?: (id: string) => void;
   isSelected?: boolean;
   onUpdate?: (attributes: Record<string, unknown>) => void;
+  device?: Breakpoint;
 }
 
 function ChildrenSlot({ node, path, selectElement }: SortableNodeProps): ReactNode {
@@ -74,7 +76,7 @@ export const SortableNode: FC<SortableNodeProps> = ({ node, path, onSelect, sele
 };
 
 export const CanvasNode: FC<CanvasNodeProps> = ({ node, path, onSelect, selectElement }) => {
-  const { selectedElementId, updateElement } = useEditorStore();
+  const { selectedElementId, updateElement, activeBreakpoint } = useEditorStore();
   const isSelected = selectedElementId === node.id;
   const registry = window.__niyiRegistry;
   const definition = registry?.getElement(node.type);
@@ -86,6 +88,24 @@ export const CanvasNode: FC<CanvasNodeProps> = ({ node, path, onSelect, selectEl
   const childrenSlot = (
     <ChildrenSlot node={node} path={path} onSelect={onSelect} selectElement={selectElement} />
   );
+
+  const hidden = isHiddenAtBreakpoint(extractBaseAttributes(node.attributes), activeBreakpoint);
+
+  if (hidden) {
+    return (
+      <div
+        className={`p-2 border border-dashed rounded text-[11px] text-gray-400 ${
+          isSelected ? 'border-[#2271b1] text-[#2271b1]' : 'border-gray-300'
+        }`}
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect();
+        }}
+      >
+        Hidden on {activeBreakpoint}
+      </div>
+    );
+  }
 
   if (!definition?.Canvas) {
     return (
@@ -111,6 +131,7 @@ export const CanvasNode: FC<CanvasNodeProps> = ({ node, path, onSelect, selectEl
       selectElement={selectElement}
       isSelected={isSelected}
       onUpdate={handleUpdate}
+      device={activeBreakpoint}
     >
       {childrenSlot}
     </CanvasComponent>
